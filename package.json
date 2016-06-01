@@ -1,0 +1,48 @@
+{
+  "name": "k-frame",
+  "version": "0.2.0",
+  "description": "Kevin's collection of A-Frame add-ons, components, and helpers.",
+  "main": "index.js",
+  "scripts": {
+    "dist": "webpack index.js dist/k-frame.js && webpack -p index.js dist/k-frame.min.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ngokevin/k-frame.git"
+  },
+  "keywords": [
+    "a-frame",
+    "aframe",
+    "aframe-components",
+    "a-frame-components",
+    "aframe-component",
+    "k-frame",
+    "webvr",
+    "threejs",
+    "three",
+    "3d",
+    "vr"
+  ],
+  "author": "Kevin Ngo <me@ngokevin.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ngokevin/k-frame/issues"
+  },
+  "homepage": "https://github.com/ngokevin/k-frame#readme",
+  "dependencies": {
+    "aframe-audio-visualizer-components": "^0.2.3",
+    "aframe-entity-generator-component": "^0.1.0",
+    "aframe-event-set-component": "^0.1.2",
+    "aframe-firebase-component": "^1.0.2",
+    "aframe-layout-component": "^1.2.0",
+    "aframe-look-at-component": "^0.1.0",
+    "aframe-randomizer-components": "^0.2.0",
+    "aframe-template-component": "^1.5.0",
+    "aframe-text-component": "^0.3.0",
+    "webpack": "^1.13.1"
+  },
+  "devDependencies": {
+    "browserify": "^13.0.1"
+  }
+}

@@ -1,0 +1,9 @@
+require('aframe-audio-visualizer-components');
+require('aframe-entity-generator-component');
+require('aframe-event-set-component');
+require('aframe-firebase-component');
+require('aframe-layout-component');
+require('aframe-look-at-component');
+require('aframe-randomizer-components');
+require('aframe-template-component');
+require('aframe-text-component');
