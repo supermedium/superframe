@@ -9,6 +9,7 @@ Features:
 - [aframe-event-set-component](https://github.com/ngokevin/aframe-event-set-component)
 - [aframe-firebase-component](https://github.com/ngokevin/aframe-firebase-component)
 - [aframe-layout-component](https://github.com/ngokevin/aframe-layout-component)
+- [aframe-look-at-component](https://github.com/ngokevin/aframe-look-at-component)
 - [aframe-randomizer-component](https://github.com/ngokevin/aframe-randomizer-component)
 - [aframe-template-component](https://github.com/ngokevin/aframe-template-component)
 - [aframe-text-component](https://github.com/ngokevin/aframe-text-component)
