@@ -1,5 +1,7 @@
 # k-frame
 
+![k-frame](https://cloud.githubusercontent.com/assets/674727/15790659/69860590-2987-11e6-9511-65c28e583c6f.png)
+
 Kevin's collection of A-Frame add-ons, components, and helpers.
 
 Features:
