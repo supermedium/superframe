@@ -1,6 +1,6 @@
 {
   "name": "k-frame",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "Kevin's collection of A-Frame add-ons, components, and helpers.",
   "main": "index.js",
   "scripts": {
@@ -35,7 +35,7 @@
     "aframe-audio-visualizer-components": "^0.3.0",
     "aframe-entity-generator-component": "^0.1.0",
     "aframe-event-set-component": "^0.1.2",
-    "aframe-firebase-component": "^1.0.4",
+    "aframe-firebase-component": "^1.0.5",
     "aframe-layout-component": "^1.2.0",
     "aframe-look-at-component": "^0.1.1",
     "aframe-randomizer-components": "^0.2.0",
