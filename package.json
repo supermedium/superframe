@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dist": "webpack index.js dist/k-frame.js && webpack -p index.js dist/k-frame.min.js",
+    "postpublish": "npm run dist",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
