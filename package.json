@@ -1,6 +1,6 @@
 {
   "name": "k-frame",
-  "version": "0.2.5",
+  "version": "0.3.0",
   "description": "Kevin's collection of A-Frame add-ons, components, and helpers.",
   "main": "index.js",
   "scripts": {
@@ -39,7 +39,7 @@
     "aframe-layout-component": "^1.2.0",
     "aframe-look-at-component": "^0.1.1",
     "aframe-randomizer-components": "^0.2.0",
-    "aframe-template-component": "^1.5.0",
+    "aframe-template-component": "^1.6.0",
     "aframe-text-component": "^0.3.0"
   },
   "devDependencies": {
