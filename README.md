@@ -8,18 +8,18 @@ Kevin's collection of A-Frame components and scenes.
 
 ## Components
 
-- [animation](components/animation)
-- [audio-visualizer](components/audio-visualizer)
-- [broadcast](components/broadcast)
-- [entity-generator](components/entity-generator)
-- [event-set](components/event-set)
-- [firebase](components/firebase)
-- [layout](components/layout)
-- [look-at](components/look-at)
-- [randomizer](components/randomizer)
-- [redux](components/redux)
-- [template](components/template)
-- [text](components/text)
+- [animation](tree/components/animation/)
+- [audio-visualizer](tree/components/audio-visualizer/)
+- [broadcast](tree/components/broadcast/)
+- [entity-generator](tree/components/entity-generator/)
+- [event-set](tree/components/event-set/)
+- [firebase](tree/components/firebase/)
+- [layout](tree/components/layout/)
+- [look-at](tree/components/look-at/)
+- [randomizer](tree/components/randomizer/)
+- [redux](tree/components/redux/)
+- [template](tree/components/template/)
+- [text](tree/components/text/)
 
 ## Installation
 
