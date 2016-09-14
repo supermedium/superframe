@@ -1,0 +1,22 @@
+<html>
+  <head>
+    <script src="../build.js"></script>
+    <script src="droid_sans_mono_regular.typeface.js"></script>
+  </head>
+  <body>
+    <a-assets></a-assets>
+    <a-scene>
+      <a-entity geometry="primitive: sphere; radius: 1000"
+                material="color: #5F818A; shader: flat"
+                scale="1 1 -1"></a-entity>
+
+      <a-entity text="text: Helvetiker Regular; font: helvetiker"
+                material="color: #66E1B4"
+                position="-4 0 0" rotation="0 20 0"></a-entity>
+
+      <a-entity text="text: Droid Sans Mono Regular; font: Droid Sans Mono"
+                material="color: #66E1B4"
+                position="-4 2 0"></a-entity>
+    </a-scene>
+  </body>
+</html>

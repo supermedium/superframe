@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Lakeside</title>
+    <script src="../lib/aframe.min.js"></script>
+  </head>
+  <body>
+    <a-scene>
+      <a-assets>
+        <a-asset-item id="lakeside-obj" src="models/lakeside.obj"></a-asset-item>
+        <a-asset-item id="lakeside-mtl" src="models/lakeside.mtl"></a-asset-item>
+        <audio autoplay loop src="audio/244059__tagigobaso__nature-in-cala-fuili.wav"></audio>
+      </a-assets>
+
+      <!-- Model. -->
+      <a-entity obj-model="obj: #lakeside-obj; mtl: #lakeside-mtl"
+                position="11 -1 -10" rotation="0 30 0"></a-entity>
+
+      <!-- Lights. -->
+      <a-light type="ambient" color="#333"></a-light>
+      <a-light type="point" position="-2 15 -3"></a-light>
+    </a-scene>
+  </body>
+</html>

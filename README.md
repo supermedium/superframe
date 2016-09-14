@@ -1,24 +1,30 @@
-# k-frame
+# kframe
 
-![k-frame](https://cloud.githubusercontent.com/assets/674727/15790659/69860590-2987-11e6-9511-65c28e583c6f.png)
+![kframe](https://cloud.githubusercontent.com/assets/674727/15790659/69860590-2987-11e6-9511-65c28e583c6f.png)
 
-Kevin's collection of A-Frame add-ons, components, and helpers.
+Kevin's collection of A-Frame components and scenes.
 
-Features:
+[VIEW DEMOS](https://ngokevin.github.io/kframe/)
 
-- [aframe-audio-visualizer-components](https://github.com/ngokevin/aframe-audio-visualizer-components)
-- [aframe-entity-generator-component](https://github.com/ngokevin/aframe-entity-generator-component)
-- [aframe-event-set-component](https://github.com/ngokevin/aframe-event-set-component)
-- [aframe-firebase-component](https://github.com/ngokevin/aframe-firebase-component)
-- [aframe-layout-component](https://github.com/ngokevin/aframe-layout-component)
-- [aframe-look-at-component](https://github.com/ngokevin/aframe-look-at-component)
-- [aframe-randomizer-components](https://github.com/ngokevin/aframe-randomizer-components)
-- [aframe-template-component](https://github.com/ngokevin/aframe-template-component)
-- [aframe-text-component](https://github.com/ngokevin/aframe-text-component)
+## Components
 
-## Usage
+- [animation](components/animation)
+- [audio-visualizer](components/audio-visualizer)
+- [broadcast](components/broadcast)
+- [entity-generator](components/entity-generator)
+- [event-set](components/event-set)
+- [firebase](components/firebase)
+- [layout](components/layout)
+- [look-at](components/look-at)
+- [randomizer](components/randomizer)
+- [redux](components/redux)
+- [template](components/template)
+- [text](components/text)
 
-Just include and go.
+## Installation
+
+K-Frame bundles most of the components together for easy usage. The `firebase`
+component is excluded from this bundle.
 
 ### Browser
 
@@ -27,8 +33,8 @@ Install and use by directly including the [browser files](dist):
 ```html
 <head>
   <title>My A-Frame Scene</title>
-  <script src="https://aframe.io/releases/0.2.0/aframe.min.js"></script>
-  <script src="https://rawgit.com/ngokevin/k-frame/master/dist/k-frame.min.js"></script>
+  <script src="https://aframe.io/releases/0.3.0/aframe.min.js"></script>
+  <script src="https://rawgit.com/ngokevin/kframe/master/dist/kframe.min.js"></script>
 </head>
 
 <body>
@@ -40,6 +46,14 @@ Install and use by directly including the [browser files](dist):
 
 ### npm
 
+Or install from npm. Requiring K-Frame will automatically register the
+components and systems.
+
 ```js
-require('k-frame');
+require('kframe');
 ```
+
+### Installing Individual Components
+
+For documentation on installing individual components, see the [documentation
+pages](#components) for each component.

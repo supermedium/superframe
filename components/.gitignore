@@ -1,0 +1,6 @@
+gh-pages
+node_modules/
+npm-debug.log
+examples/build.js
+examples/node_modules/
+.sw[ponm]

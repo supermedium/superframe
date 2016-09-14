@@ -255,6 +255,7 @@
 /* 3 */
 /***/ function(module, exports) {
 
+	/* global AFRAME */
 	var styleParser = AFRAME.utils.styleParser;
 
 	if (typeof AFRAME === 'undefined') {
@@ -263,21 +264,21 @@
 
 	AFRAME.registerComponent('event-set', {
 	  schema: {
-	    default: [],
-	    parse: function (value) {
-	      return value.split(',').map(styleParser.parse);
-	    }
+	    default: '',
+	    parse: styleParser.parse
 	  },
 
+	  multiple: true,
+
 	  init: function () {
-	    this.eventListeners = [];
+	    this.eventHandler = null;
+	    this.eventName = null;
 	  },
 
 	  update: function (oldData) {
-	    this.eventListeners = [];
-	    this.removeEventListeners();
-	    this.updateEventListeners();
-	    this.addEventListeners();
+	    this.removeEventListener();
+	    this.updateEventListener();
+	    this.addEventListener();
 	  },
 
 	  /**
@@ -285,7 +286,7 @@
 	   * Generally undoes all modifications to the entity.
 	   */
 	  remove: function () {
-	    this.removeEventListeners();
+	    this.removeEventListener();
 	  },
 
 	  /**
@@ -293,7 +294,7 @@
 	   * Use to stop or remove any dynamic or background behavior such as events.
 	   */
 	  pause: function () {
-	    this.removeEventListeners();
+	    this.removeEventListener();
 	  },
 
 	  /**
@@ -301,68 +302,42 @@
 	   * Use to continue or add any dynamic or background behavior such as events.
 	   */
 	  play: function () {
-	    this.addEventListeners();
+	    this.addEventListener();
 	  },
 
 	  /**
 	   * Update source-of-truth event listener registry.
 	   * Does not actually attach event listeners yet.
 	   */
-	  updateEventListeners: function () {
+	  updateEventListener: function () {
+	    var data = this.data;
 	    var el = this.el;
-	    var eventListeners = this.eventListeners;
 
-	    this.data.forEach(addEventListener);
+	    // Set event listener using `_event`.
+	    var event = data._event;
+	    var target = data._target;
+	    delete data._event;
+	    delete data._target;
 
-	    function addEventListener (obj) {
-	      // Set event listener using `_event`.
-	      var event = obj._event;
-	      var target = obj._target;
-	      delete obj._event;
-	      delete obj._target;
+	    // Decide the target to `setAttribute` on.
+	    var targetEl = target ? el.sceneEl.querySelector(target) : el;
 
-	      // Decide the target to `setAttribute` on.
-	      var targetEl = target ? el.sceneEl.querySelector(target) : el;
-
-	      eventListeners.push([event, handler]);
-
-	      function handler () {
-	        // Get properties to set.
-	        var setAttributeArgSets = [];
-	        Object.keys(obj).forEach(function buildSetAttributeArgs (attr) {
-	          if (attr.indexOf('.') === -1) {
-	            // Normal attribute or single-property component.
-	            setAttributeArgSets.push([attr, obj[attr]]);
-	          } else {
-	            // Multi-property component with dot syntax.
-	            var attrSplit = attr.split('.');
-	            setAttributeArgSets.push([attrSplit[0], attrSplit[1], obj[attr]]);
-	          }
-	        });
-
-	        // Set attributes.
-	        setAttributeArgSets.forEach(function doSetAttributes (setAttributeArgs) {
-	          targetEl.setAttribute.apply(targetEl, setAttributeArgs);
-	        });
-	      }
-	    }
+	    this.eventName = event;
+	    this.eventHandler = function handler () {
+	      // Set attributes.
+	      Object.keys(data).forEach(function setAttribute (propName) {
+	        AFRAME.utils.entity.setComponentProperty.call(this, targetEl, propName,
+	                                                      data[propName]);
+	      });
+	    };
 	  },
 
-	  /**
-	   * Attach event listeners.
-	   */
-	  addEventListeners: function () {
-	    var el = this.el;
-	    this.eventListeners.forEach(function addEventListener (eventListenerArr) {
-	      el.addEventListener(eventListenerArr[0], eventListenerArr[1]);
-	    });
+	  addEventListener: function () {
+	    this.el.addEventListener(this.eventName, this.eventHandler);
 	  },
 
-	  removeEventListeners: function () {
-	    var el = this.el;
-	    this.eventListeners.forEach(function removeEventListener (eventListenerArr) {
-	      el.removeEventListener(eventListenerArr[0], eventListenerArr[1]);
-	    });
+	  removeEventListener: function () {
+	    this.el.removeEventListener(this.eventName, this.eventHandler);
 	  }
 	});
 
@@ -1665,10 +1640,18 @@
 	    }
 	  },
 
-	  update: function () {
+	  update: function (oldData) {
 	    var data = this.data;
+	    var el = this.el;
 	    var fetcher = data.src[0] === '#' ? fetchTemplateFromScriptTag : fetchTemplateFromXHR;
 	    var templateCacheItem = templateCache[data.src];
+
+	    // Replace children if swapping templates.
+	    if (oldData && oldData.src !== data.src) {
+	      while (el.firstChild) {
+	        el.removeChild(el.firstChild);
+	      }
+	    }
 
 	    if (templateCacheItem) {
 	      this.renderTemplate(templateCacheItem);

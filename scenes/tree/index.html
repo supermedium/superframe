@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Tree</title>
+    <script src="../lib/aframe.min.js"></script>
+  </head>
+  <body>
+    <a-scene>
+      <a-assets>
+        <a-asset-item id="tree-obj" src="models/tree.obj"></a-asset-item>
+        <a-asset-item id="tree-mtl" src="models/tree.mtl"></a-asset-item>
+        <audio autoplay loop src="audio/264481__aglinder__natural-ambience-01.wav"></audio>
+      </a-assets>
+
+      <!-- Model. -->
+      <a-entity obj-model="obj: #tree-obj; mtl: #tree-mtl"
+                position="-4 -4 -8" scale=".8 .8 .8" rotation="0 -30 0"></a-entity>
+
+      <!-- Lights. -->
+      <a-light type="ambient" color="#555"></a-light>
+      <a-light type="directional" color="#F8E796" position="-1 0.2 0.5" intensity="0.5"></a-light>
+      <a-sky color="#B9DBE6"></a-sky>
+    </a-scene>
+  </body>
+</html>

@@ -2,6 +2,7 @@
 logs
 *.log
 npm-debug.log*
+.DS_Store
 
 # Runtime data
 pids
@@ -32,4 +33,4 @@ node_modules
 # Optional REPL history
 .node_repl_history
 
-*.sw[pon]
+*.sw[ponml]

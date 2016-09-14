@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Outside Lands VR</title>
+    <script src="../lib/aframe.min.js"></script>
+    <script src="https://npmcdn.com/aframe-animation-component@3.0.1"></script>
+    <script src="https://npmcdn.com/aframe-audio-visualizer-components@3.0.1"></script>
+    <script src="https://npmcdn.com/aframe-event-set-component@3.0.1"></script>
+    <script src="https://npmcdn.com/aframe-layout-component@3.0.1"></script>
+    <script src="https://npmcdn.com/aframe-bmfont-text-component@0.1.2/dist/aframe-bmfont-text-component.min.js"></script>
+    <script src="https://npmcdn.com/aframe-entity-generator-component@3.0.0"></script>
+    <script src="components/audio-visualizer-spectrum-scale.js"></script>
+    <script src="components/pause.js"></script>
+    <script src="components/play-audio.js"></script>
+    <script src="components/play-video.js"></script>
+    <script src="components/scale-y-color.js"></script>
+  </head>
+  <body>
+    <a-scene>
+      <a-assets>
+        <a-asset-item id="osl-obj" src="models/outsidelands.obj"></a-asset-item>
+        <a-asset-item id="osl-mtl" src="models/outsidelands.mtl"></a-asset-item>
+        <img id="grass" src="img/grass.jpg">
+        <img id="rhead" src="img/rhead.jpg">
+        <img id="lcd" src="img/lcd.jpg">
+        <img id="lana" src="img/lana.jpg">
+        <a-mixin id="album" material="opacity: 0.6"
+                 animation__mouseenter="startEvents: mouseenter; property: scale;
+                                        to: 1.2 1.2 1.2"
+                 animation__mouseleave="startEvents: mouseleave; property: scale;
+                                        to: 1 1 1"></a-mixin>
+        <a-mixin id="bar"
+                 geometry="primitive: box" material="color: black; opacity: 0.8"
+                 scale-y-color="from: 30 30 30; to: 230 230 230; maxScale: 10"></a-mixin>
+        <audio id="daydream" autoplay src="audio/daydream.mp3"></audio>
+        <audio id="dance" preload="none" src="audio/dance.mp3"></audio>
+        <audio id="ss" preload="none" src="audio/ss.mp3"></audio>
+
+        <video autoplay muted id="daydreamingVid" src="video/daydreaming.mp4"></video>
+        <video autoplay muted id="daydreamingTall" src="video/daydreaming-tall.mp4"></video>
+        <video id="danceVid" preload="none" muted src="video/dance.mp4"></video>
+        <video id="danceTall" preload="none" muted src="video/dance-tall.mp4"></video>
+        <video id="summertimeVid" preload="none" muted src="video/summertime.mp4"></video>
+        <video id="summertimeTall" preload="none" muted src="video/summertime-tall.mp4"></video>
+      </a-assets>
+
+      <!-- Side videos. -->
+      <a-video id="leftVideo" src="#daydreamingTall" height="15.2" width="8"
+               position="-14 10.8 -10.5" side="front"></a-video>
+      <a-video id="rightVideo" src="#daydreamingTall" height="15.2" width="8"
+               position="14 10.8 -10.5" side="front"></a-video>
+
+      <!-- Stage. -->
+      <a-entity obj-model="obj: #osl-obj; mtl: #osl-mtl"
+                scale=".5 .4 .5" position="0 0 -15"></a-entity>
+
+      <!-- On-stage audio visualization. -->
+      <a-entity position="0 2 -17">
+        <a-entity id="audioViz"
+                  audio-visualizer="src: #daydream ;smoothingTimeConstant: 0.9"
+                  audio-visualizer-spectrum-scale="max: 50; multiplier: 0.06"
+                  entity-generator="mixin: bar; num: 200"
+                  layout="type: circle; radius: 4.5"
+                  rotation="0 135 0"></a-entity>
+        <!-- Video. -->
+        <a-video id="video" src="#daydreamingVid" height="17" width="24" side="front"
+                 position="0 7 -6"></a-video>
+        <!-- Stage light.-->
+        <a-light type="point" decay="2" distance="35" intensity="0.5"
+                 animation="property: light.intensity; dir: alternate; loop: true;
+                            to: 1.4"
+                 animation__color="property: light.color; dir: alternate; loop: true;
+                                   to: #EEF"></a-light>
+      </a-entity>
+
+      <!-- Album UI. -->
+      <a-entity animation="property: position; dir: alternate; dur: 2000;
+                           loop: true; to: 0 0.02 0; stopEvents: click" position="0 0 -0"
+                animation__2="property: scale; startEvents: click; to: 0 0 0">
+        <a-curvedimage mixin="album" src="#rhead" position="-1 1 2" radius="4"
+                       play-audio="src: #rhead"
+                       play-video="target: #video; src: #daydreamingVid"
+                       play-video__2="target: #leftVideo; src: #daydreamingTall"
+                       play-video__3="target: #rightVideo; src: #daydreamingTall"
+                       event-set="_event: click; _target: #audioViz;
+                                  audio-visualizer.src: #rhead"
+                       theta-length="15" rotation="0 180 0"
+        ></a-curvedimage>
+        <a-image mixin="album" src="#lcd" position="0 1 -2"
+                 event-set="_event: click; _target: #audioViz;
+                            audio-visualizer.src: #dance"
+                 play-audio="src: #dance"
+                 play-video="target: #video; src: #danceVid"
+                 play-video__2="target: #leftVideo; src: #danceTall"
+                 play-video__3="target: #rightVideo; src: #danceTall"
+        ></a-image>
+        <a-curvedimage mixin="album" src="#lana" position="0.6 1 2" radius="4"
+                       event-set="_event: click; _target: #audioViz;
+                                  audio-visualizer.src: #ss"
+                       play-audio="src: #ss"
+                       play-video__1="target: #video; src: #summertimeVid"
+                       play-video__2="target: #leftVideo; src: #summertimeTall"
+                       play-video__3="target: #rightVideo; src: #summertimeTall"
+                       theta-length="15" rotation="0 160 0"></a-curvedimage>
+      </a-entity>
+
+      <!-- Text. -->
+      <a-entity
+        bmfont-text="color: #888; text: Click-drag the reticle onto album cover to change song on desktop. Works with Rift + Vive."
+        rotation="-90 0 0"
+        position="-2.3 0.1 -1.9"></a-entity>
+
+      <!-- Lights. -->
+      <a-light type="ambient" color="#777"></a-light>
+      <a-entity
+        light="type: spot; color: #BBB; penumbra: 0.8; decay: 0; distance: 50"
+        position="0 10 20" rotation="-15 0 0"
+        animation="property: rotation; dir: alternate; loop: true; to: 0 0 0"></a-entity>
+
+      <a-camera>
+        <a-cursor color="#DADADA" raycaster="interval: 500; objects: [mixin='album']"></a-cursor>
+      </a-camera>
+
+      <!-- Ground. -->
+      <a-plane src="#grass" rotation="-90 0 0" height="100" width="100"
+               material="repeat: 80 80" roughness="1" metalness="0"></a-plane>
+
+      <!-- Sky. -->
+      <a-sky color="rgb(11, 16, 19)"></a-sky>
+    </a-scene>
+  </body>
+</html>

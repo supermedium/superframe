@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>City</title>
+    <script src="../lib/aframe.min.js"></script>
+  </head>
+  <body>
+    <a-scene>
+      <a-assets>
+        <a-asset-item id="city-obj" src="models/city.obj"></a-asset-item>
+        <a-asset-item id="city-mtl" src="models/city.mtl"></a-asset-item>
+        <audio autoplay loop src="audio/237329__fyono__night-city-atmosphere.wav"></audio>
+      </a-assets>
+
+      <!-- Model. -->
+      <a-entity obj-model="obj: #city-obj; mtl: #city-mtl" position="0 -1 -5"></a-entity>
+
+      <!-- Lights. -->
+      <a-light type="ambient" color="#222"></a-light>
+      <a-light type="point" position="-3 5 -10">
+        <a-animation attribute="intensity" from="1" to="0.8" direction="alternate"
+                     repeat="indefinite" dur="3000"></a-animation>
+      </a-light>
+    </a-scene>
+  </body>
+</html>
