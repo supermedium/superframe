@@ -1,0 +1,9 @@
+<a-entity geometry="primitive: box" material="color: #6B55AE" position="-2 0 0">
+  <a-animation attribute="rotation" to="0 360 0" repeat="indefinite"></a-animation>
+</a-entity>
+<a-entity geometry="primitive: box" material="color: #6EA7C1" position="0 2 0">
+  <a-animation attribute="rotation" to="360 0 0" repeat="indefinite"></a-animation>
+</a-entity>
+<a-entity geometry="primitive: box" material="color: #E67FA2" position="2 0 0">
+  <a-animation attribute="rotation" to="0 0 360" repeat="indefinite"></a-animation>
+</a-entity>

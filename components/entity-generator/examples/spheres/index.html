@@ -1,0 +1,36 @@
+<html>
+  <head>
+    <title>A-Frame Entity Generator Component</title>
+    <script src="../build.js"></script>
+  </head>
+  <body>
+    <a-scene fog="type: linear; near: 0.5; far: 60">
+      <a-assets>
+        <a-mixin id="sphere" geometry="primitive: sphere; radius: 0.2">
+        </a-mixin>
+
+        <a-mixin id="random-1"
+                 random-spherical-position="lengthX: 180; lengthY: 180; radius: 10"></a-mixin>
+        <a-mixin id="random-2" random-spherical-position="radius: 30"></a-mixin>
+        <a-mixin id="random-3" random-spherical-position="radius: 50"></a-mixin>
+
+        <a-mixin id="red" material="color: #FF4B68"></a-mixin>
+        <a-mixin id="blue" material="color: #118DF0"></a-mixin>
+        <a-mixin id="yellow" material="color: #FBFFA3"></a-mixin>
+      </a-assets>
+
+      <a-entity entity-generator="mixin: random-1 red sphere; num: 500"></a-entity>
+      <a-entity entity-generator="mixin: random-2 blue sphere; num: 800">
+        <a-animation attribute="rotation" repeat="indefinite" easing="linear"
+                     dur="128000" to="0 360 0"></a-animation>
+      </a-entity>
+      <a-entity entity-generator="mixin: random-3 yellow sphere; num: 2000"></a-entity>
+
+      <a-light type="ambient" color="#222"></a-light>
+      <a-light type="point" intensity="0.5"></a-light>
+
+      <a-sky color="#000"></a-sky>
+      <a-entity camera look-controls position="0 1.8 0"></a-entity>
+    </a-scene>
+  </body>
+</html>

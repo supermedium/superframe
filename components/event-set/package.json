@@ -1,0 +1,47 @@
+{
+  "name": "aframe-event-set-component",
+  "version": "3.0.1",
+  "description": "Component to set properties in response to events.",
+  "main": "index.js",
+  "browser": "dist/aframe-event-set-component.min.js",
+  "scripts": {
+    "build": "browserify examples/main.js -o examples/build.js",
+    "dev": "budo examples/main.js:build.js --dir examples --port 8000 --live --open",
+    "dist": "webpack index.js dist/aframe-event-set-component.js && webpack -p index.js dist/aframe-event-set-component.min.js",
+    "lint": "semistandard -v | snazzy",
+    "postpublish": "npm run dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ngokevin/kframe.git"
+  },
+  "keywords": [
+    "aframe",
+    "aframe-component",
+    "aframe-vr",
+    "vr",
+    "mozvr",
+    "webvr"
+  ],
+  "author": "Kevin Ngo <me@ngokevin.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ngokevin/kframe/issues"
+  },
+  "homepage": "https://github.com/ngokevin/kframe/tree/components/event-set#readme",
+  "devDependencies": {
+    "aframe": "^0.3.0",
+    "browserify": "^12.0.1",
+    "budo": "^7.1.0",
+    "semistandard": "^8.0.0",
+    "shelljs": "^0.6.0",
+    "snazzy": "^4.0.0",
+    "webpack": "^1.12.9"
+  },
+  "semistandard": {
+    "ignore": [
+      "examples/build.js",
+      "dist/**"
+    ]
+  }
+}

@@ -1,0 +1,26 @@
+<html>
+  <head>
+    <title>A-Frame Animation Component - Repeat</title>
+    <script src="../build.js"></script>
+  </head>
+  <body>
+    <a-scene>
+      <a-box color="#F55" position="-2 0 -2"
+             animation="property: rotation; dir: alternate; repeat: 0; to: 0 45 0"></a-box>
+      <a-box color="#F55" position="0 0 -2"
+             animation="property: rotation; dir: alternate; repeat: 2; to: 0 45 0"></a-box>
+      <a-box color="#F55" position="2 0 -2"
+             animation="property: rotation; dir: alternate; repeat: 4; to: 0 45 0"></a-box>
+
+      <a-box color="#F55" position="-2 2 -2"
+             animation="property: rotation; repeat: 0; to: 0 45 0"></a-box>
+      <a-box color="#F55" position="0 2 -2"
+             animation="property: rotation; repeat: 2; to: 0 45 0"></a-box>
+      <a-box color="#F55" position="2 2 -2"
+             animation="property: rotation; repeat: 4; to: 0 45 0"></a-box>
+
+      <!-- Sky. -->
+      <a-sky color="#DDD"></a-sky>
+    </a-scene>
+  </body>
+</html>

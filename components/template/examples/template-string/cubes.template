@@ -1,0 +1,3 @@
+<a-entity geometry="primitive: box" material="color: ${color}" position="${position}">
+  <a-animation attribute="rotation" to="0 360 0" repeat="indefinite"></a-animation>
+</a-entity>

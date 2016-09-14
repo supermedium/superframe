@@ -1,0 +1,14 @@
+<html>
+  <head>
+    <title>A-Frame Redux Component - Basic</title>
+    <script src="../build.js"></script>
+    <script src="reducers/player.js"></script>
+  </head>
+  <body>
+    <a-scene redux="reducers: player">
+      <a-assets></a-assets>
+      <a-entity geometry="primitive: box" material="color: #C03546"
+                redux="player.health: opacity"></a-entity>
+    </a-scene>
+  </body>
+</html>

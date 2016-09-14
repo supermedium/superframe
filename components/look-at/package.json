@@ -1,0 +1,37 @@
+{
+  "name": "aframe-look-at-component",
+  "version": "0.1.2",
+  "description": "Look-at component for A-Frame.",
+  "main": "index.js",
+  "scripts": {
+    "build": "browserify examples/main.js -o examples/build.js",
+    "dev": "budo examples/main.js:build.js --dir examples --port 8000 --live --open",
+    "dist": "webpack index.js dist/aframe-look-at-component.js && webpack -p index.js dist/aframe-look-at-component.min.js",
+    "postpublish": "npm run dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ngokevin/kframe.git"
+  },
+  "keywords": [
+    "aframe",
+    "aframe-component",
+    "aframe-vr",
+    "vr",
+    "mozvr",
+    "webvr"
+  ],
+  "author": "Kevin Ngo <me@ngokevin.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ngokevin/kframe/issues"
+  },
+  "homepage": "https://github.com/ngokevin/kframe/tree/look-at#readme",
+  "devDependencies": {
+    "aframe": "^0.3.0",
+    "browserify": "^12.0.1",
+    "budo": "^7.1.0",
+    "shelljs": "^0.6.0",
+    "webpack": "^1.12.9"
+  }
+}

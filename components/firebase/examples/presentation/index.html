@@ -1,0 +1,122 @@
+<html>
+  <head>
+    <title>A-Frame Firebase Component - Presentation</title>
+    <script src="nunjucks-v2.3.0.min.js"></script>
+    <script src="../build.js"></script>
+    <script src="components/random-position-at.js"></script>
+    <script src="components/raise-the-roof.js"></script>
+  </head>
+  <body>
+    <a-scene firebase="apiKey: AIzaSyACFifUPrrUeBZzd98WR4bIIUl6OIajRpE;
+                       authDomain: aframe-sfhtml5-presentation.firebaseapp.com;
+                       databaseURL: https://aframe-sfhtml5-presentation.firebaseio.com;
+                       storageBucket: aframe-sfhtml5-presentation.appspot.com">
+      <a-assets>
+        <!-- Images. -->
+        <img id="ground" src="img/confectionary.png">
+        <img id="poster" src="img/poster.png">
+        <img id="slide" src="img/slide.png">
+        <!-- Mixins. -->
+        <a-mixin id="avatar"
+                geometry="primitive: box; depth: 0.3; height: 0.3; width: 0.3"
+                material="color: #222"
+                template="src: #avatar-template"></a-mixin>
+        <a-mixin id="chair-part" geometry="primitive: box" material="color: brown"></a-mixin>
+        <a-mixin id="arm" geometry="primitive: box; depth: 0.08; height: 0.5; width: 0.08"
+                          material="color: #222; shader: flat"></a-mixin>
+        <a-mixin id="eye" geometry="primitive: circle"
+                          material="shader: flat; side: double"></a-mixin>
+        <a-mixin id="poster"
+                 geometry="primitive: plane; depth: 0.02; height: 2; width: 2"
+                 material="side: double; shader: flat; src: #poster; transparent: true">
+        </a-mixin>
+        <!-- Templates. -->
+        <script id="avatar-template" type="text/html-template">
+          <!-- Face. -->
+          <a-entity rotation="0 180 0">
+            <a-entity mixin="eye" geometry="radius: 0.08"
+                      material="shader: flat; side: double"
+                      position="-0.1 0.1 0.18">
+              <a-entity mixin="eye" geometry="radius: 0.02"
+                        material="color: #222"
+                        position="0 0 0.03"></a-entity>
+            </a-entity>
+            <a-entity mixin="eye" geometry="radius: 0.08" position="0.1 0.1 0.18">
+              <a-entity mixin="eye" geometry="radius: 0.02"
+                        material="color: #222" position="0 0 0.03"></a-entity>
+            </a-entity>
+          </a-entity>
+          <!-- Arms. -->
+          <a-entity class="arms" position="0 -0.3 0">
+            <a-entity mixin="arm" position="-0.3 -0.25 0" rotation="0 0 -10"></a-entity>
+            <a-entity mixin="arm" position="0.3 -0.25 0" rotation="0 0 10"></a-entity>
+          </a-entity>
+        </script>
+        <script id="bob-animation" type="text/html-template">
+          <a-animation attribute="position" direction="alternate" dur="2000" to="0 0.2 0"
+                       repeat="indefinite"></a-animation>
+        </script>
+        <script id="chair" type="text/html-template">
+          <a-entity mixin="chair-part" geometry="height: 1; depth: 0.05; width: 0.05"
+                    position="-0.25 0.5 0"></a-entity>
+          <a-entity mixin="chair-part" geometry="height: 1; depth: 0.05; width: 0.05"
+                    position="0.25 0.5 0"></a-entity>
+          <a-entity mixin="chair-part" geometry="height: 0.5; depth: 0.05; width: 0.05"
+                    position="-0.25 0.25 0.5"></a-entity>
+          <a-entity mixin="chair-part" geometry="height: 0.5; depth: 0.05; width: 0.05"
+                    position="0.25 0.25 0.5"></a-entity>
+          <a-entity mixin="chair-part" geometry="height: 0.05; depth: 0.05; width: 0.55"
+                    position="0 1 0"></a-entity>
+          <a-entity mixin="chair-part" geometry="depth: 0.55; height: 0.05; width: 0.55"
+                    position="0 0.5 0.25"></a-entity>
+        </script>
+        <script id="chairs" type="text/nunjucks-template">
+          {% for x in range(5) %}
+            {% for z in range(10) %}
+              <a-entity class="chair" template="src: #chair"
+                        position="{{ x }} 0 {{ z }}"></a-entity>
+            {% endfor %}
+          {% endfor %}
+        </script>
+      </a-assets>
+
+      <!-- Avatar. -->
+      <a-entity random-position-at="selector: .chair; offset: 0 1.4 0.2"
+                position="0 1.8 0" rotation="0 180 0"
+                firebase-broadcast="components: position, rotation">
+        <a-entity id="head" mixin="avatar"
+                  camera look-controls wasd-controls
+                  firebase-broadcast="componentsOnce: mixin;
+                                      components: position, raise-the-roof, rotation"
+                  raise-the-roof="false">
+        </a-entity>
+      </a-entity>
+
+      <!-- Presentation slide. -->
+      <a-entity mixin="poster" geometry="height: 4.5; width: 7"
+                material="src: #slide" position="0 2.25 1"></a-entity>
+      <!-- SFHTML5 posters. -->
+      <a-entity position="-5 1 0">
+        <a-entity mixin="poster" template="src: #bob-animation" rotation="0 165 0"></a-entity>
+      </a-entity>
+      <a-entity position="5 1 0">
+        <a-entity mixin="poster" template="src: #bob-animation" rotation="0 -165 0"></a-entity>
+      </a-entity>
+      <!-- Podium. -->
+      <a-entity id="podium" geometry="primitive: box; depth: 0.9; height: 1.4; width: 0.9"
+                material="color: #A1583E" position="0 0.5 -1"></a-entity>
+      <!-- Chairs. -->
+      <a-entity template="src: #chairs" position="-5 0 -13"></a-entity>
+      <a-entity template="src: #chairs" position="1 0 -13"></a-entity>
+      <!-- Lights. -->
+      <a-entity light="type: ambient; color: #888"></a-entity>
+      <a-entity light="type: directional; intensity: 0.4" position="-1 1 0"></a-entity>
+      <!-- Ground. -->
+      <a-entity geometry="primitive: plane; height: 18; width: 15"
+                material="repeat: 10 10; src: #ground; width: 25"
+                rotation="-90 0 0" position="0 -0.1 -6"></a-entity>
+      <!-- Background. -->
+      <a-sky color="#A1DFFF"></a-sky>
+    </a-scene>
+  </body>
+</html>

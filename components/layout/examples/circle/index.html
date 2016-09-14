@@ -1,0 +1,47 @@
+<html>
+  <head>
+    <script src="../build.js"></script>
+  </head>
+  <body>
+    <a-scene>
+      <a-assets>
+        <a-mixin id="cube" geometry="primitive: box; depth: 1; height: 1; width: 1"
+                 material="color: #FFFBE0">
+        </a-mixin>
+        <a-mixin id="secondary" material="color: #FFB400"></a-mixin>
+      </a-assets>
+
+      <a-entity geometry="primitive: sphere; radius: 1000"
+                material="color: #2994B2; shader: flat" scale="1 1 -1">
+      </a-entity>
+
+      <a-entity layout="type: circle; radius: 2.5" position="0 0 -5">
+        <a-animation attribute="rotation" dur="5000" easing="linear"
+                     repeat="indefinite" to="0 360 360">
+        </a-animation>
+        <a-entity mixin="cube"></a-entity>
+        <a-entity mixin="cube"></a-entity>
+        <a-entity mixin="cube"></a-entity>
+        <a-entity mixin="cube"></a-entity>
+        <a-entity mixin="cube"></a-entity>
+        <a-entity mixin="cube"></a-entity>
+        <a-entity mixin="cube"></a-entity>
+        <a-entity mixin="cube"></a-entity>
+      </a-entity>
+
+      <a-entity layout="type: circle; radius: 3" position="0 0 -5">
+        <a-animation attribute="rotation" dur="5000" easing="linear"
+                     repeat="indefinite" to="360 0 360">
+        </a-animation>
+        <a-entity mixin="cube secondary"></a-entity>
+        <a-entity mixin="cube secondary"></a-entity>
+        <a-entity mixin="cube secondary"></a-entity>
+        <a-entity mixin="cube secondary"></a-entity>
+        <a-entity mixin="cube secondary"></a-entity>
+        <a-entity mixin="cube secondary"></a-entity>
+        <a-entity mixin="cube secondary"></a-entity>
+        <a-entity mixin="cube secondary"></a-entity>
+      </a-entity>
+    </a-scene>
+  </body>
+</html>

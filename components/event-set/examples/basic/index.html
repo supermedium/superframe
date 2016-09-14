@@ -1,0 +1,28 @@
+<html>
+  <head>
+    <title>A-Frame Event Set Component - Basic</title>
+    <script src="../build.js"></script>
+  </head>
+  <body>
+    <a-scene>
+      <a-entity geometry="primitive: box" material="color: #FCB241"
+                event-set__1="_event: click; _target: #eye-1; visible: true"
+                event-set__2="_event: click; _target: #eye-2; visible: true"
+                event-set__3="_event: mouseenter; material.color: #5A67A6"
+                event-set__4="_event: mouseleave; material.color: #FCB241"
+                position="-1 0 -2">
+        <a-sphere id="eye-1" radius="0.05" position="-0.5 0.7 0.5" visible="false"></a-sphere>
+        <a-sphere id="eye-2" radius="0.05" position="0.5 0.7 0.5" visible="false"></a-sphere>
+      </a-entity>
+
+      <a-sky color="#D68D08"></a-sky>
+
+      <a-entity camera look-controls>
+        <a-entity cursor
+                  geometry="primitive: ring; radiusInner: 0.01; radiusOuter: 0.016"
+                  material="color: #EEE"
+                  position="0 0 -1"></a-entity>
+      </a-entity>
+    </a-scene>
+  </body>
+</html>

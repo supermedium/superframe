@@ -1,0 +1,38 @@
+<html>
+  <head>
+    <title>A-Frame Broadcast Component - Basic</title>
+    <script src="../build.js"></script>
+    <script src="components/follow.js"></script>
+  </head>
+  <body>
+    <a-scene broadcast="url: http://ngokevin.com:12000">
+      <a-entity camera look-controls wasd-controls
+                broadcast="send: geometry, material, position, rotation"
+                geometry="primitive: box; depth: 0.3; height: 0.3; width: 0.3"
+                material="color: #222"
+                position="0 1.8 5"></a-entity>
+
+      <a-entity broadcast="send: position" follow="[camera]">
+        <a-entity broadcast="send: geometry, material, position"
+                  geometry="primitive: cone; height: 1.5; radiusTop: 0.1; radiusBottom: 0.4"
+                  material="color: #222"
+                  position="0 -1 0"></a-entity>
+      </a-entity>
+
+      <a-sphere color="#645FCE" radius="0.2" position="-3 0 2"></a-sphere>
+      <a-sphere color="#69E9F5" position="3 1 -7"></a-sphere>
+      <a-sphere color="#43BFC7" radius="0.4" position="1 1 -2"></a-sphere>
+      <a-sphere color="#A45FBE" position="-2 0 3"></a-sphere>
+      <a-sphere color="#382F60" radius="0.8" position="2 4 -4"></a-sphere>
+      <a-sphere color="#485188" position="2 4 -1"></a-sphere>
+
+      <a-light type="ambient" color="#444"></a-light>
+      <a-light type="point" intensity="1.2"></a-light>
+      <a-sphere color="#FFF" radius="0.2" shader="flat" position="0 0.2 0"></a-sphere>
+
+      <a-plane rotation="-90 0 0" color="#0C2233" height="25" width="25"
+               position="0 -0.1 0"></a-plane>
+      <a-sky color="#222"></a-sky>
+    </a-scene>
+  </body>
+</html>

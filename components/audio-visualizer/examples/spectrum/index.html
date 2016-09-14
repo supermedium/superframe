@@ -1,0 +1,30 @@
+<html>
+  <head>
+    <title>A-Frame Audio Visualizer Component - Spectrum</title>
+    <script src="../build.js"></script>
+    <script src="components/scale-y-color.js"></script>
+  </head>
+  <body>
+    <a-scene>
+      <a-assets>
+        <a-mixin id="bar" geometry="primitive: box" material="color: black"
+                          scale-y-color="from: 10 60 10; to: 180 255 180; maxScale: 15">
+        </a-mixin>
+        <audio id="song" autoplay loop src="yourhandinmine.mp3"></audio>
+      </a-assets>
+
+      <a-entity audio-visualizer="src: #song; smoothingTimeConstant: 0.9"
+                audio-visualizer-spectrum-scale="max: 50; multiplier: 0.06"
+                entity-generator="mixin: bar; num: 256"
+                layout="type: circle; radius: 10"
+                rotation="0 180 0">
+      </a-entity>
+
+      <a-light type="ambient" color="#222"></a-light>
+      <a-light type="point" position="0 1 0" intensity="2"></a-light>
+      <a-circle color="#333" opacity="0.8" rotation="-90 0 0" radius="12"
+                roughness="1"></a-circle>
+      <a-sky color="#222"></a-sky>
+    </a-scene>
+  </body>
+</html>

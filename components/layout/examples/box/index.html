@@ -1,0 +1,34 @@
+<html>
+  <head>
+    <script src="../build.js"></script>
+  </head>
+  <body>
+    <a-scene>
+      <a-assets>
+        <a-mixin id="cube" geometry="primitive: box"
+                 material="color: #FFFBE0"></a-mixin>
+        <a-mixin id="secondary" material="color: #FFB400"></a-mixin>
+      </a-assets>
+
+      <a-entity geometry="primitive: sphere; radius: 1000"
+                material="color: #2994B2; shader: flat" scale="1 1 -1">
+      </a-entity>
+
+      <a-entity layout="type: box; columns: 4; margin: 4" position="0 0 -15">
+        <a-entity mixin="cube"></a-entity>
+        <a-entity mixin="cube"></a-entity>
+        <a-entity mixin="cube"></a-entity>
+        <a-entity mixin="cube"></a-entity>
+        <a-entity mixin="cube"></a-entity>
+        <a-entity mixin="cube"></a-entity>
+        <a-entity mixin="cube"></a-entity>
+        <a-entity mixin="cube"></a-entity>
+        <a-entity mixin="cube"></a-entity>
+        <a-entity mixin="cube"></a-entity>
+        <a-entity mixin="cube"></a-entity>
+        <a-entity mixin="cube"></a-entity>
+        <a-entity mixin="cube"></a-entity>
+      </a-entity>
+    </a-scene>
+  </body>
+</html>

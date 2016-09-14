@@ -1,0 +1,58 @@
+<html>
+  <head>
+    <title>A-Frame Animation Component - Basic</title>
+    <script src="../build.js"></script>
+    <script src="components/event-proxy.js"></script>
+  </head>
+  <body>
+    <a-scene>
+      <a-assets>
+        <a-mixin id="option"
+                 geometry="primitive: plane; width: 2"
+                 material="color: #333"
+                 event-proxy="listen: click; target: a-box"></a-mixin>
+      </a-assets>
+
+      <a-box color="#F55" height="3"
+             animation__scale="property: scale; dir: alternate; dur: 200;
+                               easing: easeInSine; loop: true; to: 1.2 1 1.2;
+                               startEvents: scale; pauseEvents: animation-pause"
+             animation__color="property: color; dir: alternate; dur: 1000;
+                               easing: easeInSine; loop: true; to: #5F5;
+                               startEvents: color; pauseEvents: animation-pause"
+             animation__yoyo="property: position; dir: alternate; dur: 1000;
+                              easing: easeInSine; loop: true; to: 0 2 0;
+                              startEvents: position; pauseEvents: animation-pause"
+             position="0 1 -2">
+      </a-box>
+
+      <a-entity layout="type: line; margin: 2.5" position="-2.5 -1 0">
+        <a-entity mixin="option" event-proxy="emit: scale">
+          <a-entity bmfont-text="text: Scale; color: #FFF" position="-0.2 0 0.1"></a-entity>
+        </a-entity>
+        <a-entity mixin="option" event-proxy="emit: color">
+          <a-entity bmfont-text="text: Color; color: #FFF" position="-0.25 0 0.1"></a-entity>
+        </a-entity>
+        <a-entity mixin="option" event-proxy="emit: position">
+          <a-entity bmfont-text="text: Position; color: #FFF" position="-0.45 0 0.1"></a-entity>
+        </a-entity>
+        <a-entity mixin="option" event-proxy="emit: animation-pause">
+          <a-entity bmfont-text="text: Pause; color: #FFF" position="-0.3 0 0.1"></a-entity>
+        </a-entity>
+      </a-entity>
+      </a-entity>
+
+      <!-- Lights. -->
+      <a-light type="ambient" color="#333"></a-light>
+      <a-light type="directional" position="-1 1 -0.5"></a-light>
+      <a-light type="directional" position="1 1 0.5" intensity=".5"></a-light>
+
+      <!-- Sky. -->
+      <a-sky color="#DDD"></a-sky>
+
+      <a-entity position="0 0 3">
+        <a-camera><a-cursor color="#FFF"></a-cursor></a-camera>
+      </a-entity>
+    </a-scene>
+  </body>
+</html>

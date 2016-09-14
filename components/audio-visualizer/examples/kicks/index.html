@@ -1,0 +1,34 @@
+<html>
+  <head>
+    <title>A-Frame Audio Visualizer Component - Kicks</title>
+    <script src="../build.js"></script>
+    <script src="components/color-on-kick.js"></script>
+  </head>
+  <body>
+    <a-scene>
+      <a-assets>
+        <a-mixin id="box" geometry="primitive: box" material="color: #C03546"
+                 audio-visualizer="src: #machinecivilization"
+                 audio-visualizer-kick="threshold: 0.00012"
+                 color-on-kick></a-mixin>
+        <audio id="machinecivilization" src="machinecivilization.mp3" autoplay loop></audio>
+      </a-assets>
+
+      <a-entity position="0 0.5 0">
+        <a-entity mixin="box" audio-visualizer-kick="threshold: 10"
+                  position="-2 0 0"></a-entity>
+        <a-entity mixin="box" audio-visualizer-kick="threshold: 100"
+                  position="-1 0 0"></a-entity>
+        <a-entity mixin="box" audio-visualizer-kick="threshold: 200"></a-entity>
+        <a-entity mixin="box" audio-visualizer-kick="threshold: 300"
+                  position="1 0 0"></a-entity>
+      </a-entity>
+
+      <a-light type="ambient" color="#222"></a-light>
+      <a-light type="point" position="1 2 1"></a-light>
+      <a-light type="point" position="-2 2 1"></a-light>
+      <a-plane color="#333" rotation="-90 0 0" height="30" width="30"></a-plane>
+      <a-sky color="#222"></a-sky>
+    </a-scene>
+  </body>
+</html>

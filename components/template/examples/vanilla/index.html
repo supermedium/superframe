@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>A-Frame Template Component - Vanilla HTML</title>
+    <script src="../build.js"></script>
+  </head>
+  <body>
+    <a-scene>
+      <a-entity>
+        <a-entity template="src: cubes.template" position="-4 0 0"></a-entity>
+        <a-entity template="src: cubes.template" position="0 4 0"></a-entity>
+        <a-entity template="src: cubes.template" position="4 0 0"></a-entity>
+
+        <a-animation attribute="rotation" dur="2000" to="0 360 0"
+                     repeat="indefinite"></a-animation>
+      </a-entity>
+
+      <a-camera position="0 1.8 8"></a-camera>
+      <a-sky color="#402A30"></a-sky>
+    </a-scene>
+  </body>
+</html>

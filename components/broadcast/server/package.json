@@ -1,0 +1,30 @@
+{
+  "name": "aframe-broadcast-server",
+  "version": "1.0.0",
+  "description": "Simple multiuser server for WebVR that syncs position and rotation of entities via WebSockets.",
+  "main": "index.js",
+  "scripts": {
+    "start": "forever start index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ngokevin/webvr-multiuser-server.git"
+  },
+  "keywords": [
+    "webvr",
+    "multiuser",
+    "server",
+    "multiplayer"
+  ],
+  "author": "Kevin Ngo <me@ngokevin.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ngokevin/webvr-multiuser-server/issues"
+  },
+  "homepage": "https://github.com/ngokevin/webvr-multiuser-server#readme",
+  "dependencies": {
+    "socket.io": "^1.4.6",
+    "forever": "^0.15.1"
+  }
+}

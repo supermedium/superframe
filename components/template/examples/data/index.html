@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>A-Frame Template Component - Data</title>
+    <script src="../build.js"></script>
+  </head>
+  <body>
+    <a-scene>
+      <a-assets>
+        <script>
+          AFRAME.registerComponent('sphere-data', {
+            schema: {
+              color: {type: 'string'},
+              radius: {type: 'number'}
+            }
+          });
+        </script>
+        <script id="sphere" type="text/nunjucks">
+          <a-entity geometry="primitive: sphere; radius: {{ radius }}"
+                    material="color: {{ color }}"></a-entity>
+        </script>
+      </a-assets>
+
+      <a-entity template="src: #sphere; data: sphere-data"
+                sphere-data="color: #38486F; radius: 1"
+                position="-4 0 0"></a-entity>
+      <a-entity template="src: #sphere; data: sphere-data"
+                sphere-data="color: #584F84; radius: 2"
+                position="0 4 0"></a-entity>
+      <a-entity template="src: #sphere; data: sphere-data"
+                sphere-data="color: #876A96; radius: 3"
+                position="4 0 0"></a-entity>
+
+      <a-camera position="0 1.8 8"></a-camera>
+      <a-sky color="#D7C1E0"></a-sky>
+    </a-scene>
+  </body>
+</html>

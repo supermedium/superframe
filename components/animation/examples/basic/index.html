@@ -1,0 +1,56 @@
+<html>
+  <head>
+    <title>A-Frame Animation Component - Basic</title>
+    <script src="../build.js"></script>
+  </head>
+  <body>
+    <a-scene>
+      <a-assets>
+        <script id="orbiter" type="template/nunjucks">
+          <a-entity animation__rotate="property: rotation; dur: 2000;
+                                       easing: {{ easing }}; loop: true; to: 0 360 0">
+            <a-sphere radius=".08" color="#CCC"
+                      animation__color="property: material.color; dir: alternate;
+                                        dur: 400; loop: true; to: #333"
+                      position="{{ orbitradius }} 0 0">
+            </a-sphere>
+          </a-entity>
+        </script>
+      </a-assets>
+
+      <a-box id="top-plate" height="0.2" position="0 2.5 0"
+             animation__height="property: geometry.height; dir: alternate; dur: 200; loop: true; to: 0.18"></a-box>
+
+      <a-cylinder id="piston" color="#F55" radius="0.1"
+                  animation__scale="property: scale; dir: alternate; dur: 200;
+                                    easing: easeInSine; loop: true; to: 1.2 1 1.2"
+                  animation__color="property: color; dir: alternate; dur: 1000;
+                                    easing: easeInSine; loop: true; to: #5F5"
+                  animation__yoyo="property: position; dir: alternate; dur: 1000;
+                                   easing: easeInSine; loop: true; to: 0 2 0">
+      </a-cylinder>
+
+      <a-box id="bottom-plate" height="0.2" position="0 -0.5 0"></a-box>
+
+      <!-- Orbiters. -->
+      <a-entity template="src: #orbiter" data-orbitradius="1" data-easing="linear"
+                position="0 0.3 0"></a-entity>
+      <a-entity template="src: #orbiter" data-orbitradius="2" data-easing="easeInCubic"
+                position="0 0.6 0"></a-entity>
+      <a-entity template="src: #orbiter" data-orbitradius="1.2" data-easing="easeOutSine"
+                position="0 0.9 0"></a-entity>
+      <a-entity template="src: #orbiter" data-orbitradius="1.8" data-easing="easeInOutBounce"
+                position="0 1.2 0"></a-entity>
+      <a-entity template="src: #orbiter" data-orbitradius="1.5" data-easing="easeInBack"
+                position="0 1.5 0"></a-entity>
+
+      <!-- Lights. -->
+      <a-light type="ambient" color="#333"></a-light>
+      <a-light type="directional" position="-1 1 -0.5"></a-light>
+      <a-light type="directional" position="1 1 0.5" intensity=".5"></a-light>
+
+      <!-- Sky. -->
+      <a-sky color="#DDD"></a-sky>
+    </a-scene>
+  </body>
+</html>

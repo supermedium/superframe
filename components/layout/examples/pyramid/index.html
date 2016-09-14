@@ -1,0 +1,32 @@
+<html>
+  <head>
+    <script src="../build.js"></script>
+  </head>
+  <body>
+    <a-scene>
+      <a-assets>
+        <a-mixin id="image" geometry="primitive: plane; height: 5; width: 5"
+                 material="shader: flat" look-at="[camera]"></a-mixin>
+        <img id="everglades" src="../img/everglades.jpg">
+        <img id="lassen" src="../img/lassen.jpg">
+        <img id="pinnacles" src="../img/pinnacles.jpg">
+        <img id="sequoia" src="../img/sequoia.jpg">
+      </a-assets>
+
+      <a-entity geometry="primitive: sphere; radius: 1000"
+                material="color: #2994B2; shader: flat" scale="1 1 -1">
+      </a-entity>
+
+      <a-entity layout="type: pyramid; radius: 5">
+        <a-entity mixin="image" material="src: #everglades"></a-entity>
+        <a-entity mixin="image" material="src: #lassen"></a-entity>
+        <a-entity mixin="image" material="src: #pinnacles"></a-entity>
+        <a-entity mixin="image" material="src: #sequoia"></a-entity>
+      </a-entity>
+
+      <a-entity position="0 0 0">
+        <a-entity camera look-controls></a-entity>
+      </a-entity>
+    </a-scene>
+  </body>
+</html>
