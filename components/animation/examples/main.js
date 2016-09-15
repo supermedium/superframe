@@ -1,5 +1,5 @@
 require('aframe');
-require('aframe-template-component');
+require('aframe-bmfont-text-component');
 require('aframe-layout-component');
-require('./lib/aframe-bmfont-text-component.min.js');
+require('aframe-template-component');
 require('../index.js');

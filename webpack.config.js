@@ -1,5 +1,6 @@
 var glob = require('glob');
 var join = require('path').join;
+var webpack = require('webpack');
 
 var ENTRY = {};
 var RESOLVE_ROOT = [__dirname];
@@ -17,6 +18,9 @@ module.exports = {
     path: __dirname,
     filename: '[name]/build.js'
   },
+  plugins: [
+    new webpack.optimize.UglifyJsPlugin()
+  ],
   resolve: {
     root: RESOLVE_ROOT
   }
