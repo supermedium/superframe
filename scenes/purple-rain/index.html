@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Purple Rain</title>
+    <meta name="description" content="Purple Rain">
+    <script src="assets/aframe.min.js"></script>
+    <script src="assets/d3-threeD.js"></script>
+    <script src="assets/SVGLoader.js"></script>
+    <script src="components/aframe-audio-visualizer-components.min.js"></script>
+    <script src="components/aframe-randomizer-components.min.js"></script>
+    <script src="components/aframe-template-component.min.js"></script>
+    <script src="components/aframe-vid-shader.min.js"></script>
+    <script src="components/color-copy.js"></script>
+    <script src="components/color-on-kick.js"></script>
+    <script src="components/entity-generator.js"></script>
+    <script src="components/light-color-copy.js"></script>
+    <script src="components/spotlight-target.js"></script>
+    <script src="components/svg-extrude-geometry.js"></script>
+  </head>
+  <body>
+    <a-scene antialias="true">
+      <a-assets>
+        <audio id="purplerain-audio" src="assets/purplerain.mp3" loop></audio>
+        <img id="ground" src="assets/ground.jpg">
+        <img id="love" src="assets/love.svg">
+        <img id="prince-img" src="assets/prince.png">
+        <a-mixin id="raindrop"
+                 geometry="primitive: box; depth: 0.008; height: 0.05; width: 0.008"
+                 material="color: #8B3FB4; shader: flat"
+                 random-position="min: -6 -6 -6; max: 6 6 3"></a-mixin>
+        <a-mixin id="spotlight"
+                 light="angle: 80; color: #AAC; intensity: 1; type: spot"
+                 spotlight-target="#prince"></a-mixin>
+        <a-mixin id="candlelight"
+                 geometry="primitive: sphere; radius: 0.2; segments: 4"
+                 material="color: #F5F0E8; shader: flat"></a-mixin>
+        <a-mixin id="candle-left" template="src: #candle-template"
+                 random-spherical-position="startX: 140; lengthX: 40; lengthY: 180;
+                                            radius: 80"></a-mixin>
+        <a-mixin id="candle-right" template="src: #candle-template"
+                 random-spherical-position="startX: 0; lengthX: 40; lengthY: 180;
+                                            radius: 80"></a-mixin>
+        <video id="prince-video" autoplay loop src="assets/prince.mp4"></video>
+        <script id="candle-template" type="text/html">
+          <a-entity>
+            <a-entity mixin="candlelight" position="0 1 0"></a-entity>
+            <a-animation attribute="rotation" dur="3000" from="0 0 -45"
+                         to="0 0 45" repeat="indefinite" direction="alternate"></a-animation>
+          </a-entity>
+        </script>
+      </a-assets>
+
+      <audio id="rain-audio" autoplay loop src="assets/rain.mp3">
+        <script>document.querySelector('#rain-audio').volume = 0.2;</script>
+      </audio>
+
+      <!-- Stage. -->
+      <a-entity svg-extrude-geometry="src: #love; bevelThickness: 4; curveSegments: 36"
+                material="color: #BD1EEE; metalness: 0.1; roughness: 0.6"
+                scale="0.34 0.34 0.34" rotation="90 0 0" position="-103 1 -220"></a-entity>
+      <a-entity svg-extrude-geometry="src: #love; bevelSize: 0.1;
+                                      bevelThickness: 0.1; curveSegments: 8"
+                material="color: #111; metalness: 1; roughness: 0.2"
+                scale="0.30 0.30 0.01" rotation="90 0 0" position="-90.9 2.6 -193.8"></a-entity>
+      <a-image id="prince" src="#prince-img" position="0 5 -3" scale="3 5 3"></a-image>
+      <a-entity geometry="primitive: plane; height: 10; width: 20"
+                material="shader: video; src: #prince-video; opacity: 0.4"
+                position="0 25 -10" rotation="40 0 0"></a-entity>
+
+      <a-entity geometry="primitive: circle; radius: 4.5"
+                material="color: #111; shader: flat; side: double"
+                rotation="-90 0 0" position="0 3 -15"></a-entity>
+
+      <!-- Rain. -->
+      <a-entity id="rain-generator" entity-generator="mixin: raindrop; num: 200"
+                position="0 5 10">
+        <a-animation id="fall" attribute="position" dur="700" easing="linear"
+                     repeat="indefinite" to="0 0 10"></a-animation>
+      </a-entity>
+
+      <!-- Banner. -->
+      <a-entity id="banner"
+                geometry="primitive: cylinder; radius: 50; openEnded: true;
+                          segmentsRadial: 52"
+                material="color: #BD1EEE; side: back; shader: flat"
+                position="0 35 0"
+                audio-visualizer="src: #purplerain-audio"
+                audio-visualizer-kick="decay: .0005; frequency: 130, 140; threshold: .0075"
+                color-on-kick></a-entity>
+      <a-entity geometry="primitive: cylinder; radius: 50; openEnded: true;
+                          segmentsRadial: 52"
+                material="color: #BD1EEE; side: back; shader: flat"
+                color-copy="#banner" rotation="90 0 0"></a-entity>
+
+      <!-- Camera. -->
+      <a-entity camera look-controls position="0 5 10"></a-entity>
+
+      <a-entity entity-generator="mixin: candle-left; num: 150"></a-entity>
+      <a-entity entity-generator="mixin: candle-right; num: 150"></a-entity>
+      <a-entity entity-generator="mixin: candle-left; num: 80" rotation="0 -90 0"></a-entity>
+
+      <a-light type="ambient" color="#343" light-color-copy="target: #banner"></a-light>
+      <a-entity mixin="spotlight" position="-40 60 -130"></a-entity>
+      <a-entity mixin="spotlight" position="40 60 -130"></a-entity>
+
+      <a-entity>
+        <a-animation attribute="rotation" to="0 360 0" dur="10000"
+                     easing="linear" repeat="indefinite"></a-animation>
+        <a-light type="point" color="#888" intensity="1.3" distance="25"
+                 position="0 0 20"></a-light>
+      </a-entity>
+
+      <a-sky color="#112"></a-sky>
+      <a-entity geometry="primitive: circle; radius: 40"
+                material="color: #333; src: #ground; repeat: 100 100; metalness: 0;
+                          roughness: 0.8"
+                rotation="-90 0 0"></a-entity>
+    </a-scene>
+  </body>
+</html>
