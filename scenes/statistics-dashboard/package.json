@@ -1,0 +1,18 @@
+{
+  "scripts": {
+    "build": "browserify index.js -o build.js",
+    "dev": "budo index.js:build.js --port 8005 --live --open"
+  },
+  "author": "Kevin Ngo <me@ngokevin.com>",
+  "repository": "ngokevin/aframe-statistics-dashboard",
+  "dependencies": {
+    "aframe-animation-component": "^0.3.2",
+    "aframe-bmfont-text-component": "^0.1.2",
+    "browserify": "^13.0.1",
+    "budo": "^8.2.2",
+    "d3": "^4.1.1",
+    "superagent": "^1.8.3",
+    "superagent-promise-plugin": "^3.2.0",
+    "urlgray": "^0.2.3"
+  }
+}
