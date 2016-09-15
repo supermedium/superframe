@@ -4,8 +4,8 @@
   "description": "Kevin's collection of A-Frame components and scenes.",
   "main": "index.js",
   "scripts": {
-    "build": "webpack",
-    "dev": "webpack-dev-server",
+    "build": "webpack --config webpack-dev.config.js",
+    "dev": "webpack-dev-server --config webpack-dev.config.js",
     "dist": "webpack index.js dist/kframe.js && webpack -p index.js dist/kframe.min.js",
     "postinstall": "node lib/scripts/install.js",
     "postpublish": "npm run dist",
