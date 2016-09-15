@@ -8,18 +8,18 @@ Kevin's collection of A-Frame components and scenes.
 
 ## Components
 
-- [animation](tree/components/animation/)
-- [audio-visualizer](tree/components/audio-visualizer/)
-- [broadcast](tree/components/broadcast/)
-- [entity-generator](tree/components/entity-generator/)
-- [event-set](tree/components/event-set/)
-- [firebase](tree/components/firebase/)
-- [layout](tree/components/layout/)
-- [look-at](tree/components/look-at/)
-- [randomizer](tree/components/randomizer/)
-- [redux](tree/components/redux/)
-- [template](tree/components/template/)
-- [text](tree/components/text/)
+- [animation](tree/components/animation/) - Animations using anime.js
+- [audio-visualizer](tree/components/audio-visualizer/) - Audio visualizations using WebAudio
+- [broadcast](tree/components/broadcast/) - Multi-user using raw websockets
+- [entity-generator](tree/components/entity-generator/) - Generate a number of entities given a mixin
+- [event-set](tree/components/event-set/) - Set properties in response to events
+- [firebase](tree/components/firebase/) - Multi-user using Firebase
+- [layout](tree/components/layout/) - Position and layout child entities in 3D space
+- [look-at](tree/components/look-at/) - Rotate an entity to face towards another entity
+- [randomizer](tree/components/randomizer/) - Randomize color, position, rotation, scale
+- [redux](tree/components/redux/) - Hook in Redux reducers, data bindings, and action dispatches (WIP)
+- [template](tree/components/template/) - Encapsulate groups of entities, use templating engines, and do string interpolations
+- [text](tree/components/text/) - Geometry-based text
 
 ## Installation
 
