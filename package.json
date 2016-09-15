@@ -4,7 +4,10 @@
   "description": "Kevin's collection of A-Frame components and scenes.",
   "main": "index.js",
   "scripts": {
+    "build": "webpack",
+    "dev": "webpack-dev-server",
     "dist": "webpack index.js dist/kframe.js && webpack -p index.js dist/kframe.min.js",
+    "postinstall": "node lib/scripts/install.js",
     "postpublish": "npm run dist",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "http-server"
@@ -34,7 +37,10 @@
   },
   "homepage": "https://github.com/ngokevin/kframe#readme",
   "devDependencies": {
+    "browser-sync": "^2.16.0",
+    "glob": "^7.0.6",
     "http-server": "^0.9.0",
-    "webpack": "^1.13.1"
+    "webpack": "^1.13.2",
+    "webpack-dev-server": "^1.15.2"
   }
 }

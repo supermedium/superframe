@@ -30,8 +30,9 @@
   "homepage": "https://github.com/ngokevin/kframe/tree/components/animation#readme",
   "devDependencies": {
     "aframe": "^0.3.0",
-    "aframe-bmfont-text-component": "^0.1.1",
+    "aframe-bmfont-text-component": "^0.1.4",
     "aframe-layout-component": "^1.2.0",
+    "aframe-template-component": "^3.1.1",
     "browserify": "^13.0.0",
     "budo": "^8.2.2",
     "randomcolor": "^0.4.4",
