@@ -1,7 +1,8 @@
 <html>
   <head>
-    <script src="../../dist/kframe.min.js"></script>
     <script src="https://aframe.io/releases/0.3.0/aframe.min.js"></script>
+    <script src="../../dist/kframe.min.js"></script>
+    <script src="components/pathfinder.js"></script>
   </head>
   <body>
     <a-scene>
@@ -9,7 +10,8 @@
         <a-mixin
           id="enemy"
           geometry="primitive: torusKnot; radius: 0.25"
-          material="color: #111"></a-mixin>
+          material="color: #111"
+          pathfinder="target: #core"></a-mixin>
         <a-mixin
           id="tower"
           geometry="primitive: box; depth: 2; height: 2; width: 2"
