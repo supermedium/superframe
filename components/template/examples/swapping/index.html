@@ -8,12 +8,12 @@
   <body>
     <a-scene>
       <a-entity template="src: scenes/spheres.html"
-                template-looper="scenes/boxes.html, scenes/spheres.html"></a-entity>
+                template-looper="scenes/boxes.html, scenes/spheres.html"
+                position="0 0 -8"></a-entity>
 
-      <a-camera position="0 1.8 8"></a-camera>
       <a-sky color="#D7C1E0"></a-sky>
 
-      <a-sky id="mask" color="#111" opacity="0" position="0 1.8 8" radius="2">
+      <a-sky id="mask" color="#111" opacity="0" radius="2">
         <a-animation attribute="material.opacity" begin="fade" from="0" to="1" dur="200"
                      direction="alternate" repeat="1"></a-animation>
       </a-sky>

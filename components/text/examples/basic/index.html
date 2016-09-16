@@ -3,14 +3,13 @@
     <script src="../build.js"></script>
   </head>
   <body>
-    <a-assets></a-assets>
     <a-scene>
-      <a-entity geometry="primitive: sphere; radius: 1000"
-                material="color: #5F818A; shader: flat"
-                scale="1 1 -1"></a-entity>
-      <a-entity text="text: Hello, World!"
-                material="color: #66E1B4"
-                position="0 2 0"></a-entity>
+      <a-entity
+        text="text: Hello, World!"
+        material="color: #66E1B4"
+        position="0 2 -4"
+      ></a-entity>
+      <a-sky color="#5F818A"></a-sky>
     </a-scene>
   </body>
 </html>

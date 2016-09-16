@@ -1,4 +1,4 @@
-require('firebase');
+var firebase = require('firebase');
 var parse = require('url-parse');
 
 var channelQueryParam = parse(location.href, true).query['aframe-firebase-channel'];
