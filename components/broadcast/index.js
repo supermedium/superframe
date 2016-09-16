@@ -11,6 +11,9 @@ AFRAME.registerSystem('broadcast', {
   init: function () {
     var sceneEl = this.sceneEl;
     var url = sceneEl.getAttribute('broadcast').url;
+
+    if (!url) { return; }
+
     this.socket = io(url);
 
     this.socket.on('connect', function () {
