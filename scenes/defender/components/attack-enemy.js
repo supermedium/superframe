@@ -16,11 +16,12 @@ AFRAME.registerComponent('attack-enemy', {
     this.time = 0;
   },
 
-  tick: function (t, dt) {
+  tick: function (t) {
     var el = this.el;
 
     // Maintain rate of fire.
-    if ((t - this.time) / 1000 < (1 / this.data.fireRate)) { return; }
+    var timeSinceLastShot = (t - this.time) / 1000;
+    if (timeSinceLastShot < (1 / this.data.fireRate)) { return; }
     this.time = t;
 
     // Grab the closest enemy and target it.

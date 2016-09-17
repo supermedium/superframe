@@ -29,6 +29,7 @@ AFRAME.registerComponent('enemy', {
     var name = 'Enemy ' + id;
     this.el.setAttribute('id', name);
     this.el.setAttribute('label__name', {text: name});
+    this.updateHPLabel();
   },
 
   /**
@@ -39,12 +40,18 @@ AFRAME.registerComponent('enemy', {
 
     // Update HP.
     var newHP = Math.max(this.data.hp - damage, 0);
-    el.setAttribute('hp', newHP);
+    el.setAttribute('enemy', 'hp', newHP);
 
-    // Update HP label.
-    el.setAttribute('label__hp', {text: 'HP ' + newHP.toString(), level: 2});
+    this.updateHPLabel();
 
     // Check for death.
     if (newHP <= 0) { el.emit('enemyDead'); }
+  },
+
+  /**
+   * Update HP label using HP data.
+   */
+  updateHPLabel: function () {
+    this.el.setAttribute('label__hp', {text: 'HP ' + this.data.hp, level: 2});
   }
 });
