@@ -5,6 +5,5 @@ require('./components/event-set/');
 require('./components/layout/');
 require('./components/look-at/');
 require('./components/randomizer/');
-require('./components/redux/');
 require('./components/template/');
 require('./components/text/');
