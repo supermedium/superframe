@@ -23,8 +23,16 @@ Kevin's collection of A-Frame components and scenes.
 
 ## Installation
 
-K-Frame bundles most of the components together for easy usage. The `firebase`
-component is excluded from this bundle.
+K-Frame bundles some components together for convenience:
+
+- animation
+- audio-visualizer
+- entity-generator
+- event-set
+- layout
+- randomizer
+- template
+- text
 
 ### Browser
 
