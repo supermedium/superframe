@@ -22,7 +22,7 @@ AFRAME.registerComponent('pathfinder', {
     direction.y = 0;
 
     // Scale down direction vector to the speed we want to travel in meters per second.
-    var magnitude = Math.sqrt(Math.pow(direction.x, 2) + Math.pow(direction.z, 2));
+    var magnitude = direction.length();
     var factor = this.data.speed / magnitude;
     direction.x = direction.x * factor;
     direction.z = direction.z * factor * (dt / 1000);

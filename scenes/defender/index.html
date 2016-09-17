@@ -2,6 +2,10 @@
   <head>
     <script src="https://aframe.io/releases/0.3.0/aframe.min.js"></script>
     <script src="../../dist/kframe.min.js"></script>
+    <script src="../lib/aframe-bmfont-text-component.min.js"></script>
+    <script src="components/attack-enemy.js"></script>
+    <script src="components/enemy.js"></script>
+    <script src="components/label.js"></script>
     <script src="components/pathfinder.js"></script>
   </head>
   <body>
@@ -9,6 +13,7 @@
       <a-assets>
         <a-mixin
           id="enemy"
+          enemy
           geometry="primitive: torusKnot; radius: 0.25"
           material="color: #111"
           pathfinder="target: #core"></a-mixin>
@@ -18,6 +23,7 @@
           material="color: #AAA"></a-mixin>
         <a-mixin
           id="towerWeapon"
+          attack-enemy
           geometry="primitive: sphere; radius: 0.5"
           material="color: red"
           position="0 2 0"></a-mixin>
@@ -32,7 +38,9 @@
       </a-entity>
 
       <a-entity id="enemies">
+        <a-entity mixin="enemy" position="-10 1 30"></a-entity>
         <a-entity mixin="enemy" position="0 1 30"></a-entity>
+        <a-entity mixin="enemy" position="10 1 30"></a-entity>
       </a-entity>
 
       <!-- Play area. -->
