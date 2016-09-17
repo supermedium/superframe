@@ -3,10 +3,10 @@
     <script src="https://aframe.io/releases/0.3.0/aframe.min.js"></script>
     <script src="../../dist/kframe.min.js"></script>
     <script src="../lib/aframe-bmfont-text-component.min.js"></script>
-    <script src="components/attack-enemy.js"></script>
     <script src="components/enemy.js"></script>
     <script src="components/label.js"></script>
     <script src="components/pathfinder.js"></script>
+    <script src="components/tower-weapon.js"></script>
   </head>
   <body>
     <a-scene>
@@ -14,34 +14,40 @@
         <a-mixin
           id="enemy"
           enemy
-          geometry="primitive: torusKnot; radius: 0.25"
-          hp="100"
+          geometry="primitive: torusKnot; radius: 0.25; radiusTubular: 0.02"
           material="color: #111"
-          pathfinder="target: #core"></a-mixin>
+          pathfinder="target: #core"
+        ></a-mixin>
         <a-mixin
           id="tower"
           geometry="primitive: box; depth: 2; height: 2; width: 2"
-          material="color: #AAA"></a-mixin>
+          material="color: #AAA"
+        ></a-mixin>
         <a-mixin
           id="towerWeapon"
-          attack-enemy
           geometry="primitive: sphere; radius: 0.5"
           material="color: red"
-          position="0 2 0"></a-mixin>
+          position="0 2 0"
+          tower-weapon
+        ></a-mixin>
       </a-assets>
 
-      <!-- Towers. -->
-      <a-entity id="towers" position="0 1 0">
-        <a-entity mixin="tower" position="2 0 0">
-          <a-entity mixin="towerWeapon"></a-entity>
-        </a-entity>
-        <a-entity mixin="tower"></a-entity>
-      </a-entity>
-
+      <!-- Enemies. -->
       <a-entity id="enemies">
         <a-entity mixin="enemy" position="-10 1 30"></a-entity>
         <a-entity mixin="enemy" position="0 1 30"></a-entity>
         <a-entity mixin="enemy" position="10 1 30"></a-entity>
+      </a-entity>
+
+      <!-- Towers. -->
+      <a-entity id="towers" position="0 1 0">
+        <a-entity mixin="tower" position="-5 0 0">
+          <a-entity mixin="towerWeapon"></a-entity>
+        </a-entity>
+        <a-entity mixin="tower"></a-entity>
+        <a-entity mixin="tower" position="5 0 0">
+          <a-entity mixin="towerWeapon"></a-entity>
+        </a-entity>
       </a-entity>
 
       <!-- Play area. -->

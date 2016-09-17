@@ -10,6 +10,10 @@ AFRAME.registerSystem('enemy', {
   addEnemy: function (enemy) {
     this.enemies.push(enemy);
     return this.id++;
+  },
+
+  removeEnemy: function (enemy) {
+    this.enemies.splice(this.enemies.indexOf(enemy), 1);
   }
 });
 
@@ -18,10 +22,12 @@ AFRAME.registerSystem('enemy', {
  */
 AFRAME.registerComponent('enemy', {
   schema: {
-    hp: {default: 100}
+    hp: {default: 10}
   },
 
   init: function () {
+    this.dead = false;
+
     // Add enemy.
     var id = this.system.addEnemy(this.el);
 
@@ -38,6 +44,8 @@ AFRAME.registerComponent('enemy', {
   applyDamage: function (damage) {
     var el = this.el;
 
+    if (this.dead) { return; }
+
     // Update HP.
     var newHP = Math.max(this.data.hp - damage, 0);
     el.setAttribute('enemy', 'hp', newHP);
@@ -45,7 +53,15 @@ AFRAME.registerComponent('enemy', {
     this.updateHPLabel();
 
     // Check for death.
-    if (newHP <= 0) { el.emit('enemyDead'); }
+    if (newHP <= 0) {
+      this.dead = true;
+      // Remove from system.
+      el.sceneEl.systems.enemy.removeEnemy(el);
+      // Emit event.
+      el.emit('enemyDead');
+      // Remove from DOM.
+      el.parentEl.removeChild(el);
+    }
   },
 
   /**

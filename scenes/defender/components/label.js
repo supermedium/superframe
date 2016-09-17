@@ -18,5 +18,9 @@ AFRAME.registerComponent('label', {
   update: function () {
     this.textEl.setAttribute('bmfont-text', {text: this.data.text});
     this.textEl.setAttribute('position', {x: 0, y: this.data.level, z: 0});
+  },
+
+  remove: function () {
+    this.el.removeChild(this.textEl);
   }
 });

@@ -1,13 +1,13 @@
 /**
- * Attack an enemy.
+ * Tower weapon to attack enemies.
  *
  * Depends on enemy system.
  */
-AFRAME.registerComponent('attack-enemy', {
+AFRAME.registerComponent('tower-weapon', {
   schema: {
     attackRadius: {default: 5},
     damage: {default: 1},
-    fireRate: {default: 5},  // projectiles per second.
+    fireRate: {default: 2},  // projectiles per second.
     projectileMixin: {default: ''}
   },
 
@@ -18,17 +18,28 @@ AFRAME.registerComponent('attack-enemy', {
 
   tick: function (t) {
     var el = this.el;
+    var self = this;
+
+    // No enemies.
+    if (!el.sceneEl.systems.enemy.enemies.length) {
+      el.removeAttribute('label__target');
+      return;
+    }
 
     // Maintain rate of fire.
     var timeSinceLastShot = (t - this.time) / 1000;
     if (timeSinceLastShot < (1 / this.data.fireRate)) { return; }
     this.time = t;
 
-    // Grab the closest enemy and target it.
     if (!this.currentTarget) {
+      // Grab the closest enemy and target it.
       this.currentTarget = getClosestEnemy(el.sceneEl.systems.enemy.enemies,
                                            el.object3D.position.clone());
-      this.el.setAttribute('label__target', {text: 'Target: ' + this.currentTarget.id});
+      // Once dead, find new target.
+      this.currentTarget.addEventListener('enemyDead', function () {
+        self.currentTarget = null;
+      });
+      el.setAttribute('label__target', {text: 'Target: ' + this.currentTarget.id});
     }
 
     // Attack enemy.
