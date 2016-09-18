@@ -7,8 +7,7 @@
     "build": "browserify examples/main.js -o examples/build.js",
     "dev": "budo examples/main.js:build.js --dir examples --port 8008 --live --open",
     "dist": "webpack index.js dist/aframe-text-component.js && webpack -p index.js dist/aframe-text-component.min.js",
-    "postpublish": "npm run dist",
-    "test": "karma start ./tests/karma.conf.js"
+    "postpublish": "npm run dist"
   },
   "repository": {
     "type": "git",
@@ -29,7 +28,7 @@
   },
   "homepage": "https://github.com/ngokevin/kframe/tree/components/mountain#readme",
   "devDependencies": {
-    "aframe": "^0.2.0",
+    "aframe": "^0.3.1",
     "browserify": "^12.0.1",
     "budo": "^8.1.0",
     "webpack": "^1.12.9"
