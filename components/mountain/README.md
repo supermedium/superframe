@@ -2,7 +2,7 @@
 
 Mountain component and primitive for A-Frame.
 
-![Screenshot](https://cloud.githubusercontent.com/assets/674727/18611595/c98bc48e-7cf2-11e6-8e2a-2110fbfe0ff0.png")
+![Screenshot](https://cloud.githubusercontent.com/assets/674727/18611595/c98bc48e-7cf2-11e6-8e2a-2110fbfe0ff0.png)
 
 Uses Perlin noise to create a height map, create a shaded texture from that
 height map using a `<canvas>`, and using the height map to create vertices on a
