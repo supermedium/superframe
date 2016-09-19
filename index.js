@@ -4,6 +4,7 @@ require('./components/entity-generator/');
 require('./components/event-set/');
 require('./components/layout/');
 require('./components/look-at/');
+require('./components/mountain/');
 require('./components/randomizer/');
 require('./components/template/');
 require('./components/text/');

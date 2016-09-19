@@ -59,5 +59,6 @@ var ctx = {
   components: components
 };
 
+// Copy README.
 var readme = nunjucks.render('README.md', ctx);
-console.log(readme);
+fs.writeFileSync('README.md', readme);
