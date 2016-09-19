@@ -58,58 +58,12 @@
     <h2>Components</h2>
 
     <ul id="components">
-      <li>
-        <a href="components/animation/examples/">Animation</a>
-        <p>Animations using anime.js</p>
-      </li>
-      <li>
-        <a href="components/audio-visualizer/examples/">Audio Visualizer</a>
-        <p>Audio visualizations using WebAudio</p>
-      </li>
-      <li>
-        <a href="components/broadcast/examples/">Broadcast</a>
-        <p>Multi-user using raw websockets</p>
-      </li>
-      <li>
-        <a href="components/entity-generator/examples/">Entity Generator</a>
-        <p>Generate a number of entities given a mixin</p>
-      </li>
-      <li>
-        <a href="components/event-set/examples/">Event Set</a>
-        <p>Set properties in response to events</p>
-      </li>
-      <li>
-        <a href="components/firebase/examples/">Firebase</a>
-        <p>Multi-user using Firebase</p>
-      </li>
-      <li>
-        <a href="components/layout/examples/">Layout</a>
-        <p>Position and layout child entities in 3D space</p>
-      </li>
-      <li>
-        <a href="components/look-at/examples/">Look-At</a>
-        <p>Rotate an entity to face towards another entity</p>
-      </li>
-      <li>
-        <a href="components/mountain/examples/">Mountain</a>
-        <p>Mountain terrain using randomly-generated height map</p>
-      </li>
-      <li>
-        <a href="components/randomizer/examples/">Randomizer</a>
-        <p>Randomize color, position, rotation, scale</p>
-      </li>
-      <li>
-        <a href="components/redux/examples/">Redux</a>
-        <p>Hook in Redux reducers, data bindings, and action dispatches</p>
-      </li>
-      <li>
-        <a href="components/template/examples/">Template</a>
-        <p>Encapsulate groups of entities, use templating engines, and do string interpolations</p>
-      </li>
-      <li>
-        <a href="components/text/examples/">Text</a>
-        <p>Geometry-based text</p>
-      </li>
+      {% for component in components -%}
+        <li>
+          <a href="{{ component.exampleIndexHtmlPath }}">{{ component.name }}</a>
+          <p>{{ component.description }}</p>
+        </li>
+      {% endfor %}
     </ul>
 
     <h2>Scenes</h2>
