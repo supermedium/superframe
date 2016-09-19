@@ -1,7 +1,7 @@
 {
   "name": "aframe-animation-component",
   "version": "3.0.1",
-  "description": "Animation component for A-Frame.",
+  "description": "Animations in A-Frame using anime.js",
   "main": "index.js",
   "scripts": {
     "build": "browserify examples/main.js -o examples/build.js",

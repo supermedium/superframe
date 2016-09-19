@@ -1,7 +1,7 @@
 {
   "name": "aframe-firebase-component",
   "version": "3.0.0",
-  "description": "Firebase component for multiuser A-Frame.",
+  "description": "Multi-user in A-Frame using Firebase",
   "main": "index.js",
   "scripts": {
     "build": "browserify examples/main.js -o examples/build.js",

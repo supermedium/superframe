@@ -1,7 +1,7 @@
 {
   "name": "aframe-text-component",
   "version": "0.3.0",
-  "description": "Text geometry component for A-Frame.",
+  "description": "Geometry-based text in A-Frame",
   "main": "index.js",
   "scripts": {
     "build": "browserify examples/main.js -o examples/build.js",

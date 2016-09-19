@@ -1,7 +1,7 @@
 {
   "name": "aframe-redux-component",
   "version": "0.1.0",
-  "description": "Redux component for A-Frame.",
+  "description": "Hook in Redux reducers, data bindings, and action dispatches for A-Frame",
   "main": "index.js",
   "scripts": {
     "build": "browserify examples/main.js -o examples/build.js",

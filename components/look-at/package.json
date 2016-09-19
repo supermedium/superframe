@@ -1,7 +1,7 @@
 {
   "name": "aframe-look-at-component",
   "version": "0.1.2",
-  "description": "Look-at component for A-Frame.",
+  "description": "Rotate an entity to face towards another entity in A-Frame",
   "main": "index.js",
   "scripts": {
     "build": "browserify examples/main.js -o examples/build.js",

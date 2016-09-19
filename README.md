@@ -8,19 +8,19 @@ Kevin's collection of A-Frame components and scenes.
 
 ## Components
 
-- [animation](https:/github.com/ngokevin/kframe/tree/master/components/animation/) - Animation component for A-Frame.
-- [audio-visualizer](https:/github.com/ngokevin/kframe/tree/master/components/audio-visualizer/) - Audio visualizer components for A-Frame.
-- [broadcast](https:/github.com/ngokevin/kframe/tree/master/components/broadcast/) - Broadcast component for A-Frame.
-- [entity-generator](https:/github.com/ngokevin/kframe/tree/master/components/entity-generator/) - Entity Generator component for A-Frame.
-- [event-set](https:/github.com/ngokevin/kframe/tree/master/components/event-set/) - Component to set properties in response to events.
-- [firebase](https:/github.com/ngokevin/kframe/tree/master/components/firebase/) - Firebase component for multiuser A-Frame.
-- [layout](https:/github.com/ngokevin/kframe/tree/master/components/layout/) - Layout component for A-Frame.
-- [look-at](https:/github.com/ngokevin/kframe/tree/master/components/look-at/) - Look-at component for A-Frame.
-- [mountain](https:/github.com/ngokevin/kframe/tree/master/components/mountain/) - Mountain component for A-Frame.
-- [randomizer](https:/github.com/ngokevin/kframe/tree/master/components/randomizer/) - A-Frame Randomizer Components for A-Frame.
-- [redux](https:/github.com/ngokevin/kframe/tree/master/components/redux/) - Redux component for A-Frame.
-- [template](https:/github.com/ngokevin/kframe/tree/master/components/template/) - Template component for A-Frame.
-- [text](https:/github.com/ngokevin/kframe/tree/master/components/text/) - Text geometry component for A-Frame.
+- [animation](https:/github.com/ngokevin/kframe/tree/master/components/animation/) - Animations in A-Frame using anime.js
+- [audio-visualizer](https:/github.com/ngokevin/kframe/tree/master/components/audio-visualizer/) - Audio visualizations in A-Frame using WebAudio
+- [broadcast](https:/github.com/ngokevin/kframe/tree/master/components/broadcast/) - Multi-user in A-Frame using raw websockets
+- [entity-generator](https:/github.com/ngokevin/kframe/tree/master/components/entity-generator/) - Generate a number of entities in A-Frame given a mixin
+- [event-set](https:/github.com/ngokevin/kframe/tree/master/components/event-set/) - Set properties in response to events in A-Frame
+- [firebase](https:/github.com/ngokevin/kframe/tree/master/components/firebase/) - Multi-user in A-Frame using Firebase
+- [layout](https:/github.com/ngokevin/kframe/tree/master/components/layout/) - Position and layout child entities in 3D space for A-Frame
+- [look-at](https:/github.com/ngokevin/kframe/tree/master/components/look-at/) - Rotate an entity to face towards another entity in A-Frame
+- [mountain](https:/github.com/ngokevin/kframe/tree/master/components/mountain/) - Mountain terrain in A-Frame using randomly-generated height maps
+- [randomizer](https:/github.com/ngokevin/kframe/tree/master/components/randomizer/) - Randomize color, position, rotation, and scale in A-Frame
+- [redux](https:/github.com/ngokevin/kframe/tree/master/components/redux/) - Hook in Redux reducers, data bindings, and action dispatches for A-Frame
+- [template](https:/github.com/ngokevin/kframe/tree/master/components/template/) - Encapsulate groups of entities, use templating engines, and do string interpolations in A-Frame
+- [text](https:/github.com/ngokevin/kframe/tree/master/components/text/) - Geometry-based text in A-Frame
 
 
 ## Installation

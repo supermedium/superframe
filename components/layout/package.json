@@ -1,7 +1,7 @@
 {
   "name": "aframe-layout-component",
   "version": "3.0.1",
-  "description": "Layout component for A-Frame.",
+  "description": "Position and layout child entities in 3D space for A-Frame",
   "main": "index.js",
   "scripts": {
     "build": "browserify examples/main.js -o examples/build.js",

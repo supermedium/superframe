@@ -1,7 +1,7 @@
 {
   "name": "aframe-template-component",
   "version": "3.1.1",
-  "description": "Template component for A-Frame.",
+  "description": "Encapsulate groups of entities, use templating engines, and do string interpolations in A-Frame",
   "main": "index.js",
   "scripts": {
     "build": "browserify examples/main.js -o examples/build.js",

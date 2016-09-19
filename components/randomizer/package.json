@@ -1,7 +1,7 @@
 {
   "name": "aframe-randomizer-components",
   "version": "3.0.1",
-  "description": "A-Frame Randomizer Components for A-Frame.",
+  "description": "Randomize color, position, rotation, and scale in A-Frame",
   "main": "index.js",
   "scripts": {
     "build": "browserify examples/main.js -o examples/build.js",
