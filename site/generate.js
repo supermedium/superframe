@@ -33,7 +33,7 @@ var components = glob.sync('components/*').map(function (componentPath) {
       description: $('meta[name="description"]').attr('content'),
       fullRelativePath: examplePath.replace('/index.html', '/'),
       github: path.join(GITHUB, examplePath).replace('/index.html', '/'),
-      relativePath: path.join(examplePath.split('/')[3], '/'),
+      relativePath: path.join('examples', examplePath.split('/')[3], '/'),
       image: image
     };
   });
@@ -42,7 +42,7 @@ var components = glob.sync('components/*').map(function (componentPath) {
     description: json['description'],
     github: path.join(GITHUB, componentPath, '/'),
     name: componentPath.split('/')[1],
-    exampleIndexHtmlPath: path.join(componentPath, 'examples/'),
+    relativePath: path.join(componentPath, '/'),
     examples: examples
   };
 });
@@ -72,7 +72,5 @@ fs.writeFileSync('index.html', indexHtml);
 // Generate component pages.
 components.forEach(function (component) {
   var exampleHtml = nunjucks.render('component.html', component);
-  fs.writeFileSync(
-    path.join(component.exampleIndexHtmlPath, 'index.html'),
-    exampleHtml);
+  fs.writeFileSync(path.join(component.relativePath, 'index.html'), exampleHtml);
 });

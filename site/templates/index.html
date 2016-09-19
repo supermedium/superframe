@@ -60,7 +60,7 @@
     <ul id="components">
       {% for component in components -%}
         <li>
-          <a href="{{ component.exampleIndexHtmlPath }}">{{ component.name }}</a>
+          <a href="{{ component.relativePath }}">{{ component.name }}</a>
           <p>{{ component.description }}</p>
         </li>
       {% endfor %}
