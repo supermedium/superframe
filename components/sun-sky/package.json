@@ -1,0 +1,31 @@
+{
+  "name": "aframe-sun-sky",
+  "version": "3.0.0",
+  "description": "Gradient sky with adjustable sun in A-Frame",
+  "main": "index.js",
+  "scripts": {
+    "postpublish": "npm run dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ngokevin/kframe.git"
+  },
+  "keywords": [
+    "aframe",
+    "aframe-component",
+    "aframe-shader",
+    "aframe-vr",
+    "vr",
+    "mozvr",
+    "webvr"
+  ],
+  "author": "Kevin Ngo <me@ngokevin.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ngokevin/kframe/issues"
+  },
+  "homepage": "https://github.com/ngokevin/kframe/tree/components/sun-sky#readme",
+  "devDependencies": {
+    "aframe": "^0.3.0"
+  }
+}

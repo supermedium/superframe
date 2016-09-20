@@ -18,6 +18,9 @@ module.exports = {
     path: __dirname,
     filename: '[name]/build.js'
   },
+  module: {
+    loaders: [{test: /\.glsl$/, loader: 'shader'}],
+  },
   plugins: [
     new webpack.optimize.UglifyJsPlugin()
   ],

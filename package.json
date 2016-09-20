@@ -43,7 +43,9 @@
     "glob": "^7.0.6",
     "http-server": "^0.9.0",
     "nunjucks": "^2.5.2",
+    "shader-loader": "^1.3.0",
     "webpack": "^1.13.2",
-    "webpack-dev-server": "^1.15.2"
+    "webpack-dev-server": "^1.15.2",
+    "webpack-glsl-loader": "^1.0.1"
   }
 }

@@ -19,6 +19,7 @@ Kevin's collection of A-Frame components and scenes.
 - [mountain](https:/github.com/ngokevin/kframe/tree/master/components/mountain/) - Mountain terrain in A-Frame using randomly-generated height maps
 - [randomizer](https:/github.com/ngokevin/kframe/tree/master/components/randomizer/) - Randomize color, position, rotation, and scale in A-Frame
 - [redux](https:/github.com/ngokevin/kframe/tree/master/components/redux/) - Hook in Redux reducers, data bindings, and action dispatches for A-Frame
+- [sun-sky](https:/github.com/ngokevin/kframe/tree/master/components/sun-sky/) - Gradient sky with adjustable sun in A-Frame
 - [template](https:/github.com/ngokevin/kframe/tree/master/components/template/) - Encapsulate groups of entities, use templating engines, and do string interpolations in A-Frame
 - [text](https:/github.com/ngokevin/kframe/tree/master/components/text/) - Geometry-based text in A-Frame
 
@@ -35,6 +36,7 @@ K-Frame bundles some components together to `kframe.js` for convenience:
 - look-at
 - mountain
 - randomizer
+- sun-sky
 - template
 - text
 
