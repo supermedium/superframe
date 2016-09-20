@@ -1,1 +1,30 @@
-!function(e){function i(t){if(r[t])return r[t].exports;var n=r[t]={exports:{},id:t,loaded:!1};return e[t].call(n.exports,n,n.exports,i),n.loaded=!0,n.exports}var r={};return i.m=e,i.c=r,i.p="",i(0)}([function(e,i,r){r(2),e.exports=r(1)},function(e,i){!function(e){function i(t){if(r[t])return r[t].exports;var n=r[t]={exports:{},id:t,loaded:!1};return e[t].call(n.exports,n,n.exports,i),n.loaded=!0,n.exports}var r={};return i.m=e,i.c=r,i.p="",i(0)}([function(e,i,r){var t=r(!function(){var e=new Error('Cannot find module "./shaders/vertex.glsl"');throw e.code="MODULE_NOT_FOUND",e}()),n=r(!function(){var e=new Error('Cannot find module "./shaders/fragment.glsl"');throw e.code="MODULE_NOT_FOUND",e}());AFRAME.registerShader("sunSky",{schema:{luminance:{"default":1,max:0,min:2,is:"uniform"},mieCoefficient:{"default":.005,min:0,max:.1,is:"uniform"},mieDirectionalG:{"default":.8,min:0,max:1,is:"uniform"},reileigh:{"default":1,max:0,min:4,is:"uniform"},sunPosition:{type:"vec3","default":"0 0 -1",is:"uniform"},turbidity:{"default":2,max:0,min:20,is:"uniform"}},vertexShader:t,fragmentShader:n}),AFRAME.registerPrimitive("a-sun-sky",{defaultComponents:{geometry:{primitive:"sphere",radius:5e3,segmentsWidth:64,segmentsHeight:20},material:{shader:"sunSky"},scale:"-1 1 1"},mappings:{luminance:"material.luminance",mieCoefficient:"material.mieCoefficient",mieDirectionalG:"material.mieDirectionalG",reileigh:"material.reileigh",sunPosition:"material.sunPosition",turbidity:"material.turbidity"}})}])},function(e,i,r){var t=r(!function(){var e=new Error('Cannot find module "./shaders/vertex.glsl"');throw e.code="MODULE_NOT_FOUND",e}()),n=r(!function(){var e=new Error('Cannot find module "./shaders/fragment.glsl"');throw e.code="MODULE_NOT_FOUND",e}());AFRAME.registerShader("sunSky",{schema:{luminance:{"default":1,max:0,min:2,is:"uniform"},mieCoefficient:{"default":.005,min:0,max:.1,is:"uniform"},mieDirectionalG:{"default":.8,min:0,max:1,is:"uniform"},reileigh:{"default":1,max:0,min:4,is:"uniform"},sunPosition:{type:"vec3","default":"0 0 -1",is:"uniform"},turbidity:{"default":2,max:0,min:20,is:"uniform"}},vertexShader:t,fragmentShader:n}),AFRAME.registerPrimitive("a-sun-sky",{defaultComponents:{geometry:{primitive:"sphere",radius:5e3,segmentsWidth:64,segmentsHeight:20},material:{shader:"sunSky"},scale:"-1 1 1"},mappings:{luminance:"material.luminance",mieCoefficient:"material.mieCoefficient",mieDirectionalG:"material.mieDirectionalG",reileigh:"material.reileigh",sunPosition:"material.sunPosition",turbidity:"material.turbidity"}})}]);
+var glob = require('glob');
+var join = require('path').join;
+var webpack = require('webpack');
+
+var ENTRY = {};
+var RESOLVE_ROOT = [__dirname];
+glob.sync('components/*').forEach(function (componentPath) {
+  // Output to components/X/examples/build.js while watching components/X/examples/main.js.
+  ENTRY[join(componentPath, 'examples')] = join(__dirname, componentPath, 'examples', 'main.js');
+
+  // Add local node_modules/ directories.
+  RESOLVE_ROOT.push(join(componentPath));
+});
+
+module.exports = {
+  entry: ENTRY,
+  output: {
+    path: __dirname,
+    filename: '[name]/build.js'
+  },
+  module: {
+    loaders: [{test: /\.glsl$/, loader: 'shader'}],
+  },
+  plugins: [
+    new webpack.optimize.UglifyJsPlugin()
+  ],
+  resolve: {
+    root: RESOLVE_ROOT
+  }
+};
