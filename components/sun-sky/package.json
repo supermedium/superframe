@@ -1,9 +1,10 @@
 {
   "name": "aframe-sun-sky",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Gradient sky with adjustable sun in A-Frame",
   "main": "index.js",
   "scripts": {
+    "dist": "webpack --module-bind 'glsl=shader' index.js dist/aframe-sun-sky.js && webpack --module-bind 'glsl=shader' -p index.js dist/aframe-sun-sky.min.js",
     "postpublish": "npm run dist"
   },
   "repository": {
