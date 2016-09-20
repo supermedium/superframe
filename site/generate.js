@@ -4,7 +4,7 @@ var fs = require('fs');
 var nunjucks = require('nunjucks');
 var path = require('path');
 
-var GITHUB = 'https://github.com/ngokevin/kframe/tree/master';
+var GITHUB = 'https://github.com/ngokevin/kframe/tree/master/';
 
 nunjucks.configure('site/templates');
 
@@ -32,7 +32,7 @@ var components = glob.sync('components/*').map(function (componentPath) {
       title: $('title').text(),
       description: $('meta[name="description"]').attr('content'),
       fullRelativePath: examplePath.replace('/index.html', '/'),
-      github: path.join(GITHUB, examplePath).replace('/index.html', '/'),
+      github: GITHUB + examplePath.replace('/index.html', '/'),
       relativePath: path.join('examples', examplePath.split('/')[3], '/'),
       image: image
     };
@@ -40,7 +40,7 @@ var components = glob.sync('components/*').map(function (componentPath) {
 
   return {
     description: json['description'],
-    github: path.join(GITHUB, componentPath, '/'),
+    github: GITHUB + componentPath + '/',
     name: componentPath.split('/')[1],
     relativePath: path.join(componentPath, '/'),
     examples: examples
