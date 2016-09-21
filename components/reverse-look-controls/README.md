@@ -1,4 +1,4 @@
-## aframe-sky-shader
+## aframe-reverse-look-controls
 
 ### Usage
 
@@ -10,12 +10,12 @@ Install and use by directly including the [browser files](dist):
 <head>
   <title>My A-Frame Scene</title>
   <script src="https://aframe.io/releases/0.3.0/aframe.min.js"></script>
-  <script src="https://rawgit.com/ngokevin/kframe/tree/master/components/sun-sky/dist/aframe-sun-sky.min.js"></script>
+  <script src="https://rawgit.com/ngokevin/kframe/tree/master/components/reverse-look-controls/dist/aframe-reverse-look-controls.min.js"></script>
 </head>
 
 <body>
   <a-scene>
-    <a-sun-sky></a-sun-sky>
+    <a-entity camera reverse-look-controls></a-entity>
   </a-scene>
 </body>
 ```
@@ -25,12 +25,12 @@ Install and use by directly including the [browser files](dist):
 Install via NPM:
 
 ```bash
-npm install aframe-sun-sky
+npm install aframe-reverse-look-controls
 ```
 
 Then register and use.
 
 ```js
 require('aframe');
-require('aframe-sun-sky');
+require('aframe-reverse-look-controls');
 ```
