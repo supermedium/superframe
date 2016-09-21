@@ -19,6 +19,7 @@ Kevin's collection of A-Frame components and scenes.
 - [mountain](https://github.com/ngokevin/kframe/tree/master/components/mountain/) - Mountain terrain in A-Frame using randomly-generated height maps
 - [randomizer](https://github.com/ngokevin/kframe/tree/master/components/randomizer/) - Randomize color, position, rotation, and scale in A-Frame
 - [redux](https://github.com/ngokevin/kframe/tree/master/components/redux/) - Hook in Redux reducers, data bindings, and action dispatches for A-Frame
+- [reverse-look-controls](https://github.com/ngokevin/kframe/tree/master/components/reverse-look-controls/) - Fork of A-Frame v0.3.0 look controls component with reversed mouse drag.
 - [sun-sky](https://github.com/ngokevin/kframe/tree/master/components/sun-sky/) - Gradient sky with adjustable sun in A-Frame
 - [template](https://github.com/ngokevin/kframe/tree/master/components/template/) - Encapsulate groups of entities, use templating engines, and do string interpolations in A-Frame
 - [text](https://github.com/ngokevin/kframe/tree/master/components/text/) - Geometry-based text in A-Frame

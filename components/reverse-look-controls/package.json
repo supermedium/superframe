@@ -1,0 +1,31 @@
+{
+  "name": "aframe-reverse-look-controls-component",
+  "version": "3.0.0",
+  "description": "Fork of A-Frame v0.3.0 look controls component with reversed mouse drag.",
+  "main": "index.js",
+  "scripts": {
+    "dist": "webpack index.js dist/aframe-reverse-look-controls-component.js && webpack index.js dist/aframe-reverse-look-controls-component.min.js",
+    "postpublish": "npm run dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ngokevin/kframe.git"
+  },
+  "keywords": [
+    "aframe",
+    "aframe-component",
+    "aframe-vr",
+    "vr",
+    "mozvr",
+    "webvr"
+  ],
+  "author": "Kevin Ngo <me@ngokevin.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ngokevin/kframe/issues"
+  },
+  "homepage": "https://github.com/ngokevin/kframe/tree/components/reverse-look-controls-component#readme",
+  "devDependencies": {
+    "aframe": "^0.3.0"
+  }
+}
