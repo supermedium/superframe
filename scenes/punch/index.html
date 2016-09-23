@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>A-Frame</title>
+    <script src="https://aframe.io/releases/0.3.1/aframe.min.js"></script>
+    <script src="components/punch-emit.js"></script>
+  </head>
+  <body>
+    <a-scene>
+      <a-assets>
+        <a-mixin id="sphere" geometry="primitive: sphere; radius: 0.01"
+          material="color: red; opacity: 0.5"></a-mixin>
+      </a-assets>
+
+      <a-entity hand-controls="left" punch-emit="sphere"></a-entity>
+      <a-entity hand-controls="right" punch-emit="sphere"></a-entity>
+
+      <!-- Lights. -->
+      <a-sky color="#B9DBE6"></a-sky>
+    </a-scene>
+  </body>
+</html>
