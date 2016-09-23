@@ -1,12 +1,12 @@
 {
   "name": "aframe-mountain-component",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Mountain terrain in A-Frame using randomly-generated height maps",
   "main": "index.js",
   "scripts": {
     "build": "browserify examples/main.js -o examples/build.js",
     "dev": "budo examples/main.js:build.js --dir examples --port 8008 --live --open",
-    "dist": "webpack index.js dist/aframe-text-component.js && webpack -p index.js dist/aframe-text-component.min.js",
+    "dist": "webpack index.js dist/aframe-mountain-component.js && webpack -p index.js dist/aframe-mountain-component.min.js",
     "postpublish": "npm run dist"
   },
   "repository": {
