@@ -1,4 +1,6 @@
-## aframe-sky-shader
+## aframe-sun-sky
+
+<img width="1060" alt="screen shot 2016-09-22 at 5 58 20 pm" src="https://cloud.githubusercontent.com/assets/674727/18770774/2c775afa-80ee-11e6-9a0a-648cea864415.png">
 
 ### Usage
 

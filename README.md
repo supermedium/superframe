@@ -81,3 +81,9 @@ git clone git@github.com:ngokevin/kframe
 npm install  # Run npm install on all inner modules
 npm run dev  # Webpack dev server that watches all component files
 ```
+
+To run one component at a time, pass the name of the component.
+
+```bash
+npm run dev -- sun-sky
+```
