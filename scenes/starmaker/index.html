@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>A-Frame</title>
+    <script src="https://aframe.io/releases/0.3.1/aframe.min.js"></script>
+    <script src="components/time-to-live.js"></script>
+    <script src="components/projectile.js"></script>
+    <script src="components/punch-emit.js"></script>
+  </head>
+  <body>
+    <a-scene>
+      <a-assets>
+        <img id="floor" src="https://cdn.aframe.io/a-painter/images/floor.jpg" crossOrigin="anonymous">
+        <img id="skymap" src="https://cdn.aframe.io/a-painter/images/sky.jpg" crossOrigin="anonymous">
+        <a-mixin id="sphere"
+          geometry="primitive: sphere; radius: 0.008; segmentsHeight: 6; segmentsWidth: 6"
+          material="shader: flat; color: #FFF"
+          time-to-live="4000"
+        ></a-mixin>
+      </a-assets>
+
+      <a-entity hand-controls="left" punch-emit="sphere"></a-entity>
+      <a-entity hand-controls="right" punch-emit="sphere"></a-entity>
+
+      <a-entity id="sky"
+        geometry="primitive: sphere; radius: 11; phiLength: 360; phiStart: 0; thetaLength: 90"
+        material="shader: flat; side: back; height: 2048; src: #skymap; width: 2048"
+      ></a-entity>
+      <a-entity id="ground"
+        geometry="primitive: circle; radius: 12;"
+        rotation="-90 0 0"
+        material="shader: flat; src: #floor"
+      ></a-entity>
+    </a-scene>
+  </body>
+</html>
