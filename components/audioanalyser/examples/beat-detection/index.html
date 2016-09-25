@@ -1,0 +1,34 @@
+<html>
+  <head>
+    <title>Beat Detection</title>
+    <meta name="description" content="Detecting beats (i.e., kick or peaks) in audio"></meta>
+    <script src="https://aframe.io/releases/0.3.1/aframe.min.js"></script>
+    <script src="../build.js"></script>
+    <script src="components/color-on-beat.js"></script>
+  </head>
+  <body>
+    <a-scene>
+      <a-assets>
+        <a-mixin id="box"
+          geometry="primitive: box" material="color: #C03546"
+          audioanalyser="src: #machinecivilization"
+          color-on-beat
+        ></a-mixin>
+        <audio id="machinecivilization" src="machinecivilization.mp3" autoplay loop></audio>
+      </a-assets>
+
+      <a-entity id="container" position="0 0.5 -4">
+        <a-entity mixin="box"
+          audio-visualizer-kick
+          position="0 0 0"
+        ></a-entity>
+      </a-entity>
+
+      <a-light type="ambient" color="#222"></a-light>
+      <a-light type="point" position="1 2 1"></a-light>
+      <a-light type="point" position="-2 2 1"></a-light>
+      <a-plane color="#333" rotation="-90 0 0" height="30" width="30"></a-plane>
+      <a-sky color="#222"></a-sky>
+    </a-scene>
+  </body>
+</html>

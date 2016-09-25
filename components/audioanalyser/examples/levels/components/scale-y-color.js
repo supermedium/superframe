@@ -1,4 +1,6 @@
-/* Change color at different levels of scale. */
+/*
+ * Change color at different levels of scale.
+ */
 AFRAME.registerComponent('scale-y-color', {
   schema: {
     from: {type: 'vec3', default: {x: 0, y: 0, z: 0}},

@@ -1,0 +1,49 @@
+<html>
+  <head>
+    <title>Volume</title>
+    <meta name="description" content="Visualizing global average audio volume"></meta>
+    <script src="https://aframe.io/releases/0.3.1/aframe.min.js"></script>
+    <script src="../build.js"></script>
+    <script src="components/audioanalyser-volume-scale.js"></script>
+  </head>
+  <body>
+    <a-scene antialias="true">
+      <a-assets>
+        <audio id="song" src="sunshine.mp3" autoplay loop></audio>
+        <img id="floor" src="https://cdn.aframe.io/a-painter/images/floor.jpg" crossOrigin="anonymous">
+        <img id="skymap" src="https://cdn.aframe.io/a-painter/images/sky.jpg" crossOrigin="anonymous">
+      </a-assets>
+
+      <a-entity id="jim"
+        geometry="primitive: box; depth: 2; height: 5; width: 3.5"
+        material="color: #510710"
+        position="0 0 -5.25"
+      ></a-entity>
+      <a-sphere id="leftEyeball" position="-1 2 -4" radius="0.5"></a-sphere>
+      <a-sphere id="rightEyeball" position="1 2 -4" radius="0.5"></a-sphere>
+      <a-sphere id="leftEye" color="black" position="-1 2 -3.5" radius="0.1"></a-sphere>
+      <a-sphere id="rightEye" color="black" position="1 2 -3.5" radius="0.1"></a-sphere>
+      <a-sphere id="mouth"
+        color="#000"
+        audioanalyser="src: #song"
+        audioanalyser-volume-scale="multiplier: .008"
+        position="0 1 -4"
+        side="double"
+        shader="flat"
+      ></a-sphere>
+
+      <a-light type="ambient" color="#222"></a-light>
+      <a-light type="point" position="1 2 1"></a-light>
+      <a-light type="point" position="-2 2 1"></a-light>
+      <a-entity id="sky"
+        geometry="primitive: sphere; radius: 11; phiLength: 360; phiStart: 0; thetaLength: 90"
+        material="shader: flat; side: back; height: 2048; src: #skymap; width: 2048"
+      ></a-entity>
+      <a-entity id="ground"
+        geometry="primitive: circle; radius: 12;"
+        rotation="-90 0 0"
+        material="shader: flat; src: #floor"
+      ></a-entity>
+    </a-scene>
+  </body>
+</html>

@@ -1,4 +1,4 @@
-## aframe-audio-visualizer-components
+## aframe-audio-analyser-component
 
 Audio visualizer components for [A-Frame](https://aframe.io) using WebAudio API.
 
