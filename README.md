@@ -9,7 +9,7 @@ Kevin's collection of A-Frame components and scenes.
 ## Components
 
 - [animation](https://github.com/ngokevin/kframe/tree/master/components/animation/) - Animations in A-Frame using anime.js
-- [audio-visualizer](https://github.com/ngokevin/kframe/tree/master/components/audio-visualizer/) - Audio visualizations in A-Frame using WebAudio
+- [audioanalyser](https://github.com/ngokevin/kframe/tree/master/components/audioanalyser/) - Audio visualizations in A-Frame using WebAudio AnalyserNode
 - [broadcast](https://github.com/ngokevin/kframe/tree/master/components/broadcast/) - Multi-user in A-Frame using raw websockets
 - [entity-generator](https://github.com/ngokevin/kframe/tree/master/components/entity-generator/) - Generate a number of entities in A-Frame given a mixin
 - [event-set](https://github.com/ngokevin/kframe/tree/master/components/event-set/) - Set properties in response to events in A-Frame
@@ -80,10 +80,4 @@ pages](#components) for each component.
 git clone git@github.com:ngokevin/kframe
 npm install  # Run npm install on all inner modules
 npm run dev  # Webpack dev server that watches all component files
-```
-
-To run one component at a time, pass the name of the component.
-
-```bash
-npm run dev -- sun-sky
 ```
