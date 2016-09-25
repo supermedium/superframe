@@ -1,11 +1,9 @@
 {
   "name": "aframe-audioanalyser-component",
-  "version": "3.0.1",
-  "description": "Audio visualizations in A-Frame using WebAudio AnalyserNode",
+  "version": "3.0.0",
+  "description": "Audio visualizations in A-Frame using Web Audio (AnalyserNode)",
   "main": "index.js",
   "scripts": {
-    "build": "browserify examples/main.js -o examples/build.js",
-    "dev": "budo examples/main.js:build.js --dir examples --port 8000 --live --open",
     "dist": "webpack index.js dist/aframe-audioanalyser-component.js && webpack -p index.js dist/aframe-audioanalyser-component.min.js",
     "postpublish": "npm run dist"
   },
@@ -28,7 +26,6 @@
   },
   "homepage": "https://github.com/ngokevin/tree/components/audio-analyser#readme",
   "devDependencies": {
-    "aframe": "^0.3.0",
     "aframe-entity-generator-component": "^0.1.0",
     "aframe-layout-component": "^1.2.0",
     "browserify": "^12.0.1",

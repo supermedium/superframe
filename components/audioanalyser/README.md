@@ -1,44 +1,48 @@
-## aframe-audio-analyser-component
+## aframe-audioanalyser-component
 
-Audio visualizer components for [A-Frame](https://aframe.io) using WebAudio API.
+Audio visualizations for [A-Frame](https://aframe.io) using Web Audio (`AnalyserNode`).
+
+![analyser](https://cloud.githubusercontent.com/assets/674727/18812560/9ad8acf6-828d-11e6-9cea-a39487e5ffdc.gif)
+
+These components mostly provide processed Web Audio data (beat detection,
+levels, volume, waveform). How that is visualized is up to you (by writing
+components that use this data to have a visual effect). Components will generally
+implement the `tick` handler and read the analyser data. See the examples for
+some example visualization components.
 
 ### Properties
 
-#### audio-visualizer
-
 | Property              | Description                                                          | Default Value |
 | --------              | -----------                                                          | ------------- |
+| enableBeatDetection   | Whether or not to detect beats. Disable if not using.                | true          |
+| enableLevels          | Whether or not to store frequency data. Disable if not using.        | true          |
+| enableVolume          | Whether or not to calculate average volume. Disable if not using.    | true          |
+| enableWaveform        | Whether or not to store waveform data. Disable if not using.         | true          |
 | fftSize               | Frequency domain.                                                    | 2048          |
 | smoothingTimeConstant | How smooth the frequency data is returned.                           | 0.8           |
 | unique                | Whether to share the audio instance with other visualizing entities. | false         |
 
+### Members
+
+| Member   | Description                                                       | Type          |
+| -------- | -----------                                                       | ------------- |
+| analyser | Web Audio AnalyserNode                                            | AnalyserNode  |
+| volume   | Whether or not to store frequency data. Disable if not using.     | number        |
+| waveform | Whether or not to calculate average volume. Disable if not using. | Uint8Array    |
+| levels   | Whether or not to store waveform data. Disable if not using.      | Uint8Array    |
+
 To access the analyser node:
 
 ```
-el.components['audio-visualizer'].analyser;
+el.components.audioanalyser.analyser;
 ```
 
-#### audio-visualizer-kick
+### Events
 
-Adds kick with `audio-visualizer` component as a dependency.
-
-Kicks are detected when the amplitude (normalized values between 0 and 1) of a
-specified frequency, or the max amplitude over a range, is greater than the
-minimum threshold, as well as greater than the previously registered kick's
-amplitude, which is decreased by the decay rate per frame.
-
-| Property  | Description                                                                    | Default Value |
-| --------  | -----------                                                                    | ------------- |
-| frequency | Range of frequencies of spectrum to check.                                     | 127, 129      |
-| threshold | Threshold of amplitude to go over to fire a kick.                              | 0.00001       |
-| decay     | Rate that previously registered kick's amplitude is reduced by on every frame. | 0             |
-
-Events will be emitted on kicks and off kicks.
-
-| Event Name                  | Description                                   |
-| --------                    | -----------                                   |
-| audio-visualizer-kick-start | Kick start. Went from not kicking to kicking. |
-| audio-visualizer-kick-end   | Kick end. Went from kicking to not kicking.   |
+| Event Name          | Description                        |
+| --------            | -----------                        |
+| audioanalyser-beat  | Beat detected with beat detection. |
+| audioanalyser-ready | AnalyserNode initialized.          |
 
 ### Usage
 
@@ -49,13 +53,19 @@ Install and use by directly including the [browser files](dist):
 ```html
 <head>
   <title>Audio Visualizer</title>
-  <script src="https://aframe.io/releases/0.3.0/aframe.min.js"></script>
-  <script src="https://rawgit.com/ngokevin/aframe-audio-visualizer-components/master/dist/aframe-audio-visualizer-components.min.js"></script>
+  <script src="https://aframe.io/releases/0.3.1/aframe.min.js"></script>
+  <script src="https://unpkg.com/aframe-audioanalyser-component/dist/aframe-audioanalyser-components.min.js"></script>
 </head>
 
 <body>
   <a-scene>
-    <a-entity audio-visualizer="src: url(rickroll.mp3)" audio-visualizer-kick></a-entity>
+    <a-assets>
+      <audio id="song" src="rickroll.mp3" autoplay loop></audio>
+    </a-assets>
+    <a-entity
+      audio-analyser="#song"
+      component-that-does-stuff-with-audio-analyser-data
+    ></a-entity>
   </a-scene>
 </body>
 ```
@@ -65,12 +75,12 @@ Install and use by directly including the [browser files](dist):
 Install via NPM:
 
 ```bash
-npm install aframe-audio-visualizer-components
+npm install aframe-audioanalyser-component
 ```
 
 Then register and use.
 
 ```js
 require('aframe');
-require('aframe-audio-visualizer-components');
+require('aframe-audioanalyser-component');
 ```
