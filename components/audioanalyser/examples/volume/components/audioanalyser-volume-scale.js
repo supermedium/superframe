@@ -14,7 +14,6 @@ AFRAME.registerComponent('audioanalyser-volume-scale', {
     if (!analyserComponent.analyser) { return; }
 
     volume = analyserComponent.volume * this.data.multiplier;
-    console.log(volume);
     el.setAttribute('scale', {
       x: volume,
       y: volume,
