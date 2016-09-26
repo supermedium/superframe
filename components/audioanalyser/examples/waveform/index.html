@@ -4,30 +4,39 @@
     <meta name="description" content="Visualizing audio waveform (i.e., what the waves look like moving through a physical medium)"></meta>
     <script src="https://aframe.io/releases/0.3.1/aframe.min.js"></script>
     <script src="../build.js"></script>
+    <script src="components/audioanalyser-volume-bind.js"></script>
     <script src="components/audioanalyser-waveform.js"></script>
+    <script src="components/if-no-vr-headset.js"></script>
   </head>
   <body>
     <a-scene antialias="true">
       <a-assets>
-        <audio id="song" src="heartofme.mp3" autoplay loop></audio>
+        <audio id="song" src="lightitup.wav" autoplay loop></audio>
         <img id="floor" src="https://cdn.aframe.io/a-painter/images/floor.jpg" crossOrigin="anonymous">
       </a-assets>
 
-      <a-entity
+      <a-entity id="analyser"
         audioanalyser="src: #song"
-        audioanalyser-waveform="radius: 1"
+        audioanalyser-waveform="radius: 0.5"
         rotation="90 0 0"
-        position="0 10 0"
+        position="0 50 0"
       ></a-entity>
 
+      <a-entity hand-controls="left" if-no-vr-headset="visible: false"></a-entity>
+      <a-entity hand-controls="right" if-no-vr-headset="visible: false"></a-entity>
+
       <a-light type="ambient" color="#222"></a-light>
-      <a-light type="point" position="1 2 1"></a-light>
+      <a-light
+        audioanalyser-volume-bind="analyserEl: #analyser; component: light; property: intensity; max: 2.2; multiplier: .018"
+        type="point"
+        position="1 2 1"
+      ></a-light>
       <a-light type="point" position="-2 2 1"></a-light>
       <a-sky color="#111"></a-sky>
       <a-entity id="ground"
         geometry="primitive: circle; radius: 30"
         rotation="-90 0 0"
-        material="shader: flat; src: #floor"
+        material="src: #floor"
       ></a-entity>
     </a-scene>
   </body>

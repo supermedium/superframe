@@ -89,7 +89,7 @@ AFRAME.registerComponent('audioanalyser-waveform', {
 
     // Write current waveform into all rings.
     this.geometry.vertices.forEach(function (vertex, index) {
-      vertex.z = Math.max(analyserComponent.waveform[index] * data.multiplier,
+      vertex.z = Math.min(analyserComponent.waveform[index] * data.multiplier,
                           data.maxHeight);
     });
 
