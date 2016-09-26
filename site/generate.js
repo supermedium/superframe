@@ -84,8 +84,7 @@ glob.sync('components/*/examples/*/*.html').forEach(function (htmlPath) {
   var githubCorner = nunjucks.render('github-corner.html', {
     github: GITHUB + htmlPath.replace(/index.html$/, '')
   });
-  html = html.replace(/<\/a-scene>((.|[\r\n])*)<!--githubcorner-->/, '</a-scene>\n');
-  html = html.replace(/<!--githubcorner-->((.|[\r\n])*)<!--endgithubcorner-->/g, '');
+  html = html.replace(/<\/a-scene>((.|[\r\n])*)<!--endgithubcorner-->/, '</a-scene>');
   html = html.replace(/  <\/body>/, '\n' + githubCorner + '  </body>');
   fs.writeFileSync(htmlPath, html);
 });

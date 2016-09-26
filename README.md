@@ -74,22 +74,10 @@ require('kframe');
 For documentation on installing individual components, see the [documentation
 pages](#components) for each component.
 
-## Development
+## Local Installation
 
 ```bash
 git clone git@github.com:ngokevin/kframe
 npm install  # Run npm install on all inner modules
 npm run dev  # Webpack dev server that watches all component files
-```
-
-To develop on only a single component:
-
-```bash
-npm run dev -- component-name
-```
-
-To generate web pages:
-
-```bash
-npm run generate
 ```
