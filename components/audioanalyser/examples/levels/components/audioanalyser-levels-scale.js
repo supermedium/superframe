@@ -2,19 +2,20 @@
  * Scale children based on audio frequency levels.
  */
 AFRAME.registerComponent('audioanalyser-levels-scale', {
-  dependencies: ['audioanalyser'],
-
   schema: {
+    analyserEl: {type: 'selector'},
     max: {default: 20},
     multiplier: {default: 100}
   },
 
   tick: function (time) {
+    var analyserEl;
     var children;
     var data = this.data;
     var levels;
 
-    levels = this.el.components.audioanalyser.levels;
+    analyserEl = data.analyserEl || this.el;
+    levels = analyserEl.components.audioanalyser.levels;
     if (!levels) { return; }
 
     children = this.el.children;
