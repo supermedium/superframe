@@ -74,3 +74,14 @@ components.forEach(function (component) {
   var exampleHtml = nunjucks.render('component.html', component);
   fs.writeFileSync(path.join(component.relativePath, 'index.html'), exampleHtml);
 });
+
+// Append GitHub corners to all pages.
+glob.sync('components/*/examples/*/*.html').forEach(function (htmlPath) {
+  var html = fs.readFileSync(htmlPath, 'utf-8');
+  var githubCorner = nunjucks.render('github-corner.html', {
+    url: GITHUB + htmlPath.replace(/index.html$/, '')
+  });
+  html = html.replace(/<!--githubcorner-->.*<!--endgithubcorner-->/, '');
+  html = html.replace(/  <\/body>/, '\n' + githubCorner + '  </body>');
+  fs.writeFileSync(htmlPath, html);
+});
