@@ -15,25 +15,28 @@ var components = glob.sync('components/*').map(function (componentPath) {
 
   // Get examples.
   var examples = glob.sync(path.join(componentPath, 'examples/*/index.html'));
-  examples = examples.map(function (examplePath) {
-    var html = fs.readFileSync(examplePath, 'utf-8');
+  examples = examples.map(function (exampleHTMLPath) {
+    var examplePath = exampleHTMLPath.replace('/index.html', '/');
+    var html = fs.readFileSync(exampleHTMLPath, 'utf-8');
     var $ = cheerio.load(html);
 
     // Preview image.
     var image = null;
     if (fs.existsSync(path.join(examplePath, 'preview.png'))) {
       image = path.join(examplePath, 'preview.png');
+      image = image.split('/').splice(-3).join('/');
     } else if (fs.existsSync(path.join(examplePath, 'preview.gif'))) {
       image = path.join(examplePath, 'preview.gif');
+      image = image.split('/').splice(-3).join('/');
     }
 
     // Metadata.
     return {
       title: $('title').text(),
       description: $('meta[name="description"]').attr('content'),
-      fullRelativePath: examplePath.replace('/index.html', '/'),
-      github: GITHUB + examplePath.replace('/index.html', '/'),
-      relativePath: path.join('examples', examplePath.split('/')[3], '/'),
+      fullRelativePath: exampleHTMLPath,
+      github: GITHUB + examplePath,
+      relativePath: path.join('examples', exampleHTMLPath.split('/')[3], '/'),
       image: image
     };
   });
@@ -79,7 +82,7 @@ components.forEach(function (component) {
 glob.sync('components/*/examples/*/*.html').forEach(function (htmlPath) {
   var html = fs.readFileSync(htmlPath, 'utf-8');
   var githubCorner = nunjucks.render('github-corner.html', {
-    url: GITHUB + htmlPath.replace(/index.html$/, '')
+    github: GITHUB + htmlPath.replace(/index.html$/, '')
   });
   html = html.replace(/<!--githubcorner-->.*<!--endgithubcorner-->/, '');
   html = html.replace(/  <\/body>/, '\n' + githubCorner + '  </body>');

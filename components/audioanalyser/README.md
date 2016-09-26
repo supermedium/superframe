@@ -10,6 +10,8 @@ components that use this data to have a visual effect). Components will generall
 implement the `tick` handler and read the analyser data. See the examples for
 some example visualization components.
 
+Not tested on mobile.
+
 ### Properties
 
 | Property              | Description                                                          | Default Value |
