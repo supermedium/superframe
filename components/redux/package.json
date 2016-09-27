@@ -1,6 +1,6 @@
 {
   "name": "aframe-redux-component",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Hook in Redux reducers, data bindings, and action dispatches for A-Frame",
   "main": "index.js",
   "scripts": {

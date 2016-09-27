@@ -16,7 +16,11 @@ glob.sync(components).forEach(function (componentPath) {
   RESOLVE_ROOT.push(join(componentPath));
 });
 
-var PLUGINS = [];
+var PLUGINS = [
+  new webpack.DefinePlugin({
+    'process.env': {'NODE_ENV': JSON.stringify('production')}
+  })
+];
 if (process.env.NODE_ENV === 'production') {
   PLUGINS.push(new webpack.optimize.UglifyJsPlugin());
 }
