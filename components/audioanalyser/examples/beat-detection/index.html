@@ -8,6 +8,7 @@
     <script src="../lib/spotify-web-api.js"></script>
     <script src="../build.js"></script>
     <script src="../components/color-on-beat.js"></script>
+    <script src="../components/.js"></script>
     <script src="../components/ring-on-beat.js"></script>
     <script src="../components/spotify.js"></script>
   </head>
@@ -28,6 +29,12 @@
         color-on-beat="analyserEl: #analyser"
         ring-on-beat="analyserEl: #analyser"
         position="0 0.5 -4">
+      </a-entity>
+
+      <a-entity id="text"
+        bmfont-text="text: Say out loud 'play <artist name or song>'; color: #FFF"
+        position="-1.85 2 -4"
+        remove-on-event="el: #analyser; event: spotify-play">
       </a-entity>
 
       <a-light type="ambient" color="#222"></a-light>

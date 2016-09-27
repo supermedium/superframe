@@ -10,6 +10,8 @@
     <script src="../components/audioanalyser-levels-scale.js"></script>
     <script src="../components/audioanalyser-volume-bind.js"></script>
     <script src="../components/audioanalyser-volume-scale.js"></script>
+    <script src="../components/remove-on-event.js"></script>
+    <script src="../components/ring-on-beat.js"></script>
     <script src="../components/scale-y-color.js"></script>
     <script src="../components/spotify.js"></script>
   </head>
@@ -30,9 +32,16 @@
         spotify
       ></a-entity>
 
+      <a-entity id="text"
+        bmfont-text="text: Say out loud 'play <artist name or song>'; color: #FFF"
+        position="-1.9 4 -4"
+        remove-on-event="el: #analyser; event: spotify-play">
+      </a-entity>
+
       <a-entity id="jim"
         geometry="primitive: box; depth: 2; height: 5; width: 3.5"
         material="color: #10193F"
+        ring-on-beat="analyserEl: #analyser"
         position="0 0 -5.25"
       ></a-entity>
       <a-sphere id="leftEyeball" position="-1 2 -4" radius="0.5" shader="flat"></a-sphere>
