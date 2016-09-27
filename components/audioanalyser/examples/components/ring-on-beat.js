@@ -14,6 +14,7 @@ AFRAME.registerComponent('ring-on-beat', {
     analyserEl.addEventListener('audioanalyser-beat', function () {
       var ringEl = document.createElement('a-ring');
       ringEl.setAttribute('material', 'opacity', '0.6');
+      ringEl.setAttribute('position', '0 0.1 0');
       ringEl.setAttribute('rotation', '-90 0 0');
       el.appendChild(ringEl);
 
