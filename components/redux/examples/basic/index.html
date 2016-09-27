@@ -2,14 +2,28 @@
   <head>
     <title>Basic</title>
     <meta name="description" content="Work in progress"></meta>
+    <script src="https://aframe.io/releases/0.3.1/aframe.min.js"></script>
     <script src="../build.js"></script>
-    <script src="reducers/player.js"></script>
+    <script src="reducers.js"></script>
+    <script>
+      AFRAME.registerComponent('increase-counter', {
+        tick: function () {
+          this.el.sceneEl.systems.redux.store.dispatch({
+            type: 'COUNTER__INCREASE'
+          });
+        }
+      });
+    </script>
   </head>
   <body>
-    <a-scene redux="reducers: player">
-      <a-assets></a-assets>
-      <a-entity geometry="primitive: box" material="color: #C03546"
-                redux="player.health: opacity"></a-entity>
+    <a-scene redux="reducers: counter">
+      <a-entity
+        bmfont-text="color: #111"
+        redux-bind="counter.number: bmfont-text.text"
+        increase-counter
+        position="0 1 -4"
+      ></a-entity>
+      <a-sky color="#24CAFF"></a-sky>
     </a-scene>
 
     <!--githubcorner-->

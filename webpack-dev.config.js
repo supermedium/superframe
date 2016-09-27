@@ -16,6 +16,11 @@ glob.sync(components).forEach(function (componentPath) {
   RESOLVE_ROOT.push(join(componentPath));
 });
 
+var PLUGINS = [];
+if (process.env.NODE_ENV === 'production') {
+  PLUGINS.push(new webpack.optimize.UglifyJsPlugin());
+}
+
 module.exports = {
   entry: ENTRY,
   output: {
@@ -25,9 +30,7 @@ module.exports = {
   module: {
     loaders: [{test: /\.glsl$/, loader: 'shader'}],
   },
-  plugins: [
-    new webpack.optimize.UglifyJsPlugin()
-  ],
+  plugins: PLUGINS,
   resolve: {
     root: RESOLVE_ROOT
   }

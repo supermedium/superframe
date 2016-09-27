@@ -1,11 +1,9 @@
 {
   "name": "aframe-redux-component",
-  "version": "0.1.0",
+  "version": "3.0.0",
   "description": "Hook in Redux reducers, data bindings, and action dispatches for A-Frame",
   "main": "index.js",
   "scripts": {
-    "build": "browserify examples/main.js -o examples/build.js",
-    "dev": "budo examples/main.js:build.js --dir examples --port 8000 --live --open",
     "dist": "webpack index.js dist/aframe-redux-component.js && webpack -p index.js dist/aframe-redux-component.min.js",
     "lint": "semistandard -v | snazzy",
     "postpublish": "npm run dist"
@@ -29,11 +27,7 @@
   },
   "homepage": "https://github.com/ngokevin/kframe/tree/components/redux#readme",
   "devDependencies": {
-    "aframe": "aframevr/aframe#master",
-    "browserify": "^13.0.0",
-    "budo": "^8.2.2",
-    "inquirer": "^1.0.2",
-    "randomcolor": "^0.4.4",
+    "aframe-bmfont-text-component": "^0.1.4",
     "semistandard": "^8.0.0",
     "shelljs": "^0.7.0",
     "shx": "^0.1.1",
