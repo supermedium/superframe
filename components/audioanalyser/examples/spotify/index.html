@@ -19,8 +19,8 @@
         <img id="skymap" src="https://cdn.aframe.io/a-painter/images/sky.jpg" crossOrigin="anonymous">
         <a-mixin id="bar"
           geometry="primitive: box"
-          material="color: rgb(10, 10, 60)"
-          scale-y-color="from: 10 10 60; to: 200, 210, 240; maxScale: 15"
+          material="color: rgb(10, 20, 50); shader: flat"
+          scale-y-color="from: 10 20 50; to: 210, 220, 250; maxScale: 15"
         ></a-mixin>
       </a-assets>
 
@@ -49,7 +49,7 @@
 
       <a-entity
         audioanalyser-levels-scale="analyserEl: #analyser; max: 50; multiplier: 0.06"
-        entity-generator="mixin: bar; num: 256"
+        entity-generator="mixin: bar; num: 128"
         layout="type: circle; radius: 10"
         rotation="0 180 0"
       ></a-entity>
@@ -58,11 +58,6 @@
       <a-light
         audioanalyser-volume-bind="analyserEl: #analyser; component: light; property: intensity; max: 2.2; multiplier: .01"
         position="1 2 1"
-        type="point"
-      ></a-light>
-      <a-light
-        audioanalyser-volume-bind="analyserEl: #analyser; component: light; property: intensity; max: 2.2; multiplier: .01"
-        position="-2 2 1"
         type="point"
       ></a-light>
       <a-entity id="sky"
