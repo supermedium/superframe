@@ -119,12 +119,8 @@
 
 	    function init (analyser) {
 	      self.analyser = analyser;
-	      if (data.enableLevels) {
-	        self.levels = new Uint8Array(self.analyser.frequencyBinCount);
-	      }
-	      if (data.enableWaveform) {
-	        self.waveform = new Uint8Array(self.analyser.fftSize);
-	      }
+	      self.levels = new Uint8Array(self.analyser.frequencyBinCount);
+	      self.waveform = new Uint8Array(self.analyser.fftSize);
 	      self.el.emit('audioanalyser-ready', {analyser: analyser});
 	    }
 	  },
