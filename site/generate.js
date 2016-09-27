@@ -5,6 +5,7 @@ var nunjucks = require('nunjucks');
 var path = require('path');
 
 var GITHUB = 'https://github.com/ngokevin/kframe/tree/master/';
+var RAW_GITHUB = 'https://raw.githubusercontent.com/ngokevin/kframe/master/';
 
 nunjucks.configure('site/templates');
 
@@ -86,5 +87,25 @@ glob.sync('components/*/examples/*/*.html').forEach(function (htmlPath) {
   });
   html = html.replace(/<\/a-scene>((.|[\r\n])*)<!--endgithubcorner-->/, '</a-scene>');
   html = html.replace(/  <\/body>/, '\n' + githubCorner + '  </body>');
+  fs.writeFileSync(htmlPath, html);
+});
+
+// Generate preview meta tags.
+glob.sync('components/*/examples/*/*.html').forEach(function (htmlPath) {
+  var html = fs.readFileSync(htmlPath, 'utf-8');
+  var examplePath = htmlPath.replace('index.html', '');
+
+  var image;
+  if (fs.existsSync(path.join(examplePath, 'preview.png'))) {
+    image = 'preview.png';
+  } else if (fs.existsSync(path.join(examplePath, 'preview.gif'))) {
+    image = 'preview.gif';
+  }
+  if (!image) { return; }
+  image = RAW_GITHUB + examplePath + image;
+
+  var meta = '<meta property="og:image" content="' + image + '"></meta>\n';
+  html = html.replace(/<meta property="og:image".*?<\/meta>\n    /, '');
+  html = html.replace(/<script/, meta + '    <script');
   fs.writeFileSync(htmlPath, html);
 });
