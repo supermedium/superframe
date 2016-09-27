@@ -4,7 +4,9 @@
   "description": "Hook in Redux reducers, data bindings, and action dispatches for A-Frame",
   "main": "index.js",
   "scripts": {
-    "dist": "webpack index.js dist/aframe-redux-component.js && webpack -p index.js dist/aframe-redux-component.min.js",
+    "dist": "npm run dist:min && npm run dist:max",
+    "dist:min": "webpack index.js dist/aframe-redux-component.js",
+    "dist:max": "NODE_ENV=production && webpack -p index.js dist/aframe-redux-component.min.js",
     "lint": "semistandard -v | snazzy",
     "postpublish": "npm run dist"
   },
