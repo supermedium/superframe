@@ -1,6 +1,7 @@
 ## aframe-redux-component
 
-A [Redux](http://redux.js.org/) component for [A-Frame](https://aframe.io).
+Hook in [Redux](http://redux.js.org/) reducers, data bindings, and action
+dispatches for [A-Frame](https://aframe.io).
 
 This component provides simple hooks into A-Frame for creating reducers,
 setting up component data-bindings to the state, and dispatching actions. All
@@ -8,13 +9,13 @@ without React. What's cooler than Redux VR?
 
 ### Usage
 
-The Redux system will create the store using passed in reducers:
+The Redux system will create the store by combining registered reducers:
 
 ```html
 <a-scene redux="reducers: counter"></a-scene>
 ```
 
-To register reducers, we can use the `AFRAME.registerReducer` API:
+To register reducers, use `AFRAME.registerReducer`:
 
 ```js
 AFRAME.registerReducer('counter', {
@@ -48,13 +49,14 @@ AFRAME.registerReducer('counter', {
 });
 ```
 
-The `redux` component handles data binding. The component subscribes to the
-store to update an entity's components on every change. The keys of the
+The `redux-bind` component handles data binding. The component subscribes to
+the store to update an entity's components on every change. The keys of the
 component are state selectors, using dot-delimitation to reach deeper into the
 state. The values of the component define what components to data-bind the
 state property to.
 
-This will bind `reduxState.counter.number` to the `bmfont-text` component.
+This will bind `reduxState.counter.number` to the `bmfont-text.text` component
+property.
 
 ```html
 <a-entity redux="counter.number: bmfont-text"></a-entity>
@@ -63,7 +65,13 @@ This will bind `reduxState.counter.number` to the `bmfont-text` component.
 To dispatch an action, we can use the Redux system's `dispatch` method.
 
 ```js
-document.querySelector('a-scene').systems.redux.dispatch(AFRAME.reducers.counter.DECREASE_COUNTER);
+AFRAME.registerComponent('increase-counter', {
+  tick: function () {
+    this.el.sceneEl.systems.redux.store.dispatch({
+      type: 'COUNTER__INCREASE'
+    });
+  }
+});
 ```
 
 ### API
@@ -90,6 +98,7 @@ Install and use by directly including the [browser files](dist):
 <head>
   <title>My A-Frame Scene</title>
   <script src="https://aframe.io/releases/0.3.0/aframe.min.js"></script>
+  <script src="https://unpkg.com/aframe-bmfont-text-component/dist/aframe-bmfont-text-component.min.js"></script>
   <script src="https://unpkg.com/aframe-redux-component/dist/aframe-redux-component.min.js"></script>
 </head>
 
