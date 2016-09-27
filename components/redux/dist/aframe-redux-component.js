@@ -44,16 +44,8 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	(function webpackMissingModule() { throw new Error("Cannot find module \"index.js\""); }());
-	module.exports = __webpack_require__(1);
-
-
-/***/ },
-/* 1 */
-/***/ function(module, exports, __webpack_require__) {
-
 	/* global AFRAME */
-	var redux = __webpack_require__(2);
+	var redux = __webpack_require__(1);
 
 	var setComponentProperty = AFRAME.utils.entity.setComponentProperty;
 	var combineReducers = redux.combineReducers;
@@ -210,7 +202,7 @@
 
 
 /***/ },
-/* 2 */
+/* 1 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -218,27 +210,27 @@
 	exports.__esModule = true;
 	exports.compose = exports.applyMiddleware = exports.bindActionCreators = exports.combineReducers = exports.createStore = undefined;
 
-	var _createStore = __webpack_require__(3);
+	var _createStore = __webpack_require__(2);
 
 	var _createStore2 = _interopRequireDefault(_createStore);
 
-	var _combineReducers = __webpack_require__(12);
+	var _combineReducers = __webpack_require__(11);
 
 	var _combineReducers2 = _interopRequireDefault(_combineReducers);
 
-	var _bindActionCreators = __webpack_require__(14);
+	var _bindActionCreators = __webpack_require__(13);
 
 	var _bindActionCreators2 = _interopRequireDefault(_bindActionCreators);
 
-	var _applyMiddleware = __webpack_require__(15);
+	var _applyMiddleware = __webpack_require__(14);
 
 	var _applyMiddleware2 = _interopRequireDefault(_applyMiddleware);
 
-	var _compose = __webpack_require__(16);
+	var _compose = __webpack_require__(15);
 
 	var _compose2 = _interopRequireDefault(_compose);
 
-	var _warning = __webpack_require__(13);
+	var _warning = __webpack_require__(12);
 
 	var _warning2 = _interopRequireDefault(_warning);
 
@@ -261,7 +253,7 @@
 	exports.compose = _compose2['default'];
 
 /***/ },
-/* 3 */
+/* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -270,11 +262,11 @@
 	exports.ActionTypes = undefined;
 	exports['default'] = createStore;
 
-	var _isPlainObject = __webpack_require__(4);
+	var _isPlainObject = __webpack_require__(3);
 
 	var _isPlainObject2 = _interopRequireDefault(_isPlainObject);
 
-	var _symbolObservable = __webpack_require__(9);
+	var _symbolObservable = __webpack_require__(8);
 
 	var _symbolObservable2 = _interopRequireDefault(_symbolObservable);
 
@@ -527,12 +519,12 @@
 	}
 
 /***/ },
-/* 4 */
+/* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var getPrototype = __webpack_require__(5),
-	    isHostObject = __webpack_require__(7),
-	    isObjectLike = __webpack_require__(8);
+	var getPrototype = __webpack_require__(4),
+	    isHostObject = __webpack_require__(6),
+	    isObjectLike = __webpack_require__(7);
 
 	/** `Object#toString` result references. */
 	var objectTag = '[object Object]';
@@ -603,10 +595,10 @@
 
 
 /***/ },
-/* 5 */
+/* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var overArg = __webpack_require__(6);
+	var overArg = __webpack_require__(5);
 
 	/** Built-in value references. */
 	var getPrototype = overArg(Object.getPrototypeOf, Object);
@@ -615,7 +607,7 @@
 
 
 /***/ },
-/* 6 */
+/* 5 */
 /***/ function(module, exports) {
 
 	/**
@@ -636,7 +628,7 @@
 
 
 /***/ },
-/* 7 */
+/* 6 */
 /***/ function(module, exports) {
 
 	/**
@@ -662,7 +654,7 @@
 
 
 /***/ },
-/* 8 */
+/* 7 */
 /***/ function(module, exports) {
 
 	/**
@@ -697,14 +689,14 @@
 
 
 /***/ },
-/* 9 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(10);
+	module.exports = __webpack_require__(9);
 
 
 /***/ },
-/* 10 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
@@ -713,7 +705,7 @@
 		value: true
 	});
 
-	var _ponyfill = __webpack_require__(11);
+	var _ponyfill = __webpack_require__(10);
 
 	var _ponyfill2 = _interopRequireDefault(_ponyfill);
 
@@ -732,7 +724,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 11 */
+/* 10 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -760,7 +752,7 @@
 	};
 
 /***/ },
-/* 12 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -768,13 +760,13 @@
 	exports.__esModule = true;
 	exports['default'] = combineReducers;
 
-	var _createStore = __webpack_require__(3);
+	var _createStore = __webpack_require__(2);
 
-	var _isPlainObject = __webpack_require__(4);
+	var _isPlainObject = __webpack_require__(3);
 
 	var _isPlainObject2 = _interopRequireDefault(_isPlainObject);
 
-	var _warning = __webpack_require__(13);
+	var _warning = __webpack_require__(12);
 
 	var _warning2 = _interopRequireDefault(_warning);
 
@@ -907,7 +899,7 @@
 	}
 
 /***/ },
-/* 13 */
+/* 12 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -937,7 +929,7 @@
 	}
 
 /***/ },
-/* 14 */
+/* 13 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -993,7 +985,7 @@
 	}
 
 /***/ },
-/* 15 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1004,7 +996,7 @@
 
 	exports['default'] = applyMiddleware;
 
-	var _compose = __webpack_require__(16);
+	var _compose = __webpack_require__(15);
 
 	var _compose2 = _interopRequireDefault(_compose);
 
@@ -1056,7 +1048,7 @@
 	}
 
 /***/ },
-/* 16 */
+/* 15 */
 /***/ function(module, exports) {
 
 	"use strict";

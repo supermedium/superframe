@@ -10,6 +10,10 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 module.exports = {
-  entry: 'index.js',
+  entry: './index.js',
+  output: {
+    path: 'dist',
+    filename: process.env.NODE_ENV === 'production' ? 'aframe-redux-component.min.js' : 'aframe-redux-component.js',
+  },
   plugins: PLUGINS
 };
