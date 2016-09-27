@@ -4,32 +4,44 @@
     <meta name="description" content="Detecting beats (i.e., kick or peaks) in audio"></meta>
     <meta property="og:image" content="https://raw.githubusercontent.com/ngokevin/kframe/master/components/audioanalyser/examples/beat-detection/preview.png"></meta>
     <script src="https://aframe.io/releases/0.3.1/aframe.min.js"></script>
+    <script src="../lib/annyang.min.js"></script>
+    <script src="../lib/spotify-web-api.js"></script>
     <script src="../build.js"></script>
     <script src="../components/color-on-beat.js"></script>
+    <script src="../components/ring-on-beat.js"></script>
+    <script src="../components/spotify.js"></script>
   </head>
   <body>
     <a-scene>
       <a-assets>
-        <a-mixin id="box"
-          geometry="primitive: box" material="color: #C03546"
-          audioanalyser="src: #machinecivilization"
-          color-on-beat
-        ></a-mixin>
-        <audio id="machinecivilization" src="machinecivilization.mp3" autoplay loop></audio>
+        <img id="floor" src="https://cdn.aframe.io/a-painter/images/floor.jpg" crossOrigin="anonymous">
+        <img id="skymap" src="https://cdn.aframe.io/a-painter/images/sky.jpg" crossOrigin="anonymous">
       </a-assets>
 
-      <a-entity id="container" position="0 0.5 -4">
-        <a-entity mixin="box"
-          audio-visualizer-kick
-          position="0 0 0"
-        ></a-entity>
+      <a-entity id="analyser"
+        audioanalyser
+        spotify>
+      </a-entity>
+
+      <a-entity id="box"
+        geometry="primitive: box" material="color: #C03546"
+        color-on-beat="analyserEl: #analyser"
+        ring-on-beat="analyserEl: #analyser"
+        position="0 0.5 -4">
       </a-entity>
 
       <a-light type="ambient" color="#222"></a-light>
       <a-light type="point" position="1 2 1"></a-light>
       <a-light type="point" position="-2 2 1"></a-light>
-      <a-plane color="#333" rotation="-90 0 0" height="30" width="30"></a-plane>
-      <a-sky color="#222"></a-sky>
+      <a-entity id="sky"
+        geometry="primitive: sphere; radius: 30; phiLength: 360; phiStart: 0; thetaLength: 90"
+        material="shader: flat; side: back; height: 2048; src: #skymap; width: 2048"
+      ></a-entity>
+      <a-entity id="ground"
+        geometry="primitive: circle; radius: 30.5"
+        rotation="-90 0 0"
+        material="src: #floor"
+      ></a-entity>
     </a-scene>
 
     <!--githubcorner-->
