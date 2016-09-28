@@ -4,11 +4,30 @@ AFRAME.registerComponent('remove-on-event', {
     event: {type: 'string'}
   },
 
+  init: function () {
+    this._removeEntity = this._removeEntity.bind(this);
+  },
+
   update: function () {
     var data = this.data;
     var el = this.el;
-    data.el.addEventListener(data.event, function () {
-      el.parentNode.removeChild(el);
-    });
-  }
+    this.removeEventListener();
+    el.addEventListener(data.event, this._removeEntity);
+  },
+
+  remove: function () {
+    this.removeEventListener();
+  },
+
+  removeEventListener: function () {
+    var data = this.data;
+    var el = this.el;
+    el.removeEventListener(data.event, this._removeEntity);
+  },
+
+  _removeEntity: function () {
+    var el = this.el;
+    if (!el.parentEl) { return; }
+    el.parentEl.removeChild(el);
+  },
 });

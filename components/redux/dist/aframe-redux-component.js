@@ -172,13 +172,16 @@
 
 	    // Subscribe to store and register handler to do data-binding to components.
 	    store = el.sceneEl.systems.redux.store;
-	    this.unsubscribe = store.subscribe(function handler () {
+	    this.unsubscribe = store.subscribe(handler);
+	    handler();
+
+	    function handler () {
 	      var state = store.getState();
 	      Object.keys(data).forEach(function syncComponent (stateSelector) {
 	        var propertyName = data[stateSelector].trim();
 	        setComponentProperty(el, propertyName, select(state, stateSelector));
 	      });
-	    });
+	    }
 	  },
 
 	  remove: function () {
