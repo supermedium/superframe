@@ -26,6 +26,9 @@ var components = glob.sync('components/*').map(function (componentPath) {
     if (fs.existsSync(path.join(examplePath, 'preview.png'))) {
       image = path.join(examplePath, 'preview.png');
       image = image.split('/').splice(-3).join('/');
+    } else if (fs.existsSync(path.join(examplePath, 'preview.jpg'))) {
+      image = path.join(examplePath, 'preview.jpg');
+      image = image.split('/').splice(-3).join('/');
     } else if (fs.existsSync(path.join(examplePath, 'preview.gif'))) {
       image = path.join(examplePath, 'preview.gif');
       image = image.split('/').splice(-3).join('/');
@@ -98,6 +101,8 @@ glob.sync('components/*/examples/*/*.html').forEach(function (htmlPath) {
   var image;
   if (fs.existsSync(path.join(examplePath, 'preview.png'))) {
     image = 'preview.png';
+  } else if (fs.existsSync(path.join(examplePath, 'preview.jpg'))) {
+    image = 'preview.jpg';
   } else if (fs.existsSync(path.join(examplePath, 'preview.gif'))) {
     image = 'preview.gif';
   }
