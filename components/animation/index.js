@@ -47,6 +47,8 @@ AFRAME.registerComponent('animation', {
     var propType = getPropertyType(el, data.property);
     var self = this;
 
+    if (!data.property) { return; }
+
     // Base config.
     this.repeat = data.repeat;
     var config = {
