@@ -54,11 +54,11 @@ AFRAME.registerComponent('animation', {
     var config = {
       autoplay: false,
       begin: function () {
-        el.emit('animation-begin');
+        el.emit('animationbegin');
         el.emit(attrName + '-begin');
       },
       complete: function () {
-        el.emit('animation-complete');
+        el.emit('animationcomplete');
         el.emit(attrName + '-complete');
         // Repeat.
         if (--self.repeat > 0) { self.animation.play(); }

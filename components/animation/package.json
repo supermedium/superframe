@@ -1,6 +1,6 @@
 {
   "name": "aframe-animation-component",
-  "version": "3.0.2",
+  "version": "3.0.4",
   "description": "Animations in A-Frame using anime.js",
   "main": "index.js",
   "scripts": {
@@ -8,7 +8,7 @@
     "dev": "budo examples/main.js:build.js --dir examples --port 8000 --live --open",
     "dist": "webpack index.js dist/aframe-animation-component.js && webpack -p index.js dist/aframe-animation-component.min.js",
     "lint": "semistandard -v | snazzy",
-    "postpublish": "npm run dist"
+    "prepublish": "npm run dist"
   },
   "repository": {
     "type": "git",
