@@ -26,6 +26,7 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 module.exports = {
+  devServer: {port: 9090},
   entry: ENTRY,
   output: {
     path: __dirname,
