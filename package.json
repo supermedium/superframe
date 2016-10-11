@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "NODE_ENV=production webpack --config webpack-dev.config.js",
-    "dev": "webpack-dev-server --config webpack-dev.config.js --port 9090",
+    "dev": "webpack-dev-server --config webpack-dev.config.js",
     "dist": "webpack index.js dist/kframe.js && webpack -p index.js dist/kframe.min.js",
     "generate": "node site/generate",
     "postinstall": "node lib/scripts/install.js",
