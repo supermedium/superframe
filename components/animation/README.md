@@ -86,8 +86,8 @@ the `Function` column. For example: `easeInOutElastic`. The only exception is
 | --------                 | -----------                                                               |
 | animationbegin           | Animation began.                                                          |
 | animationcomplete        | Animation completed.                                                      |
-| animation__<ID>-begin    | Animation completed. Different event emitted depending on animation name. |
-| animation__<ID>-complete | Animation completed. Different event emitted depending on animation name. |
+| animation__[ID]-begin    | Animation completed. Different event emitted depending on animation name. |
+| animation__[ID]-complete | Animation completed. Different event emitted depending on animation name. |
 
 ### Installation
 
