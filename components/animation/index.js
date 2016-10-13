@@ -135,12 +135,26 @@ AFRAME.registerComponent('animation', {
 
   playAnimation: function () {
     if (!this.animation) { return; }
+    var updateConfig = configDefault;
+    var propType = getPropertyType(this.el, this.data.property);
+    if (propType === 'vec2' || propType === 'vec3' || propType === 'vec4') {
+      updateConfig = configVector;
+    }
+    this.config = updateConfig(this.el, this.data, this.config);
+    this.animation = anime(this.config);
     this.animation.restart();
     this.animationIsPlaying = true;
   },
 
   pauseAnimation: function () {
     if (!this.animation) { return; }
+    var updateConfig = configDefault;
+    var propType = getPropertyType(this.el, this.data.property);
+    if (propType === 'vec2' || propType === 'vec3' || propType === 'vec4') {
+      updateConfig = configVector;
+    }
+    this.config = updateConfig(this.el, this.data, this.config);
+    this.animation = anime(this.config);
     this.animation.pause();
     this.animationIsPlaying = false;
   }
