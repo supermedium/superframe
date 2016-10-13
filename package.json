@@ -1,6 +1,6 @@
 {
   "name": "kframe",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "description": "Kevin's collection of A-Frame components and scenes.",
   "main": "index.js",
   "scripts": {
