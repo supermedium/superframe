@@ -10,7 +10,7 @@ AFRAME.registerComponent('remove-on-event', {
 
   update: function () {
     var data = this.data;
-    var el = this.el;
+    var el = data.el || this.el;
     this.removeEventListener();
     el.addEventListener(data.event, this._removeEntity);
   },
@@ -27,7 +27,11 @@ AFRAME.registerComponent('remove-on-event', {
 
   _removeEntity: function () {
     var el = this.el;
-    if (!el.parentEl) { return; }
-    el.parentEl.removeChild(el);
+    if (el.parentEl) {
+      el.parentEl.removeChild(el);
+    }
+    if (el.parentNode) {
+      el.parentNode.removeChild(el);
+    }
   },
 });
