@@ -1,0 +1,93 @@
+<html>
+  <head>
+    <title>Showcase</title>
+    <meta name="description" content="Various audio visualizations combined together."></meta>
+    <meta property="og:image" content="https://raw.githubusercontent.com/ngokevin/kframe/master/components/audioanalyser/examples/showcase/preview.gif"></meta>
+    <script src="https://aframe.io/releases/0.3.2/aframe.min.js"></script>
+    <script src="../build.js"></script>
+    <script src="../components/audioanalyser-levels-scale.js"></script>
+    <script src="../components/audioanalyser-volume-bind.js"></script>
+    <script src="../components/audioanalyser-volume-scale.js"></script>
+    <script src="../components/audioanalyser-waveform.js"></script>
+    <script src="../components/ring-on-beat.js"></script>
+    <script src="../components/scale-y-color.js"></script>
+  </head>
+  <body>
+    <a-scene antialias="true">
+      <a-assets>
+        <!-- By Tours. From http://freemusicarchive.org/music/Tours/Enthusiast/Tours_-_Enthusiast. CC Attribution License. -->
+        <audio id="song" crossorigin autoplay loop src="Tours-Enthusiast.wav"></audio>
+        <img id="floor" src="https://cdn.aframe.io/a-painter/images/floor.jpg" crossOrigin="anonymous">
+        <img id="skymap" src="https://cdn.aframe.io/a-painter/images/sky.jpg" crossOrigin="anonymous">
+        <a-mixin id="bar"
+          geometry="primitive: box"
+          material="color: rgb(10, 20, 50); shader: flat"
+          scale-y-color="from: 10 20 50; to: 210, 220, 250; maxScale: 15"
+        ></a-mixin>
+      </a-assets>
+
+      <!-- Audio analyser. -->
+      <a-entity id="analyser"
+        audioanalyser="src: #song"
+        audioanalyser-waveform="radius: 0.5"
+        rotation="90 0 0"
+        position="0 30 0"
+      ></a-entity>
+
+      <!-- Singing box. -->
+      <a-entity id="jim"
+        geometry="primitive: box; depth: 2; height: 5; width: 3.5"
+        material="color: #10193F"
+        ring-on-beat="analyserEl: #analyser"
+        position="0 0 -5.25"
+      ></a-entity>
+      <a-sphere id="leftEyeball" position="-1 2 -4" radius="0.5" shader="flat"></a-sphere>
+      <a-sphere id="rightEyeball" position="1 2 -4" radius="0.5" shader="flat"></a-sphere>
+      <a-sphere id="leftEye" color="black" position="-1 2 -3.5" radius="0.1"></a-sphere>
+      <a-sphere id="rightEye" color="black" position="1 2 -3.5" radius="0.1"></a-sphere>
+      <a-sphere id="mouth"
+        color="#000"
+        audioanalyser-volume-scale="analyserEl: #analyser; multiplier: .004"
+        position="0 1 -4"
+        side="double"
+        shader="flat"
+        spotify-search
+      ></a-sphere>
+
+      <!-- Spectrum visualization. -->
+      <a-entity
+        audioanalyser-levels-scale="analyserEl: #analyser; max: 50; multiplier: 0.06"
+        entity-generator="mixin: bar; num: 128"
+        layout="type: circle; radius: 10"
+        rotation="0 180 0"
+      ></a-entity>
+
+      <!-- Lights, sky, ground. -->
+      <a-light type="ambient" color="#222"></a-light>
+      <a-light
+        audioanalyser-volume-bind="analyserEl: #analyser; component: light; property: intensity; max: 2.2; multiplier: .01"
+        position="1 2 1"
+        type="point"
+      ></a-light>
+      <a-entity id="sky"
+        geometry="primitive: sphere; radius: 500; phiLength: 360; phiStart: 0; thetaLength: 90"
+        material="shader: flat; side: back; height: 2048; src: #skymap; width: 2048"
+      ></a-entity>
+      <a-entity id="ground"
+        geometry="primitive: circle; radius: 30.5"
+        rotation="-90 0 0"
+        material="src: #floor"
+      ></a-entity>
+    </a-scene>
+
+    <!--githubcorner-->
+    <a href="https://github.com/ngokevin/kframe/tree/master/components/audioanalyser/examples/spotify/" class="github-corner">
+      <svg width="80" height="80" viewBox="0 0 250 250" style="fill: #111; color: #EFEFEF; position: absolute; bottom: 0; border: 0; left: 0; transform: rotate(180deg)">
+        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path>
+      </svg>
+    </a>
+    <style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}
+    </style>
+    <!--endgithubcorner-->
+  </body>
+</html>

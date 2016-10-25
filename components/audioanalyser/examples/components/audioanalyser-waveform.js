@@ -50,7 +50,7 @@ AFRAME.registerComponent('audioanalyser-waveform', {
         linewidth: 1 ,
         opacity : 0.7,
         blending : THREE.AdditiveBlending,
-        depthTest : false,
+        depthTest : true,
         transparent : true
       });
       lineMesh = new THREE.Line(this.geometry, material);
