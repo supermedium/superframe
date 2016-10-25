@@ -82,7 +82,7 @@ components.forEach(function (component) {
 // Append GitHub corners to all pages.
 glob.sync('components/*/examples/*/*.html').forEach(function (htmlPath) {
   var html = fs.readFileSync(htmlPath, 'utf-8');
-  var githubCorner = nunjucks.render('github-corner.html', {
+  var githubCorner = nunjucks.render('github-corner-scene.html', {
     github: GITHUB + htmlPath.replace(/index.html$/, '')
   });
   html = html.replace(/<\/a-scene>((.|[\r\n])*)<!--endgithubcorner-->/, '</a-scene>');
