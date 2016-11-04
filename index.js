@@ -1,5 +1,5 @@
 require('./components/animation/');
-require('./components/audio-visualizer/');
+require('./components/audioanalyser/');
 require('./components/entity-generator/');
 require('./components/event-set/');
 require('./components/layout/');
