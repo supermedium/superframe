@@ -1,6 +1,6 @@
 {
   "name": "aframe-mountain-component",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Mountain terrain in A-Frame using randomly-generated height maps",
   "main": "index.js",
   "scripts": {
