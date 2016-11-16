@@ -1,5 +1,5 @@
 var THREE = AFRAME.THREE;
-var isMobile = AFRAME.utils.isMobile();
+var isMobile = (AFRAME.utils.isMobile || AFRAME.utils.device.isMobile)();
 
 // To avoid recalculation at every mouse movement tick
 var PI_2 = Math.PI / 2;
