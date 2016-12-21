@@ -1,22 +1,24 @@
 /**
- * Text component for A-Frame.
+ * TextGeometry component for A-Frame.
  */
-require('./lib/FontUtils');
-require('./lib/TextGeometry');
-require('./lib/helvetiker_regular.typeface');
+var debug = AFRAME.utils.debug;
+
+var error = debug('aframe-text-component:error');
+
+var fontLoader = new THREE.FontLoader();
 
 AFRAME.registerComponent('text', {
   schema: {
-    bevelEnabled: { default: false },
-    bevelSize: { default: 8, min: 0 },
-    bevelThickness: { default: 12, min: 0 },
-    curveSegments: { default: 12, min: 0 },
-    font: { default: 'helvetiker' },
-    height: { default: 0.05, min: 0 },
-    size: { default: 0.5, min: 0 },
-    style: { default: 'normal', oneOf: [ 'normal', 'italics' ] },
-    text: { default: '' },
-    weight: { default: 'normal', oneOf: [ 'normal', 'bold' ] }
+    bevelEnabled: {default: false},
+    bevelSize: {default: 8, min: 0},
+    bevelThickness: {default: 12, min: 0},
+    curveSegments: {default: 12, min: 0},
+    fontPath: {type: 'asset', default: 'https://rawgit.com/ngokevin/kframe/master/components/text/lib/helvetiker_regular.typeface.json'},
+    height: {default: 0.05, min: 0},
+    size: {default: 0.5, min: 0},
+    style: {default: 'normal', oneOf: ['normal', 'italics']},
+    text: {default: ''},
+    weight: {default: 'normal', oneOf: ['normal', 'bold']}
   },
 
   /**
@@ -24,10 +26,22 @@ AFRAME.registerComponent('text', {
    * Generally modifies the entity based on the data.
    */
   update: function (oldData) {
-    this.el.getOrCreateObject3D('mesh', THREE.Mesh).geometry = getTextGeometry(this.data);
+    var data = this.data;
+    var el = this.el;
+
+    var mesh = el.getOrCreateObject3D('mesh', THREE.Mesh);
+    if (data.fontPath) {
+      // Load typeface.json font.
+      fontLoader.load(data.fontPath, function (response) {
+        mesh.geometry = new THREE.TextGeometry(data.text, AFRAME.utils.extend({
+          font: response
+        }, data));
+      });
+    } else if (data.font) {
+      // Set font if already have a typeface.json through setAttribute.
+      mesh.geometry = new THREE.TextGeometry(data.text, data);
+    } else {
+      error('Must provide `font` (typeface.json) or `fontPath` (string) to text component.');
+    }
   }
 });
-
-function getTextGeometry (data) {
-  return new THREE.TextGeometry(data.text, data);
-}

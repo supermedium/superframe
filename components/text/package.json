@@ -29,6 +29,7 @@
   },
   "homepage": "https://github.com/ngokevin/kframe/tree/components/text#readme",
   "devDependencies": {
+    "aframe": "aframevr/aframe#master",
     "browserify": "^12.0.1",
     "budo": "^8.1.0",
     "chai": "^3.4.1",
