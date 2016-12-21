@@ -1,23 +1,24 @@
 ## aframe-text-component
 
-A text geometry component for [A-Frame](https://aframe.io) VR. The text geometry
-component (shape) can be paired with the [material component](https://aframe.io/docs/components/material.html) (appearance).
+A text geometry component for [A-Frame](https://aframe.io). The text geometry
+component wraps
+[THREE.TextGeometry](https://threejs.org/docs/?q=textge#Reference/Geometries/TextGeometry).
 
-![screenshot](https://cloud.githubusercontent.com/assets/674727/11915616/59342aca-a663-11e5-9b6b-8a0b243fe5da.png)
+![screenshot](https://cloud.githubusercontent.com/assets/674727/21373560/c4c7507c-c6d4-11e6-86a5-88cb3ae8d0cb.png)
 
 ## Properties
 
-| Property       | Description | Default Value |
-| --------       | ----------- | ------------- |
-| bevelEnabled   |             | false         |
-| bevelSize      |             | 8             |
-| bevelThickness |             | 12            |
-| curveSegments  |             | 12            |
-| font           |             | helvetiker    |
-| height         |             | 0.05          |
-| size           |             | 0.5           |
-| style          |             | normal        |
-| text           |             | None          |
+| Property       | Description                                                   | Default Value                                                                                  |
+| --------       | -----------                                                   | -------------                                                                                  |
+| bevelEnabled   |                                                               | false                                                                                          |
+| bevelSize      |                                                               | 8                                                                                              |
+| bevelThickness |                                                               | 12                                                                                             |
+| curveSegments  |                                                               | 12                                                                                             |
+| font           | Path to a typeface.json file or selector to `<a-asset-item>`. | https://rawgit.com/ngokevin/kframe/master/components/text/lib/helvetiker_regular.typeface.json |
+| height         |                                                               | 0.05                                                                                           |
+| size           |                                                               | 0.5                                                                                            |
+| style          |                                                               | normal                                                                                         |
+| text           |                                                               | None                                                                                           |
 
 ### Usage
 
@@ -28,13 +29,18 @@ Install and use by directly including the [browser files](dist):
 ```html
 <head>
   <title>My A-Frame Scene</title>
-  <script src="https://aframe.io/releases/0.2.0/aframe.min.js"></script>
+  <script src="https://aframe.io/releases/0.4.0/aframe.min.js"></script>
   <script src="https://rawgit.com/ngokevin/aframe-text-component/master/dist/aframe-text-component.min.js"></script>
 </head>
 
 <body>
   <a-scene>
+    <a-assets>
+      <a-asset-item id="optimerBoldFont" src="https://rawgit.com/mrdoob/three.js/dev/examples/fonts/optimer_bold.typeface.json"></a-asset-item>
+    </a-assets>
+
     <a-entity text="text: What's up"></a-entity>
+    <a-entity text="text: Dog?; font: #optimerBoldFont"></a-entity>
   </a-scene>
 </body>
 ```
@@ -56,18 +62,17 @@ require('aframe-text-component');
 
 ## Using Different Fonts
 
-The text component uses `typeface.js`, fonts defined in JS files for three.js.
-typeface fonts can be generated from regular fonts using this [typeface
-font generator](http://gero3.github.io/facetype.js/). You can also find some
-sample generated fonts, currently in the `examples/fonts` directory in the [three.js
-repository](https://github.com/mrdoob/three.js).
+The text component uses `typeface.json` files, which are Web Fonts converted to
+JSON for three.js.  Typeface fonts can be generated from fonts using this
+[typeface font generator](http://gero3.github.io/facetype.js/). You can also
+find some sample generated fonts in the `examples/fonts` directory in the
+[three.js repository](https://github.com/mrdoob/three.js).
 
-By default, the text component only comes with one typeface font, Helvetiker
-(Regular). Each font is fairly large, from at least 60KB to hundreds of KBs.
+By default, the text geometry component points to Helvetiker (Regular). Each
+font is fairly large, from at least 60KB to hundreds of KBs.
 
-To include a font for use with the text component, append or require the
-typeface font *after* this component. This component uses `FontUtils` which
-should be initialized before adding fonts.
+To include a font for use with the text component, it is recommended to define
+it in `<a-asset-item>` and point to the font with a selector.
 
 For example in HTML:
 
@@ -82,19 +87,39 @@ For example in HTML:
   <body>
     <a-scene>
       <a-assets>
-        <a-mixin id="font" text="font: myfont"></a-mixin>
+        <a-asset-item id="optimerBoldFont" src="https://rawgit.com/mrdoob/three.js/dev/examples/fonts/optimer_bold.typeface.json"></a-asset-item>
+        <a-mixin id="boldFont" text="font: #optimerBoldFont"></a-mixin>
       </a-assets>
-      <a-entity mixin="font" text="text: Hello"></a-entity>
-      <a-entity mixin="font" text="text: World"></a-entity>
+
+      <a-entity mixin="boldFont" text="text: What's up"></a-entity>
+      <a-entity text="text: Dog?; font: #optimerBoldFont"></a-entity>
     </a-scene>
   </body>
 </html>
 ```
 
-Or in JS:
+Or in JS, we can bundle and set a font directly with `setAttribute` such that
+we don't have to XHR the font file separately at runtime:
 
 ```js
 require('aframe');
 require('aframe-text-component');
-require('./fonts/myfont.typeface');
+
+var fontJson = require('./fonts/myfont.typeface.json');
+var el = document.createElement('a-entity');
+el.setAttribute('text', {font: fontJson});
 ```
+
+## Applying a Material
+
+The text geometry component defines just the geometry. We can apply any
+three.js material to the geometry:
+
+```html
+<a-entity text="text: HELLO" material="color: red; src: #texture"></a-entity>
+```
+
+See the [Vaporwave
+Example](https://ngokevin.github.io/kframe/components/text/examples/vaporwave/)
+by [Ada Rose Edwards](https://twitter.com/lady_ada_king) for an example on applying
+materials.

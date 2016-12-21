@@ -5,18 +5,21 @@
     <meta property="og:image" content="https://raw.githubusercontent.com/ngokevin/kframe/master/components/text/examples/fonts/preview.png"></meta>
     <script src="https://aframe.io/releases/0.4.0/aframe.min.js"></script>
     <script src="../build.js"></script>
-    <script src="droid_sans_mono_regular.typeface.js"></script>
   </head>
   <body>
     <a-scene>
+      <a-assets>
+        <a-asset-item id="droidFont" src="droid_sans_mono_regular.typeface.json"></a-asset-item>
+      </a-assets>
+
       <a-entity
-        text="text: Helvetiker Regular; font: helvetiker"
+        text="text: Helvetiker Regular"
         material="color: #66E1B4"
         position="-4 0 -4" rotation="0 20 0"
       ></a-entity>
 
       <a-entity
-        text="text: Droid Sans Mono Regular; font: Droid Sans Mono"
+        text="text: Droid Sans Mono Regular; font: #droidFont"
         material="color: #66E1B4"
         position="-4 2 -4"
       ></a-entity>
