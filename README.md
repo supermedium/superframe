@@ -30,7 +30,7 @@ Kevin's collection of A-Frame components and scenes.
 K-Frame bundles some components together to `kframe.js` for convenience:
 
 - animation
-- audio-visualizer
+- audioanalyser
 - entity-generator
 - event-set
 - layout

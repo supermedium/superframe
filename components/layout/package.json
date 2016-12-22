@@ -1,6 +1,6 @@
 {
   "name": "aframe-layout-component",
-  "version": "3.0.1",
+  "version": "4.0.0",
   "description": "Position and layout child entities in 3D space for A-Frame",
   "main": "index.js",
   "scripts": {
@@ -31,7 +31,7 @@
   },
   "homepage": "https://github.com/ngokevin/kframe/tree/components/layout#readme",
   "devDependencies": {
-    "aframe": "^0.2.0",
+    "aframe": "^0.4.0",
     "browserify": "^12.0.1",
     "budo": "^7.1.0",
     "chai": "^3.4.1",
@@ -44,6 +44,6 @@
     "karma-mocha-reporter": "^1.1.3",
     "karma-sinon-chai": "^1.1.0",
     "mocha": "^2.3.4",
-    "webpack": "^1.12.9"
+    "webpack": "^1.14.0"
   }
 }

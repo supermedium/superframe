@@ -28,7 +28,7 @@ AFRAME.registerComponent('layout', {
       if (childEl.hasLoaded) { return _getPositions(); }
       childEl.addEventListener('loaded', _getPositions);
       function _getPositions () {
-        var position = childEl.getComputedAttribute('position');
+        var position = childEl.getAttribute('position');
         self.initialPositions.push([position.x, position.y, position.z]);
       }
     });
@@ -37,6 +37,14 @@ AFRAME.registerComponent('layout', {
       // Only update if direct child attached.
       if (evt.detail.el.parentNode !== el) { return; }
       self.children.push(evt.detail.el);
+      self.update();
+    });
+
+    el.addEventListener('child-detached', function (evt) {
+      // Only update if direct child detached.
+      if (self.children.indexOf(evt.detail.el) === -1) { return; }
+      self.children.splice(self.children.indexOf(evt.detail.el), 1);
+      self.initialPositions.splice(self.children.indexOf(evt.detail.el), 1);
       self.update();
     });
   },
@@ -51,7 +59,7 @@ AFRAME.registerComponent('layout', {
     var numChildren = children.length;
     var positionFn;
     var positions;
-    var startPosition = el.getComputedAttribute('position');
+    var startPosition = el.getAttribute('position');
 
     // Calculate different positions based on layout shape.
     switch (data.type) {
