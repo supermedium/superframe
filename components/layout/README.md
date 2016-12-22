@@ -2,7 +2,7 @@
 
 Layout component for [A-Frame](https://aframe.io).
 
-![](https://cloud.githubusercontent.com/assets/674727/11851982/662a8dee-a3ea-11e5-92cf-4b814e2c494d.png)
+![Layout](https://cloud.githubusercontent.com/assets/674727/21413536/eb325152-c7ac-11e6-8f1b-3a5f4714dfbe.png)
 
 Automatically positions child entities in 3D space, with several layouts to
 choose from. Define the layout on the parent entity:
