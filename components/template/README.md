@@ -124,3 +124,8 @@ Then register and use.
 require('aframe');
 require('aframe-template-component');
 ```
+
+### Troubleshooting
+
+Note if using this within React, make sure the template is defined outside of
+React's root. React will treat the template as actual DOM rather than a string.
