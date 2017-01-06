@@ -25,59 +25,53 @@ Kevin's collection of A-Frame components and scenes.
 - [text](https://github.com/ngokevin/kframe/tree/master/components/text/) - Geometry-based text in A-Frame
 
 
-## Installation
+## Component Usage
 
-K-Frame bundles some components together to `kframe.js` for convenience:
+K-Frame no longer provides a bundle. Each component should be installed
+individually. Each component is published individually to npm, generates its
+own `dist/` builds in their folders, and has its own README. Components live
+within the `components/` folder.
 
-- animation
-- audioanalyser
-- entity-generator
-- event-set
-- layout
-- look-at
-- mountain
-- randomizer
-- sun-sky
-- template
-- text
+In general, you can install a component in one of several ways:
 
+### Browser Installation
 
-### Browser
-
-Install and use by directly including the [browser files](dist):
+Install and use by directly including a component's `dist/` files. For example,
+with the text geometry component:
 
 ```html
 <head>
   <title>My A-Frame Scene</title>
-  <script src="https://aframe.io/releases/0.3.0/aframe.min.js"></script>
-  <script src="https://rawgit.com/ngokevin/kframe/master/dist/kframe.min.js"></script>
+  <script src="https://aframe.io/releases/0.4.0/aframe.min.js"></script>
+  <script src="https://unpkg.com/aframe-text-component@0.4.x/dist/aframe-text-component.min.js"></script>
 </head>
-
 <body>
   <a-scene>
-    <!-- Refer to individual component documentation for specific usage. -->
+    <a-entity text="text: What's up"></a-entity>
   </a-scene>
 </body>
 ```
 
-### npm
+### npm Installation
 
-Or install from npm. Requiring K-Frame will automatically register the
-components and systems.
+Install via npm. For example, with the text geometry component:
 
-```js
-require('kframe');
+```bash
+npm install aframe-text-component
 ```
 
-### Installing Individual Components
+Then register and use.
 
-For documentation on installing individual components, see the [documentation
-pages](#components) for each component.
+```js
+require('aframe');
+require('aframe-text-component');
+```
 
-## Local Installation
+## Local Development
 
 ```bash
 git clone git@github.com:ngokevin/kframe
 npm install  # Run npm install on all inner modules
 npm run dev  # Webpack dev server that watches all component files
+npm run dev -- text  # Webpack dev server that watches only one component
 ```

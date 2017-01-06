@@ -2,7 +2,6 @@
   "name": "kframe",
   "version": "3.2.0",
   "description": "Kevin's collection of A-Frame components and scenes.",
-  "main": "index.js",
   "scripts": {
     "build": "NODE_ENV=production webpack --config webpack-dev.config.js",
     "dev": "webpack-dev-server --config webpack-dev.config.js",
