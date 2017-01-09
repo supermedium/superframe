@@ -72,6 +72,8 @@
 	    repeat: {default: 0},
 	    startEvents: {type: 'array'},
 	    pauseEvents: {type: 'array'},
+	    resumeEvents: {type: 'array'},
+	    restartEvents: {type: 'array'},
 	    to: {default: ''}
 	  },
 
@@ -83,6 +85,8 @@
 	    this.config = null;
 	    this.playAnimationBound = this.playAnimation.bind(this);
 	    this.pauseAnimationBound = this.pauseAnimation.bind(this);
+	    this.resumeAnimationBound = this.resumeAnimation.bind(this);
+	    this.restartAnimationBound = this.restartAnimation.bind(this);
 	    this.repeat = 0;
 	  },
 
@@ -123,7 +127,7 @@
 	    }
 
 	    // Stop previous animation.
-	    this.pauseAnimation();
+	    // this.pauseAnimation();
 
 	    // Config.
 	    this.config = updateConfig(el, data, config);
@@ -158,12 +162,22 @@
 	  addEventListeners: function () {
 	    var self = this;
 	    var data = this.data;
+	    // console.log(data);
 	    var el = this.el;
 	    data.startEvents.map(function (eventName) {
 	      el.addEventListener(eventName, self.playAnimationBound);
+	      // console.log(data.startEvents, eventName);
 	    });
 	    data.pauseEvents.map(function (eventName) {
 	      el.addEventListener(eventName, self.pauseAnimationBound);
+	      // console.log(data.pauseEvents, eventName);
+	    });
+	    data.resumeEvents.map(function (eventName) {
+	      el.addEventListener(eventName, self.resumeAnimationBound);
+	    });
+	    data.restartEvents.map(function (eventName) {
+	      el.addEventListener(eventName, self.restartAnimationBound);
+	      // console.log(data.restartEvents, eventName);
 	    });
 	  },
 
@@ -177,34 +191,34 @@
 	    data.pauseEvents.map(function (eventName) {
 	      el.removeEventListener(eventName, self.pauseAnimationBound);
 	    });
+	    data.resumeEvents.map(function (eventName) {
+	      el.removeEventListener(eventName, self.resumeAnimationBound);
+	    });
+	    data.restartEvents.map(function (eventName) {
+	      el.removeEventListener(eventName, self.restartAnimationBound);
+	      // console.log(data.restartEvents, eventName);
+	    });
 	  },
 
 	  playAnimation: function () {
-	    if (!this.animation) { return; }
-	    var updateConfig = configDefault;
-	    var propType = getPropertyType(this.el, this.data.property);
-	    if (propType === 'vec2' || propType === 'vec3' || propType === 'vec4') {
-	      updateConfig = configVector;
-	    }
-	    this.config = updateConfig(this.el, this.data, this.config);
-	    this.animation = anime(this.config);
-	    this.animation.restart();
-	    this.animationIsPlaying = true;
+	    this.animation.play();
 	  },
 
 	  pauseAnimation: function () {
-	    if (!this.animation) { return; }
-	    var updateConfig = configDefault;
-	    var propType = getPropertyType(this.el, this.data.property);
-	    if (propType === 'vec2' || propType === 'vec3' || propType === 'vec4') {
-	      updateConfig = configVector;
-	    }
-	    this.config = updateConfig(this.el, this.data, this.config);
-	    this.animation = anime(this.config);
 	    this.animation.pause();
-	    this.animationIsPlaying = false;
+	  },
+
+	  resumeAnimation: function () {
+	    this.animation.play();
+	  },
+
+	  restartAnimation: function () {
+	    this.animation.restart();
+	    // this.animation.pause();
 	  }
 	});
+
+
 
 	/**
 	 * Stuff property into generic `property` key.
@@ -251,12 +265,16 @@
 	}
 
 
+
+	// grab currently animated items, res-start only currently animated items
+
+
 /***/ },
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*
-	 * Anime v1.1.1
+	 * Anime v1.1.3
 	 * http://anime-js.com
 	 * JavaScript animation engine
 	 * Copyright (c) 2016 Julian Garnier
@@ -279,7 +297,7 @@
 	  }
 	}(this, function () {
 
-	  var version = '1.1.1';
+	  var version = '1.1.3';
 
 	  // Defaults
 
@@ -326,7 +344,7 @@
 	    var eases = {};
 	    var names = ['Quad', 'Cubic', 'Quart', 'Quint', 'Expo'];
 	    var functions = {
-	      Sine: function(t) { return 1 - Math.cos( t * Math.PI / 2 ); },
+	      Sine: function(t) { return 1 + Math.sin(Math.PI / 2 * t - Math.PI / 2); },
 	      Circ: function(t) { return 1 - Math.sqrt( 1 - t * t ); },
 	      Elastic: function(t, m) {
 	        if( t === 0 || t === 1 ) return t;
@@ -648,7 +666,11 @@
 	  }
 
 	  var getTweensDuration = function(tweens) {
-	    if (tweens.length) return Math.max.apply(Math, tweens.map(function(tween){ return tween.totalDuration; }));
+	    return Math.max.apply(Math, tweens.map(function(tween){ return tween.totalDuration; }));
+	  }
+
+	  var getTweensDelay = function(tweens) {
+	    return Math.min.apply(Math, tweens.map(function(tween){ return tween.delay; }));
 	  }
 
 	  // will-change
@@ -756,7 +778,6 @@
 	        anim.animatables[t].target.style[transform] = transforms[t].join(' ');
 	      }
 	    }
-	    if (anim.settings.update) anim.settings.update(anim);
 	  }
 
 	  // Animation
@@ -767,7 +788,8 @@
 	    anim.settings = mergeObjects(params, defaultSettings);
 	    anim.properties = getProperties(params, anim.settings);
 	    anim.tweens = getTweens(anim.animatables, anim.properties);
-	    anim.duration = getTweensDuration(anim.tweens) || params.duration;
+	    anim.duration = anim.tweens.length ? getTweensDuration(anim.tweens) : params.duration;
+	    anim.delay = anim.tweens.length ? getTweensDelay(anim.tweens) : params.delay;
 	    anim.currentTime = 0;
 	    anim.progress = 0;
 	    anim.ended = false;
@@ -804,7 +826,10 @@
 	      time.current = Math.min(Math.max(time.last + now - time.start, 0), anim.duration);
 	      setAnimationProgress(anim, time.current);
 	      var s = anim.settings;
-	      if (s.begin && time.current >= s.delay) { s.begin(anim); s.begin = undefined; };
+	      if (time.current >= anim.delay) {
+	        if (s.begin) s.begin(anim); s.begin = undefined;
+	        if (s.update) s.update(anim);
+	      }
 	      if (time.current >= anim.duration) {
 	        if (s.loop) {
 	          time.start = now;

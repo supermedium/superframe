@@ -26,6 +26,8 @@ AFRAME.registerComponent('animation', {
     repeat: {default: 0},
     startEvents: {type: 'array'},
     pauseEvents: {type: 'array'},
+    resumeEvents: {type: 'array'},
+    restartEvents: {type: 'array'},
     to: {default: ''}
   },
 
@@ -37,6 +39,8 @@ AFRAME.registerComponent('animation', {
     this.config = null;
     this.playAnimationBound = this.playAnimation.bind(this);
     this.pauseAnimationBound = this.pauseAnimation.bind(this);
+    this.resumeAnimationBound = this.resumeAnimation.bind(this);
+    this.restartAnimationBound = this.restartAnimation.bind(this);
     this.repeat = 0;
   },
 
@@ -77,7 +81,7 @@ AFRAME.registerComponent('animation', {
     }
 
     // Stop previous animation.
-    this.pauseAnimation();
+    // this.pauseAnimation();
 
     // Config.
     this.config = updateConfig(el, data, config);
@@ -112,12 +116,22 @@ AFRAME.registerComponent('animation', {
   addEventListeners: function () {
     var self = this;
     var data = this.data;
+    // console.log(data);
     var el = this.el;
     data.startEvents.map(function (eventName) {
       el.addEventListener(eventName, self.playAnimationBound);
+      // console.log(data.startEvents, eventName);
     });
     data.pauseEvents.map(function (eventName) {
       el.addEventListener(eventName, self.pauseAnimationBound);
+      // console.log(data.pauseEvents, eventName);
+    });
+    data.resumeEvents.map(function (eventName) {
+      el.addEventListener(eventName, self.resumeAnimationBound);
+    });
+    data.restartEvents.map(function (eventName) {
+      el.addEventListener(eventName, self.restartAnimationBound);
+      // console.log(data.restartEvents, eventName);
     });
   },
 
@@ -131,34 +145,34 @@ AFRAME.registerComponent('animation', {
     data.pauseEvents.map(function (eventName) {
       el.removeEventListener(eventName, self.pauseAnimationBound);
     });
+    data.resumeEvents.map(function (eventName) {
+      el.removeEventListener(eventName, self.resumeAnimationBound);
+    });
+    data.restartEvents.map(function (eventName) {
+      el.removeEventListener(eventName, self.restartAnimationBound);
+      // console.log(data.restartEvents, eventName);
+    });
   },
 
   playAnimation: function () {
-    if (!this.animation) { return; }
-    var updateConfig = configDefault;
-    var propType = getPropertyType(this.el, this.data.property);
-    if (propType === 'vec2' || propType === 'vec3' || propType === 'vec4') {
-      updateConfig = configVector;
-    }
-    this.config = updateConfig(this.el, this.data, this.config);
-    this.animation = anime(this.config);
-    this.animation.restart();
-    this.animationIsPlaying = true;
+    this.animation.play();
   },
 
   pauseAnimation: function () {
-    if (!this.animation) { return; }
-    var updateConfig = configDefault;
-    var propType = getPropertyType(this.el, this.data.property);
-    if (propType === 'vec2' || propType === 'vec3' || propType === 'vec4') {
-      updateConfig = configVector;
-    }
-    this.config = updateConfig(this.el, this.data, this.config);
-    this.animation = anime(this.config);
     this.animation.pause();
-    this.animationIsPlaying = false;
+  },
+
+  resumeAnimation: function () {
+    this.animation.play();
+  },
+
+  restartAnimation: function () {
+    this.animation.restart();
+    // this.animation.pause();
   }
 });
+
+
 
 /**
  * Stuff property into generic `property` key.
@@ -203,3 +217,7 @@ function getPropertyType (el, property) {
   }
   return component.schema.type;
 }
+
+
+
+// grab currently animated items, res-start only currently animated items
