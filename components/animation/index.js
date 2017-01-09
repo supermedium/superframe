@@ -116,22 +116,18 @@ AFRAME.registerComponent('animation', {
   addEventListeners: function () {
     var self = this;
     var data = this.data;
-    // console.log(data);
     var el = this.el;
     data.startEvents.map(function (eventName) {
       el.addEventListener(eventName, self.playAnimationBound);
-      // console.log(data.startEvents, eventName);
     });
     data.pauseEvents.map(function (eventName) {
       el.addEventListener(eventName, self.pauseAnimationBound);
-      // console.log(data.pauseEvents, eventName);
     });
     data.resumeEvents.map(function (eventName) {
       el.addEventListener(eventName, self.resumeAnimationBound);
     });
     data.restartEvents.map(function (eventName) {
       el.addEventListener(eventName, self.restartAnimationBound);
-      // console.log(data.restartEvents, eventName);
     });
   },
 
@@ -150,7 +146,6 @@ AFRAME.registerComponent('animation', {
     });
     data.restartEvents.map(function (eventName) {
       el.removeEventListener(eventName, self.restartAnimationBound);
-      // console.log(data.restartEvents, eventName);
     });
   },
 
@@ -168,7 +163,6 @@ AFRAME.registerComponent('animation', {
 
   restartAnimation: function () {
     this.animation.restart();
-    // this.animation.pause();
   }
 });
 
@@ -217,7 +211,3 @@ function getPropertyType (el, property) {
   }
   return component.schema.type;
 }
-
-
-
-// grab currently animated items, res-start only currently animated items
