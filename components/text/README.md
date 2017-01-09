@@ -80,7 +80,7 @@ For example in HTML:
 <html>
   <head>
     <title>My A-Frame Scene</title>
-    <script src="https://aframe.io/releases/0.2.0/aframe.min.js"></script>
+    <script src="https://aframe.io/releases/0.4.0/aframe.min.js"></script>
     <script src="https://unpkg.com/aframe-text-component/dist/aframe-text-component.min.js"></script>
     <script src="myfont.typeface.js"></script>
   </head>
