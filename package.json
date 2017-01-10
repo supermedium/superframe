@@ -1,6 +1,10 @@
 {
   "name": "kframe",
+<<<<<<< HEAD
   "version": "3.2.0",
+=======
+  "version": "3.0.0",
+>>>>>>> parent of fbdea86... bump animation
   "description": "Kevin's collection of A-Frame components and scenes.",
   "scripts": {
     "build": "NODE_ENV=production webpack --config webpack-dev.config.js",
