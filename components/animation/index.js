@@ -194,18 +194,3 @@ function getPropertyType (el, property) {
   }
   return component.schema.type;
 }
-
-
-// --------
-// I think there's some code and some state that should've been kept.
-// ---------
-
-// * keep state and code that relates to setting state
-
-// ------------------
-// I'm skimming through, and
-// an animation shouldn't automatically play if startEvents is defined.
-// But the code now doesn't seem to be stopping the animation from playing if defined.
-// ------------------
-
-// * make sure animation does not automatically play if enent is defined
