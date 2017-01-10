@@ -1,4 +1,4 @@
-/* global AFRAME */
+// /* global AFRAME */ NEW FILE
 var anime = require('animejs');
 
 if (typeof AFRAME === 'undefined') {
@@ -79,16 +79,20 @@ AFRAME.registerComponent('animation', {
     if (propType === 'vec2' || propType === 'vec3' || propType === 'vec4') {
       updateConfig = configVector;
     }
-    //
-    // // Config.
+
+    // Config.
     this.config = updateConfig(el, data, config);
     this.animation = anime(this.config);
+
+    // Stop previous animation.
+    this.pauseAnimation();
+
+    if (!this.data.startEvents.length) { this.animationIsPlaying = true; }
 
     // Play animation if no holding event.
     this.removeEventListeners();
     this.addEventListeners();
   },
-
 
   addEventListeners: function () {
     var self = this;
@@ -96,7 +100,6 @@ AFRAME.registerComponent('animation', {
     var el = this.el;
     data.startEvents.map(function (eventName) {
       el.addEventListener(eventName, self.playAnimationBound);
-      // el.addEventListener(eventName, self.playAnimationBound);
     });
     data.pauseEvents.map(function (eventName) {
       el.addEventListener(eventName, self.pauseAnimationBound);
@@ -129,18 +132,22 @@ AFRAME.registerComponent('animation', {
 
   playAnimation: function () {
     this.animation.play();
+    this.animationIsPlaying = true;
   },
 
   pauseAnimation: function () {
     this.animation.pause();
+    this.animationIsPlaying = false;
   },
 
   resumeAnimation: function () {
     this.animation.play();
+    this.animationIsPlaying = true;
   },
 
   restartAnimation: function () {
     this.animation.restart();
+    this.animationIsPlaying = true;
   }
 });
 
@@ -187,3 +194,18 @@ function getPropertyType (el, property) {
   }
   return component.schema.type;
 }
+
+
+// --------
+// I think there's some code and some state that should've been kept.
+// ---------
+
+// * keep state and code that relates to setting state
+
+// ------------------
+// I'm skimming through, and
+// an animation shouldn't automatically play if startEvents is defined.
+// But the code now doesn't seem to be stopping the animation from playing if defined.
+// ------------------
+
+// * make sure animation does not automatically play if enent is defined
