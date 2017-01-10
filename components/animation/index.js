@@ -26,6 +26,8 @@ AFRAME.registerComponent('animation', {
     repeat: {default: 0},
     startEvents: {type: 'array'},
     pauseEvents: {type: 'array'},
+    resumeEvents: {type: 'array'},
+    restartEvents: {type: 'array'},
     to: {default: ''}
   },
 
@@ -37,6 +39,8 @@ AFRAME.registerComponent('animation', {
     this.config = null;
     this.playAnimationBound = this.playAnimation.bind(this);
     this.pauseAnimationBound = this.pauseAnimation.bind(this);
+    this.resumeAnimationBound = this.resumeAnimation.bind(this);
+    this.restartAnimationBound = this.restartAnimation.bind(this);
     this.repeat = 0;
   },
 
@@ -75,39 +79,16 @@ AFRAME.registerComponent('animation', {
     if (propType === 'vec2' || propType === 'vec3' || propType === 'vec4') {
       updateConfig = configVector;
     }
-
-    // Stop previous animation.
-    this.pauseAnimation();
-
-    // Config.
+    //
+    // // Config.
     this.config = updateConfig(el, data, config);
     this.animation = anime(this.config);
-
-    if (!this.data.startEvents.length) { this.animationIsPlaying = true; }
 
     // Play animation if no holding event.
     this.removeEventListeners();
     this.addEventListeners();
   },
 
-  remove: function () {
-    this.pauseAnimation();
-    this.removeEventListeners();
-  },
-
-  pause: function () {
-    this.pauseAnimation();
-    this.removeEventListeners();
-  },
-
-  /**
-   * Called after update.
-   */
-  play: function () {
-    if (!this.animation || !this.animationIsPlaying) { return; }
-    this.playAnimation();
-    this.addEventListeners();
-  },
 
   addEventListeners: function () {
     var self = this;
@@ -115,9 +96,16 @@ AFRAME.registerComponent('animation', {
     var el = this.el;
     data.startEvents.map(function (eventName) {
       el.addEventListener(eventName, self.playAnimationBound);
+      // el.addEventListener(eventName, self.playAnimationBound);
     });
     data.pauseEvents.map(function (eventName) {
       el.addEventListener(eventName, self.pauseAnimationBound);
+    });
+    data.resumeEvents.map(function (eventName) {
+      el.addEventListener(eventName, self.resumeAnimationBound);
+    });
+    data.restartEvents.map(function (eventName) {
+      el.addEventListener(eventName, self.restartAnimationBound);
     });
   },
 
@@ -131,32 +119,28 @@ AFRAME.registerComponent('animation', {
     data.pauseEvents.map(function (eventName) {
       el.removeEventListener(eventName, self.pauseAnimationBound);
     });
+    data.resumeEvents.map(function (eventName) {
+      el.removeEventListener(eventName, self.resumeAnimationBound);
+    });
+    data.restartEvents.map(function (eventName) {
+      el.removeEventListener(eventName, self.restartAnimationBound);
+    });
   },
 
   playAnimation: function () {
-    if (!this.animation) { return; }
-    var updateConfig = configDefault;
-    var propType = getPropertyType(this.el, this.data.property);
-    if (propType === 'vec2' || propType === 'vec3' || propType === 'vec4') {
-      updateConfig = configVector;
-    }
-    this.config = updateConfig(this.el, this.data, this.config);
-    this.animation = anime(this.config);
-    this.animation.restart();
-    this.animationIsPlaying = true;
+    this.animation.play();
   },
 
   pauseAnimation: function () {
-    if (!this.animation) { return; }
-    var updateConfig = configDefault;
-    var propType = getPropertyType(this.el, this.data.property);
-    if (propType === 'vec2' || propType === 'vec3' || propType === 'vec4') {
-      updateConfig = configVector;
-    }
-    this.config = updateConfig(this.el, this.data, this.config);
-    this.animation = anime(this.config);
     this.animation.pause();
-    this.animationIsPlaying = false;
+  },
+
+  resumeAnimation: function () {
+    this.animation.play();
+  },
+
+  restartAnimation: function () {
+    this.animation.restart();
   }
 });
 
