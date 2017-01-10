@@ -38,6 +38,7 @@ AFRAME.registerComponent('animation', {
     this.animationIsPlaying = false;
     this.config = null;
     this.playAnimationBound = this.playAnimation.bind(this);
+    this.playAnimationBound = this.playAnimation.bind(this);
     this.pauseAnimationBound = this.pauseAnimation.bind(this);
     this.resumeAnimationBound = this.resumeAnimation.bind(this);
     this.restartAnimationBound = this.restartAnimation.bind(this);
@@ -79,39 +80,16 @@ AFRAME.registerComponent('animation', {
     if (propType === 'vec2' || propType === 'vec3' || propType === 'vec4') {
       updateConfig = configVector;
     }
-
-    // Stop previous animation.
-    // this.pauseAnimation();
-
-    // Config.
+    //
+    // // Config.
     this.config = updateConfig(el, data, config);
     this.animation = anime(this.config);
-
-    if (!this.data.startEvents.length) { this.animationIsPlaying = true; }
 
     // Play animation if no holding event.
     this.removeEventListeners();
     this.addEventListeners();
   },
 
-  remove: function () {
-    this.pauseAnimation();
-    this.removeEventListeners();
-  },
-
-  pause: function () {
-    this.pauseAnimation();
-    this.removeEventListeners();
-  },
-
-  /**
-   * Called after update.
-   */
-  play: function () {
-    if (!this.animation || !this.animationIsPlaying) { return; }
-    this.playAnimation();
-    this.addEventListeners();
-  },
 
   addEventListeners: function () {
     var self = this;
@@ -119,6 +97,7 @@ AFRAME.registerComponent('animation', {
     var el = this.el;
     data.startEvents.map(function (eventName) {
       el.addEventListener(eventName, self.playAnimationBound);
+      // el.addEventListener(eventName, self.playAnimationBound);
     });
     data.pauseEvents.map(function (eventName) {
       el.addEventListener(eventName, self.pauseAnimationBound);
@@ -165,8 +144,6 @@ AFRAME.registerComponent('animation', {
     this.animation.restart();
   }
 });
-
-
 
 /**
  * Stuff property into generic `property` key.
