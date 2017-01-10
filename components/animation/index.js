@@ -38,7 +38,6 @@ AFRAME.registerComponent('animation', {
     this.animationIsPlaying = false;
     this.config = null;
     this.playAnimationBound = this.playAnimation.bind(this);
-    this.playAnimationBound = this.playAnimation.bind(this);
     this.pauseAnimationBound = this.pauseAnimation.bind(this);
     this.resumeAnimationBound = this.resumeAnimation.bind(this);
     this.restartAnimationBound = this.restartAnimation.bind(this);
