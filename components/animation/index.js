@@ -1,4 +1,7 @@
 // /* global AFRAME */ NEW FILE
+
+//delay might now be working
+
 var anime = require('animejs');
 
 if (typeof AFRAME === 'undefined') {
@@ -91,6 +94,25 @@ AFRAME.registerComponent('animation', {
 
     // Play animation if no holding event.
     this.removeEventListeners();
+    this.addEventListeners();
+  },
+
+  remove: function () {
+    this.pauseAnimation();
+    this.removeEventListeners();
+  },
+
+  pause: function () {
+    this.pauseAnimation();
+    this.removeEventListeners();
+  },
+
+  /**
+   * Called after update.
+   */
+  play: function () {
+    if (!this.animation || !this.animationIsPlaying) { return; }
+    this.playAnimation();
     this.addEventListeners();
   },
 
