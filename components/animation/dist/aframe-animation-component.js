@@ -155,9 +155,22 @@
 	   * Called after update.
 	   */
 	  play: function () {
+	    var data = this.data;
+	    var self = this;
+
 	    if (!this.animation || !this.animationIsPlaying) { return; }
-	    this.playAnimation();
-	    this.addEventListeners();
+
+	    // Delay.
+	    if (data.delay) {
+	      setTimeout(play, data.delay);
+	    } else {
+	      play();
+	    }
+
+	    function play () {
+	      self.playAnimation();
+	      self.addEventListeners();
+	    }
 	  },
 
 	  addEventListeners: function () {
