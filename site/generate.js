@@ -12,7 +12,7 @@ nunjucks.configure('site/templates');
 // Get component data.
 var components = glob.sync('components/*').map(function (componentPath) {
   // Get component metadata.
-  var json = require(path.join(componentPath, 'package.json'));
+  var json = require('./' + path.join(componentPath, 'package.json'));
 
   // Get examples.
   var examples = glob.sync(path.join(componentPath, 'examples/*/index.html'));
