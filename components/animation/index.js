@@ -1,4 +1,7 @@
-/* global AFRAME */
+// /* global AFRAME */ NEW FILE
+
+//delay might now be working
+
 var anime = require('animejs');
 
 if (typeof AFRAME === 'undefined') {
@@ -26,6 +29,8 @@ AFRAME.registerComponent('animation', {
     repeat: {default: 0},
     startEvents: {type: 'array'},
     pauseEvents: {type: 'array'},
+    resumeEvents: {type: 'array'},
+    restartEvents: {type: 'array'},
     to: {default: ''}
   },
 
@@ -37,6 +42,8 @@ AFRAME.registerComponent('animation', {
     this.config = null;
     this.playAnimationBound = this.playAnimation.bind(this);
     this.pauseAnimationBound = this.pauseAnimation.bind(this);
+    this.resumeAnimationBound = this.resumeAnimation.bind(this);
+    this.restartAnimationBound = this.restartAnimation.bind(this);
     this.repeat = 0;
   },
 
@@ -76,12 +83,12 @@ AFRAME.registerComponent('animation', {
       updateConfig = configVector;
     }
 
-    // Stop previous animation.
-    this.pauseAnimation();
-
     // Config.
     this.config = updateConfig(el, data, config);
     this.animation = anime(this.config);
+
+    // Stop previous animation.
+    this.pauseAnimation();
 
     if (!this.data.startEvents.length) { this.animationIsPlaying = true; }
 
@@ -119,6 +126,12 @@ AFRAME.registerComponent('animation', {
     data.pauseEvents.map(function (eventName) {
       el.addEventListener(eventName, self.pauseAnimationBound);
     });
+    data.resumeEvents.map(function (eventName) {
+      el.addEventListener(eventName, self.resumeAnimationBound);
+    });
+    data.restartEvents.map(function (eventName) {
+      el.addEventListener(eventName, self.restartAnimationBound);
+    });
   },
 
   removeEventListeners: function () {
@@ -131,32 +144,32 @@ AFRAME.registerComponent('animation', {
     data.pauseEvents.map(function (eventName) {
       el.removeEventListener(eventName, self.pauseAnimationBound);
     });
+    data.resumeEvents.map(function (eventName) {
+      el.removeEventListener(eventName, self.resumeAnimationBound);
+    });
+    data.restartEvents.map(function (eventName) {
+      el.removeEventListener(eventName, self.restartAnimationBound);
+    });
   },
 
   playAnimation: function () {
-    if (!this.animation) { return; }
-    var updateConfig = configDefault;
-    var propType = getPropertyType(this.el, this.data.property);
-    if (propType === 'vec2' || propType === 'vec3' || propType === 'vec4') {
-      updateConfig = configVector;
-    }
-    this.config = updateConfig(this.el, this.data, this.config);
-    this.animation = anime(this.config);
-    this.animation.restart();
+    this.animation.play();
     this.animationIsPlaying = true;
   },
 
   pauseAnimation: function () {
-    if (!this.animation) { return; }
-    var updateConfig = configDefault;
-    var propType = getPropertyType(this.el, this.data.property);
-    if (propType === 'vec2' || propType === 'vec3' || propType === 'vec4') {
-      updateConfig = configVector;
-    }
-    this.config = updateConfig(this.el, this.data, this.config);
-    this.animation = anime(this.config);
     this.animation.pause();
     this.animationIsPlaying = false;
+  },
+
+  resumeAnimation: function () {
+    this.animation.play();
+    this.animationIsPlaying = true;
+  },
+
+  restartAnimation: function () {
+    this.animation.restart();
+    this.animationIsPlaying = true;
   }
 });
 
