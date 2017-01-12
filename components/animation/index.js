@@ -1,6 +1,4 @@
-// /* global AFRAME */ NEW FILE
-
-//delay might now be working
+/* global AFRAME */
 
 var anime = require('animejs');
 
