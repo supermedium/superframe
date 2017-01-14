@@ -8,6 +8,8 @@ Kevin's collection of A-Frame components and scenes.
 
 ## Components
 
+See documentation for individual components:
+
 - [animation](https://github.com/ngokevin/kframe/tree/master/components/animation/) - Animations in A-Frame using anime.js
 - [audioanalyser](https://github.com/ngokevin/kframe/tree/master/components/audioanalyser/) - Audio visualizations in A-Frame using Web Audio (AnalyserNode)
 - [broadcast](https://github.com/ngokevin/kframe/tree/master/components/broadcast/) - Multi-user in A-Frame using raw websockets
@@ -25,53 +27,10 @@ Kevin's collection of A-Frame components and scenes.
 - [text](https://github.com/ngokevin/kframe/tree/master/components/text/) - Geometry-based text in A-Frame
 
 
-## Component Usage
-
-K-Frame no longer provides a bundle. Each component should be installed
-individually. Each component is published individually to npm, generates its
-own `dist/` builds in their folders, and has its own README. Components live
-within the `components/` folder.
-
-In general, you can install a component in one of several ways:
-
-### Browser Installation
-
-Install and use by directly including a component's `dist/` files. For example,
-with the text geometry component:
-
-```html
-<head>
-  <title>My A-Frame Scene</title>
-  <script src="https://aframe.io/releases/0.4.0/aframe.min.js"></script>
-  <script src="https://unpkg.com/aframe-text-component@0.4.x/dist/aframe-text-component.min.js"></script>
-</head>
-<body>
-  <a-scene>
-    <a-entity text="text: What's up"></a-entity>
-  </a-scene>
-</body>
-```
-
-### npm Installation
-
-Install via npm. For example, with the text geometry component:
-
-```bash
-npm install aframe-text-component
-```
-
-Then register and use.
-
-```js
-require('aframe');
-require('aframe-text-component');
-```
-
-## Local Development
+## Local Installation
 
 ```bash
 git clone git@github.com:ngokevin/kframe
 npm install  # Run npm install on all inner modules
 npm run dev  # Webpack dev server that watches all component files
-npm run dev -- text  # Webpack dev server that watches only one component
 ```
