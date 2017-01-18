@@ -14,16 +14,16 @@ AFRAME.registerComponent('intersection-spawn', {
     const data = this.data;
     const el = this.el;
 
-    el.addEventListener('click', evt => {
+    el.addEventListener(data.event, evt => {
       // Create element.
       const spawnEl = document.createElement('a-entity');
 
       // Snap intersection point to grid and offset from center.
       spawnEl.setAttribute('position', evt.detail.intersection.point);
-      console.log(evt.detail.intersectedEl, evt.detail.intersection.point);
 
       // Set components and properties.
       Object.keys(data).forEach(name => {
+        if (name === 'event') { return; }
         AFRAME.utils.entity.setComponentProperty(spawnEl, name, data[name]);
       });
 

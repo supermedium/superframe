@@ -8,7 +8,9 @@
     <script src="components/intersection-spawn.js"></script>
     <script src="components/random-color.js"></script>
     <script src="components/snap.js"></script>
-  </head>
+    <script src="https://unpkg.com/aframe-vive-cursor-component@0.1.1/dist/aframe-vive-cursor-component.min.js"></script>
+    <script src="https://unpkg.com/aframe-teleport-controls@0.1.x/dist/aframe-teleport-controls.min.js" data-angle="teleport-controls"></script>
+</head>
   <body>
     <a-scene>
       <a-assets>
@@ -29,12 +31,23 @@
       <!-- Ground. -->
       <a-cylinder src="#groundTexture" radius="32" height="0.1"></a-cylinder>
 
-      <!--Tracked controls. -->
-      <a-entity hand-controls="hand: left"></a-entity>
-      <a-entity hand-controls="hand: right"></a-entity>
+      <!-- Hands. -->
+      <a-entity id="teleHand"
+        hand-controls="left"
+        teleport-controls
+      ></a-entity>
 
-      <a-camera wasd-controls="fly: true">
-        <a-cursor intersection-spawn="mixin: voxel"></a-cursor>
+      <a-entity id="blockHand"
+        hand-controls="right"
+        controller-cursor
+        intersection-spawn="event: click; mixin: voxel"
+      ></a-entity>
+
+      <!-- Camera. -->
+      <a-camera>
+        <a-cursor
+          intersection-spawn="event: click; mixin: voxel"
+        ></a-cursor>
       </a-camera>
     </a-scene>
   </body>
