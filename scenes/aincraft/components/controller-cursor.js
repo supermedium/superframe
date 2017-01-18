@@ -1,3 +1,5 @@
+const bind = AFRAME.utils.bind;
+
 const EVENTS = {
   CLICK: 'click',
   MOUSEENTER: 'mouseenter',
@@ -29,13 +31,14 @@ AFRAME.registerComponent('controller-cursor', {
   },
 
   init: function () {
-    var cursorEl = this.el;
-    var canvas = cursorEl.sceneEl.canvas;
+    const cursorEl = this.el;
+    const data = this.data;
     this.triggerDownEl = null;
     this.intersection = null;
     this.intersectedEl = null;
 
     // Wait for canvas to load.
+    const canvas = cursorEl.sceneEl.canvas;
     if (!canvas) {
       cursorEl.sceneEl.addEventListener('render-target-loaded', bind(this.init, this));
       return;
@@ -55,19 +58,20 @@ AFRAME.registerComponent('controller-cursor', {
     cursorEl.setAttribute('raycaster', {near: 0.03});
 
     // Bind methods.
-    this.onIntersectionBind = this.onIntersection.bind(this);
-    this.onIntersectionClearedBind = this.onIntersectionCleared.bind(this);
-    this.onTriggerDownBind = this.onTriggerDown.bind(this);
-    this.onTriggerUpBind = this.onTriggerUp.bind(this);
+    this.onIntersectionBind = bind(this.onIntersection, this);
+    this.onIntersectionClearedBind = bind(this.onIntersectionCleared, this);
+    this.onTriggerDownBind = bind(this.onTriggerDown, this);
+    this.onTriggerUpBind = bind(this.onTriggerUp, this);
   },
 
   /**
    * Add event listeners.
    */
   play: function () {
-    cursorEl.addEventListener('raycaster-intersection', bind(this.onIntersection, this));
+    const cursorEl = this.el;
+    cursorEl.addEventListener('raycaster-intersection', this.onIntersectionBind);
     cursorEl.addEventListener('raycaster-intersection-cleared',
-                              bind(this.onIntersectionCleared, this));
+                              this.onIntersectionClearedBind);
     cursorEl.addEventListener('triggerdown', this.onTriggerDownBind);
     cursorEl.addEventListener('triggerup', this.onTriggerUpBind);
   },
@@ -76,9 +80,9 @@ AFRAME.registerComponent('controller-cursor', {
    * Remove event listeners.
    */
   pause: function () {
-    cursorEl.removeEventListener('raycaster-intersection', bind(this.onIntersection, this));
+    cursorEl.removeEventListener('raycaster-intersection', this.onIntersectionBind);
     cursorEl.removeEventListener('raycaster-intersection-cleared',
-                              bind(this.onIntersectionCleared, this));
+                                 this.onIntersectionClearedBind);
     cursorEl.removeEventListener('triggerdown', this.onTriggerDownBind);
     cursorEl.removeEventListener('triggerup', this.onTriggerUpBind);
   },
@@ -86,7 +90,7 @@ AFRAME.registerComponent('controller-cursor', {
   /**
    * Trigger mousedown and keep track of the mousedowned entity.
    */
-  onMouseDown: function (evt) {
+  onTriggerDown: function (evt) {
     this.twoWayEmit(EVENTS.MOUSEDOWN);
     this.triggerDownEl = this.intersectedEl;
   },
@@ -97,7 +101,7 @@ AFRAME.registerComponent('controller-cursor', {
    * - Currently-intersected entity is the same as the one when mousedown was triggered,
    *   in case user mousedowned one entity, dragged to another, and mouseupped.
    */
-  onMouseUp: function (evt) {
+  onTriggerUp: function (evt) {
     this.twoWayEmit(EVENTS.MOUSEUP);
     if (!this.intersectedEl || this.triggerDownEl !== this.intersectedEl) { return; }
     this.twoWayEmit(EVENTS.CLICK);
