@@ -9,8 +9,8 @@
     <script src="components/intersection-spawn.js"></script>
     <script src="components/random-color.js"></script>
     <script src="components/snap.js"></script>
-    <script src="https://unpkg.com/aframe-teleport-controls@0.1.x/dist/aframe-teleport-controls.min.js" data-angle="teleport-controls"></script>
-</head>
+    <script src="components/aframe-teleport-controls.min.js"></script>
+  </head>
   <body>
     <a-scene>
       <a-assets>
@@ -24,17 +24,15 @@
         ></a-mixin>
       </a-assets>
 
-      <!-- Background sky. -->
-      <a-sky height="2048" radius="30" src="#skyTexture" theta-length="90"
+      <a-sky id="bg" height="2048" radius="30" src="#skyTexture" theta-length="90"
              width="2048"></a-sky>
 
-      <!-- Ground. -->
-      <a-cylinder src="#groundTexture" radius="32" height="0.1"></a-cylinder>
+      <a-cylinder id="ground" src="#groundTexture" radius="32" height="0.1"></a-cylinder>
 
       <!-- Hands. -->
       <a-entity id="teleHand"
         hand-controls="left"
-        teleport-controls
+        teleport-controls="type: parabolic; collisionEntities: [mixin='voxel'], #ground"
       ></a-entity>
 
       <a-entity id="blockHand"
