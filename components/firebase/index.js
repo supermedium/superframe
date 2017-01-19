@@ -144,7 +144,7 @@ AFRAME.registerSystem('firebase', {
 
     Object.keys(broadcastingEntities).forEach(function broadcast (id) {
       var el = broadcastingEntities[id];
-      var components = el.getComputedAttribute('firebase-broadcast').components;
+      var components = el.getAttribute('firebase-broadcast').components;
       var data = {};
 
       // Add components to broadcast once.
