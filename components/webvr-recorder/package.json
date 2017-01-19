@@ -1,0 +1,54 @@
+{
+  "name": "aframe-webvr-recorder-component",
+  "version": "1.0.0",
+  "description": "WebVR Recorder component for A-Frame.",
+  "main": "index.js",
+  "cdn": "dist/aframe-webvr-recorder-component.min.js",
+  "scripts": {
+    "build": "browserify examples/main.js -o examples/build.js",
+    "dev": "budo examples/main.js:build.js --dir examples --port 8000 --live --open",
+    "dist": "webpack index.js dist/aframe-webvr-recorder-component.js && webpack -p index.js dist/aframe-webvr-recorder-component.min.js",
+    "lint": "semistandard -v | snazzy",
+    "prepublish": "npm run dist",
+    "preghpages": "npm run build && shx rm -rf gh-pages && shx mkdir gh-pages && shx cp -r examples/* gh-pages",
+    "ghpages": "npm run preghpages && ghpages -p gh-pages",
+    "start": "npm run dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ngokevin/kframe.git"
+  },
+  "keywords": [
+    "aframe",
+    "aframe-component",
+    "aframe-vr",
+    "vr",
+    "mozvr",
+    "webvr",
+    "webvr-recorder"
+  ],
+  "author": "Kevin Ngo <me@ngokevin.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ngokevin/kframe/issues"
+  },
+  "homepage": "https://github.com/ngokevin/kframe#readme",
+  "devDependencies": {
+    "aframe": "^0.3.2",
+    "browserify": "^13.0.0",
+    "budo": "^8.2.2",
+    "ghpages": "^0.0.8",
+    "randomcolor": "^0.4.4",
+    "semistandard": "^8.0.0",
+    "shelljs": "^0.7.0",
+    "shx": "^0.1.1",
+    "snazzy": "^4.0.0",
+    "webpack": "^2.2.0"
+  },
+  "semistandard": {
+    "ignore": [
+      "examples/build.js",
+      "dist/**"
+    ]
+  }
+}
