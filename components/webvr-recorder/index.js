@@ -150,8 +150,8 @@ AFRAME.registerComponent('webvr-recorder', {
     });
 
     // Reset events array.
-    this.controller1Events = [];
-    this.controller2Events = [];
+    this.controller1Events.length = 0;
+    this.controller2Events.length = 0;
   },
 
   replayTick: function (t) {
