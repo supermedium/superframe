@@ -25,7 +25,7 @@ See documentation for individual components:
 - [sun-sky](https://github.com/ngokevin/kframe/tree/master/components/sun-sky/) - Gradient sky with adjustable sun in A-Frame
 - [template](https://github.com/ngokevin/kframe/tree/master/components/template/) - Encapsulate groups of entities, use templating engines, and do string interpolations in A-Frame
 - [text](https://github.com/ngokevin/kframe/tree/master/components/text/) - Geometry-based text in A-Frame
-- [webvr-recorder](https://github.com/ngokevin/kframe/tree/master/components/webvr-recorder/) - WebVR Recorder component for A-Frame.
+- [webvr-recorder](https://github.com/ngokevin/kframe/tree/master/components/webvr-recorder/) - A-Frame component to record WebVR pose and events to localStorage or JSON. Then replay them without needing VR.
 
 
 ## Local Installation

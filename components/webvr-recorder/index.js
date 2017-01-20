@@ -25,8 +25,8 @@ const EVENTS_DECODE = {
  */
 AFRAME.registerComponent('webvr-recorder', {
   schema: {
-    controller1: {type: 'string'},
-    controller2: {type: 'string'},
+    controller1: {default: '#controller1', type: 'string'},
+    controller2: {default: '#controller2', type: 'string'},
     source: {default: 'webvr-recorder.json'}
   },
 
@@ -240,12 +240,6 @@ function createDownloadLink () {
   return link;
 }
 
-const re = new RegExp('(\\d+\\.\\d{' + 4 + '})(\\d)');
-function truncNum (num) {
-  var m = num.toString().match(re);
-  return m ? parseFloat(m[1]) : num.valueOf();
-};
-
 function serializeVec3 (vec3) {
-  return truncNum(vec3.x) + ' ' + truncNum(vec3.y) + ' ' + truncNum(vec3.z);
+  return vec3.x + ' ' + vec3.y + ' ' + vec3.z;
 }
