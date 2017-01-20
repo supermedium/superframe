@@ -4,9 +4,11 @@
     <script src="../build.js"></script>
   </head>
   <body>
-    <a-scene>
-      <a-assets></a-assets>
-      <a-entity webvr-recorder=""></a-entity>
+    <a-scene webvr-recorder="controller1: #controller1; controller2: #controller2">
+      <a-box position="0 0 -2" color="#152530"></a-box>
+      <a-entity id="controller1" hand-controls="left"></a-entity>
+      <a-entity id="controller2" hand-controls="right"></a-entity>
+      <a-sky color="#DADADA"></a-sky>
     </a-scene>
 
     <!-- GitHub Corner. -->
