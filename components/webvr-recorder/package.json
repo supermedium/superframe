@@ -1,7 +1,7 @@
 {
   "name": "aframe-webvr-recorder-component",
   "version": "1.0.0",
-  "description": "WebVR Recorder component for A-Frame.",
+  "description": "A-Frame component to record WebVR pose and events to localStorage or JSON. Then replay them without needing VR.",
   "main": "index.js",
   "cdn": "dist/aframe-webvr-recorder-component.min.js",
   "scripts": {
