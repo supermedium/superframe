@@ -129,23 +129,22 @@ AFRAME.registerComponent('webvr-recorder', {
 
   recordTick: function (t) {
     this.record.push({
-      time: t,
       c: {
         // Camera.
-        p: this.camera.getAttribute('position'),
-        r: this.camera.getAttribute('rotation')
+        p: serializeVec3(this.camera.getAttribute('position')),
+        r: serializeVec3(this.camera.getAttribute('rotation'))
       },
       c1: {
         // Controller 1.
         e: this.controller1Events,
-        p: this.controller1.getAttribute('position'),
-        r: this.controller1.getAttribute('rotation')
+        p: serializeVec3(this.controller1.getAttribute('position')),
+        r: serializeVec3(this.controller1.getAttribute('rotation'))
       },
       c2: {
         // Controller 2.
         e: this.controller2Events,
-        p: this.controller2.getAttribute('position'),
-        r: this.controller2.getAttribute('rotation')
+        p: serializeVec3(this.controller2.getAttribute('position')),
+        r: serializeVec3(this.controller2.getAttribute('rotation'))
       }
     });
 
@@ -239,4 +238,14 @@ function createDownloadLink () {
   link.style.left = 0;
   link.style.zIndex = 9999;
   return link;
+}
+
+const re = new RegExp('(\\d+\\.\\d{' + 4 + '})(\\d)');
+function truncNum (num) {
+  var m = num.toString().match(re);
+  return m ? parseFloat(m[1]) : num.valueOf();
+};
+
+function serializeVec3 (vec3) {
+  return truncNum(vec3.x) + ' ' + truncNum(vec3.y) + ' ' + truncNum(vec3.z);
 }
