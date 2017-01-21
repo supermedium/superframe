@@ -1,6 +1,6 @@
 {
   "name": "aframe-text-component",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Geometry-based text in A-Frame",
   "main": "index.js",
   "scripts": {
