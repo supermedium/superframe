@@ -22,7 +22,7 @@ Install and use by directly including the [browser files](dist):
 <head>
   <title>My A-Frame Scene</title>
   <script src="https://aframe.io/releases/0.3.0/aframe.min.js"></script>
-  <script src="https://rawgit.com/ngokevin/aframe-entity-generator-component/master/dist/aframe-entity-generator-component.min.js"></script>
+  <script src="https://unpkg.com/aframe-entity-generator-component@^3.0.0/dist/aframe-entity-generator-component.min.js"></script>
 </head>
 
 <body>

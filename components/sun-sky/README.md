@@ -12,7 +12,7 @@ Install and use by directly including the [browser files](dist):
 <head>
   <title>My A-Frame Scene</title>
   <script src="https://aframe.io/releases/0.3.0/aframe.min.js"></script>
-  <script src="https://rawgit.com/ngokevin/kframe/tree/master/components/sun-sky/dist/aframe-sun-sky.min.js"></script>
+  <script src="https://unpkg.com/aframe-sun-sky-component@3.0.1/dist/aframe-sun-sky-component.min.js"></script>
 </head>
 
 <body>

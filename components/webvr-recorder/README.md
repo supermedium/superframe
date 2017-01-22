@@ -1,5 +1,8 @@
 ## aframe-webvr-recorder-component
 
+[mocap]: https://github.com/dmarcos/aframe-motion-capture-component
+> Not maintained. See [dmarcos/aframe-motion-capture-component][mocap]
+
 A-Frame component to record WebVR pose and events to localStorage or JSON. Then
 replay them without needing VR. Primarily for development.
 

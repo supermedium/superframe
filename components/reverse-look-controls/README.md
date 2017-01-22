@@ -10,7 +10,7 @@ Install and use by directly including the [browser files](dist):
 <head>
   <title>My A-Frame Scene</title>
   <script src="https://aframe.io/releases/0.3.0/aframe.min.js"></script>
-  <script src="https://rawgit.com/ngokevin/kframe/tree/master/components/reverse-look-controls/dist/aframe-reverse-look-controls.min.js"></script>
+  <script src="https://unpkg.com/reverse-look-controls-component@3.0.0/dist/aframe-reverse-look-controls.min.js"></script>
 </head>
 
 <body>
