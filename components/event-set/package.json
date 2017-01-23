@@ -1,6 +1,6 @@
 {
   "name": "aframe-event-set-component",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "description": "Set properties in response to events in A-Frame",
   "main": "index.js",
   "browser": "dist/aframe-event-set-component.min.js",

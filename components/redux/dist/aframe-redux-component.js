@@ -255,6 +255,7 @@
 	exports.applyMiddleware = _applyMiddleware2['default'];
 	exports.compose = _compose2['default'];
 
+
 /***/ },
 /* 2 */
 /***/ function(module, exports, __webpack_require__) {
@@ -521,6 +522,7 @@
 	  }, _ref2[_symbolObservable2['default']] = observable, _ref2;
 	}
 
+
 /***/ },
 /* 3 */
 /***/ function(module, exports, __webpack_require__) {
@@ -724,6 +726,7 @@
 
 	var result = (0, _ponyfill2['default'])(root);
 	exports['default'] = result;
+
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
@@ -753,6 +756,7 @@
 
 		return result;
 	};
+
 
 /***/ },
 /* 11 */
@@ -901,6 +905,7 @@
 	  };
 	}
 
+
 /***/ },
 /* 12 */
 /***/ function(module, exports) {
@@ -930,6 +935,7 @@
 	  } catch (e) {}
 	  /* eslint-enable no-empty */
 	}
+
 
 /***/ },
 /* 13 */
@@ -986,6 +992,7 @@
 	  }
 	  return boundActionCreators;
 	}
+
 
 /***/ },
 /* 14 */
@@ -1050,6 +1057,7 @@
 	  };
 	}
 
+
 /***/ },
 /* 15 */
 /***/ function(module, exports) {
@@ -1092,6 +1100,7 @@
 	    }, last.apply(undefined, arguments));
 	  };
 	}
+
 
 /***/ }
 /******/ ]);

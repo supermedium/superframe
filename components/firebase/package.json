@@ -1,11 +1,11 @@
 {
   "name": "aframe-firebase-component",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "description": "Multi-user in A-Frame using Firebase",
   "main": "index.js",
   "scripts": {
     "build": "browserify examples/main.js -o examples/build.js",
-    "dev": "budo examples/main.js:build.js --dir examples --port 8000 --live --open",
+    "dev": "budo examples/main.js:examples/build.js --port 8000 --live --open",
     "dist": "webpack index.js dist/aframe-firebase-component.js && webpack -p index.js dist/aframe-firebase-component.min.js",
     "postpublish": "npm run dist",
     "test": "karma start ./tests/karma.conf.js"
@@ -29,7 +29,7 @@
   },
   "homepage": "https://github.com/ngokevin/kframe/tree/components/firebase#readme",
   "devDependencies": {
-    "aframe": "^0.3.0",
+    "aframe": "^0.4.1",
     "aframe-template-component": "^1.5.0",
     "browserify": "^13.0.0",
     "budo": "^8.2.2",
