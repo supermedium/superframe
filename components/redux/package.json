@@ -4,11 +4,11 @@
   "description": "Hook in Redux reducers, data bindings, and action dispatches for A-Frame",
   "main": "index.js",
   "scripts": {
-    "dist": "npm run dist:min && npm run dist:max",
-    "dist:max": "webpack",
-    "dist:min": "NODE_ENV=production webpack",
-    "lint": "semistandard -v | snazzy",
-    "postpublish": "npm run dist"
+    "build": "browserify examples/main.js -o examples/build.js",
+    "dev": "budo examples/main.js:examples/build.js --port 8000 --live --open",
+    "dist": "webpack index.js dist/aframe-redux-components.js && webpack -p index.js dist/aframe-redux-components.min.js",
+    "postpublish": "npm run dist",
+    "test": "karma start ./tests/karma.conf.js"
   },
   "repository": {
     "type": "git",

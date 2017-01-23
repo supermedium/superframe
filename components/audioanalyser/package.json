@@ -4,8 +4,11 @@
   "description": "Audio visualizations in A-Frame using Web Audio (AnalyserNode)",
   "main": "index.js",
   "scripts": {
+    "build": "browserify examples/main.js -o examples/build.js",
+    "dev": "budo examples/main.js:examples/build.js --port 8000 --live --open",
     "dist": "webpack index.js dist/aframe-audioanalyser-component.js && webpack -p index.js dist/aframe-audioanalyser-component.min.js",
-    "postpublish": "npm run dist"
+    "lint": "semistandard -v | snazzy",
+    "prepublish": "npm run dist"
   },
   "repository": {
     "type": "git",

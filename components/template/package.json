@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "browserify examples/main.js -o examples/build.js",
-    "dev": "budo examples/main.js:build.js --dir examples --port 8000 --live --open -- --no-browser-field",
+    "dev": "budo examples/main.js:examples/build.js --port 8000 --live --open -- --no-browser-field",
     "dist": "webpack index.js dist/aframe-template-component.js && webpack -p index.js dist/aframe-template-component.min.js",
     "postpublish": "npm run dist",
     "test": "karma start ./tests/karma.conf.js"
