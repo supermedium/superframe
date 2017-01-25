@@ -30,8 +30,15 @@ See documentation for individual components:
 
 ## Local Installation
 
+Go to the folder of the component or scene you wish to develop and check out
+its README. Generally the steps involve:
+
 ```bash
-git clone git@github.com:ngokevin/kframe
-npm install  # Run npm install on all inner modules
-npm run dev  # Webpack dev server that watches all component files
+git clone git@github.com:ngokevin/kframe && cd kframe
+# Head to the folder to develop (e.g., `cd components/foo`, `cd scenes/foo`).
+npm install
+npm run dev  # (or sometimes `npm run start`)
 ```
+
+Then a page should open in your browser. You can develop on the source code and
+the server will handle live compilation and bundling.
