@@ -128,7 +128,8 @@
 	    // to state with updateMatrixWorld(). In practice, this is handled by the renderer.
 	    var target3D = this.target3D;
 	    if (target3D) {
-	      return this.el.object3D.lookAt(this.vector.setFromMatrixPosition(target3D.matrixWorld));
+	      var vector = this.el.object3D.parent.worldToLocal(target3D.getWorldPosition());
+	      return this.el.object3D.lookAt(vector);
 	    }
 	  },
 
