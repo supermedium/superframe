@@ -16,7 +16,7 @@ Features:
 
 Supports:
 
-- Vanilla HTML
+- Vanilla HTML (with [basic ES6 templating](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals))
 - [Handlebars.js](https://http://handlebarsjs.com/)
 - [Jade](http://jade-lang.com/)
 - [mustache.js](https://mustache.github.io/)
