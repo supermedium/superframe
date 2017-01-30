@@ -4,6 +4,8 @@ A template component for [A-Frame](https://aframe.io) VR.
 
 Features:
 
+- Simple ES6-style templating
+- Defining context variables via data attributes or from components
 - Agnostic template engine support, choose from popular templating engines
 - Rendering templates before, at the beginning, at the end, or after entities
 - Loading templates defined within script tags
@@ -19,6 +21,23 @@ Supports:
 - [Jade](http://jade-lang.com/)
 - [mustache.js](https://mustache.github.io/)
 - [Nunjucks](https://mozilla.github.io/nunjucks/)
+
+### Basic Example
+
+```html
+<a-scene>
+  <a-assets>
+    <script id="boxesTemplate">
+      <a-box color="${box1color}" position="-1 0 -5"></a-box>
+      <a-box color="${box2color}" position="0 1 -5"></a-box>
+      <a-box color="${box3color}" position="1 0 -5"></a-box>
+    </script>
+  </a-assets>
+
+  <a-entity template="src: #boxesTemplate"
+            data-box1color="red" data-box2color="green" data-box3color="blue"></a-entity>
+</a-scene>
+```
 
 ### Properties
 
