@@ -4,7 +4,8 @@
     <meta charset="utf-8">
     <title>Aincraft</title>
     <meta name="description" content="Aincraft">
-    <script src="https://aframe.io/releases/0.4.0/aframe.min.js"></script>
+    <script src="https://rawgit.com/aframevr/aframe/d282656/dist/aframe-master.min.js"></script>
+    <script src="https://rawgit.com/ngokevin/aframe-motion-capture/343f99/dist/aframe-motion-capture.min.js"></script>
     <script src="components/controller-cursor.js"></script>
     <script src="components/intersection-spawn.js"></script>
     <script src="components/random-color.js"></script>
@@ -12,7 +13,7 @@
     <script src="components/aframe-teleport-controls.min.js"></script>
   </head>
   <body>
-    <a-scene>
+    <a-scene avatar-recorder>
       <a-assets>
         <img id="groundTexture" src="img/floor.jpg">
         <img id="skyTexture" src="img/sky.jpg">
