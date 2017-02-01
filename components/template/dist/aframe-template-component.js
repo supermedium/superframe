@@ -124,6 +124,7 @@
 	    var renderedTemplate = renderTemplate(templateCacheItem.template, templateCacheItem.type,
 	                                          templateData);
 	    el.insertAdjacentHTML(data.insert, renderedTemplate);
+	    el.emit('templaterendered');
 	  }
 	});
 
