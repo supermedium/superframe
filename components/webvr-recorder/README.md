@@ -17,8 +17,8 @@ if any to differentiate between the two.
 
 ```html
 <a-scene webvr-recorder="controller1: #controller1; controller2: #controller2">
-  <a-entity id="controller1" hand-controls"></a-entity>
-  <a-entity id="controller2" hand-controls"></a-entity>
+  <a-entity id="controller1" hand-controls="left"></a-entity>
+  <a-entity id="controller2" hand-controls="right"></a-entity>
 </a-scene>
 ```
 
