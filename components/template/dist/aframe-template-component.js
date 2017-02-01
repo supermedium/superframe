@@ -124,6 +124,7 @@
 	    var renderedTemplate = renderTemplate(templateCacheItem.template, templateCacheItem.type,
 	                                          templateData);
 	    el.insertAdjacentHTML(data.insert, renderedTemplate);
+	    el.emit('templaterendered');
 	  }
 	});
 
@@ -158,6 +159,8 @@
 	    }
 	    default: {
 	      // If type not specified, assume HTML. Add some ES6 template string sugar.
+	      console.log(template);
+	      console.log(context);
 	      return templateString(template, context);
 	    }
 	  }
