@@ -8,17 +8,17 @@ component wraps
 
 ## Properties
 
-| Property       | Description                                                   | Default Value                                                                                  |
-| --------       | -----------                                                   | -------------                                                                                  |
-| bevelEnabled   |                                                               | false                                                                                          |
-| bevelSize      |                                                               | 8                                                                                              |
-| bevelThickness |                                                               | 12                                                                                             |
-| curveSegments  |                                                               | 12                                                                                             |
-| font           | Path to a typeface.json file or selector to `<a-asset-item>`. | https://rawgit.com/ngokevin/kframe/master/components/text/lib/helvetiker_regular.typeface.json |
-| height         |                                                               | 0.05                                                                                           |
-| size           |                                                               | 0.5                                                                                            |
-| style          |                                                               | normal                                                                                         |
-| value          |                                                               | ''                                                                                             |
+| Property       | Description                                                   | Default Value                                                                                           |
+| --------       | -----------                                                   | -------------                                                                                           |
+| bevelEnabled   |                                                               | false                                                                                                   |
+| bevelSize      |                                                               | 8                                                                                                       |
+| bevelThickness |                                                               | 12                                                                                                      |
+| curveSegments  |                                                               | 12                                                                                                      |
+| font           | Path to a typeface.json file or selector to `<a-asset-item>`. | https://rawgit.com/ngokevin/kframe/master/components/text-geometry/lib/helvetiker_regular.typeface.json |
+| height         |                                                               | 0.05                                                                                                    |
+| size           |                                                               | 0.5                                                                                                     |
+| style          |                                                               | normal                                                                                                  |
+| value          |                                                               | ''                                                                                                      |
 
 ### Usage
 

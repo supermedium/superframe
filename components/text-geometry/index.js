@@ -13,7 +13,7 @@ AFRAME.registerComponent('text-geometry', {
     bevelSize: {default: 8, min: 0},
     bevelThickness: {default: 12, min: 0},
     curveSegments: {default: 12, min: 0},
-    font: {type: 'asset', default: 'https://rawgit.com/ngokevin/kframe/master/components/text/lib/helvetiker_regular.typeface.json'},
+    font: {type: 'asset', default: 'https://rawgit.com/ngokevin/kframe/master/components/text-geometry/lib/helvetiker_regular.typeface.json'},
     height: {default: 0.05, min: 0},
     size: {default: 0.5, min: 0},
     style: {default: 'normal', oneOf: ['normal', 'italics']},
