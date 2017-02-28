@@ -12,22 +12,22 @@
     <meta name="twitter:description" content="What is vaporwave? According to commenters in various music forums, it's 'chillwave for Marxists,' 'post-elevator music,' 'corporate smooth jazz Windows 95 pop,'">
     <meta name="twitter:image" content="http://i.imgur.com/B84J9uG.jpg">
     <meta property="og:image" content="https://raw.githubusercontent.com/ngokevin/kframe/master/components/text/examples/vaporwave/preview.jpg"></meta>
-    <script src="https://rawgit.com/aframevr/aframe/917c06889ee1f3f79b7b1bbd9eab9815f9512503/dist/aframe.min.js"></script>
+    <script src="https://aframe.io/releases/0.5.0/aframe.min.js"></script>
     <script src="../build.js"></script>
-    <script src="https://cdn.rawgit.com/AdaRoseEdwards/facetype-fonts-for-a-frame/master/Dawning-of-a-New-Day_Regular.js"></script>
-    <script src="https://cdn.rawgit.com/AdaRoseEdwards/facetype-fonts-for-a-frame/master/Exo%202%20Black_Regular.js"></script>
-    <script src="https://cdn.rawgit.com/AdaRoseEdwards/facetype-fonts-for-a-frame/master/Exo%202_Bold%20Italic.js"></script>
   </head>
   <body>
-    <a-scene inspector="url: https://aframe.io/aframe-inspector/dist/aframe-inspector.min.js">
+    <a-scene>
       <a-assets>
         <img id="pink" src="https://img.gs/bbdkhfbzkk/stretch/http://i.imgur.com/1hyyIUi.jpg" crossorigin="anonymous" />
         <img src="https://img.gs/bbdkhfbzkk/stretch/https://i.imgur.com/25P1geh.png" id="grid" crossorigin="anonymous">
         <img src="https://img.gs/bbdkhfbzkk/2048x1024,stretch/http://i.imgur.com/WMNH2OF.jpg" id="chrome" crossorigin="anonymous">
         <img id="sky" src="https://img.gs/bbdkhfbzkk/2048x2048,stretch/http://i.imgur.com/WqlqEkq.jpg" crossorigin="anonymous" />
+        <a-asset-item id="dawningFont" src="fonts/dawningOfANewDayRegular.typeface.json"></a-asset-item>
+        <a-asset-item id="exoFont" src="fonts/exo2Black.typeface.json"></a-asset-item>
+        <a-asset-item id="exoItalicFont" src="fonts/exo2BlackItalic.typeface.json"></a-asset-item>
       </a-assets>
 
-      <a-entity scale="2 2 2" geometry="primitive: torusKnot;" position="0 6 -10" material="color: magenta; metalness:1; roughness: 0.1; sphericalEnvMap: #sky;">
+      <a-entity scale="2 2 2" geometry="primitive: torusKnot" position="0 6 -10" material="color: magenta; metalness:1; roughness: 0.1; sphericalEnvMap: #sky;">
         <a-animation easing="linear" attribute="rotation" dur="10000" to="0 0 360" repeat="indefinite"></a-animation>
       </a-entity>
 
@@ -35,17 +35,19 @@
         <a-entity
           rotation="0 0 5"
           position="0 2 0.2"
-          text="text: Virtual Reality; font:dawning of a new day; bevelEnabled: true; bevelSize: 0.05; bevelThickness: 0.05; curveSegments: 12; size: 1; height: 0;"
+          text-geometry="value: Virtual Reality; font: #dawningFont; bevelEnabled: true; bevelSize: 0.05; bevelThickness: 0.05; curveSegments: 12; size: 1; height: 0;"
           material="color:lavenderblush; metalness:1; roughness: 0; sphericalEnvMap: #pink;"
         ></a-entity>
 
-        <a-entity position="-0.5 0.5 -0.5" scale="0.6 1.2 1" text="text: VAPORWAVE; font: exo 2 black; bevelEnabled: true; bevelSize: 0.1; bevelThickness: 0.1; curveSegments: 1; size: 1.5; height: 0.5;" material="color:pink; metalness:0.9; roughness: 0.05; sphericalEnvMap: #chrome;"></a-entity>
+        <a-entity position="-0.5 0.5 -0.5" scale="0.6 1.2 1" text-geometry="value: VAPORWAVE; font: #exoFont; bevelEnabled: true; bevelSize: 0.1; bevelThickness: 0.1; curveSegments: 1; size: 1.5; height: 0.5;" material="color:pink; metalness:0.9; roughness: 0.05; sphericalEnvMap: #chrome;"></a-entity>
 
-        <a-entity position="1 0 0.3" text="text: Aesthetic; font: exo 2;  style: italic; size: 0.8; weight: bold; height: 0;" material="shader: flat; color:white;"></a-entity>
-        <a-entity position="1 0 0.3" text="text: Aesthetic; font: exo 2;  style: italic; size: 0.8; weight: bold; height: 0; bevelEnabled: true; bevelSize: 0.04; bevelThickness: 0.04; curveSegments: 1;" material="shader: flat; color:white;transparent: true; opacity: 0.4;"></a-entity>
+        <a-entity position="1 0 0.3" text-geometry="value: Aesthetic; font: #exoItalicFont; style: italic; size: 0.8; weight: bold; height: 0;"
+                  material="shader: flat; color: white"></a-entity>
+        <a-entity position="1 0 0.3" text-geometry="value: Aesthetic; font: #exoItalicFont; style: italic; size: 0.8; weight: bold; height: 0; bevelEnabled: true; bevelSize: 0.04; bevelThickness: 0.04; curveSegments: 1"
+                  material="shader: flat; color: white; transparent: true; opacity: 0.4"></a-entity>
       </a-entity>
 
-      <a-entity position="0 0 0"
+      <a-entity
         geometry="primitive: plane; width: 10000; height: 10000;" rotation="-90 0 0"
         material="src: #grid; repeat: 10000 10000; transparent: true;metalness:0.6; roughness: 0.4; sphericalEnvMap: #sky;"></a-entity>
 

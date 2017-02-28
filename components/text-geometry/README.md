@@ -1,4 +1,4 @@
-## aframe-text-component
+## aframe-text-geometry-component
 
 A text geometry component for [A-Frame](https://aframe.io). The text geometry
 component wraps
@@ -18,7 +18,7 @@ component wraps
 | height         |                                                               | 0.05                                                                                           |
 | size           |                                                               | 0.5                                                                                            |
 | style          |                                                               | normal                                                                                         |
-| text           |                                                               | None                                                                                           |
+| value          |                                                               | ''                                                                                             |
 
 ### Usage
 
@@ -29,8 +29,8 @@ Install and use by directly including the [browser files](dist):
 ```html
 <head>
   <title>My A-Frame Scene</title>
-  <script src="https://aframe.io/releases/0.4.0/aframe.min.js"></script>
-  <script src="https://unpkg.com/aframe-text-component@^0.4.1/dist/aframe-text-component.min.js"></script>
+  <script src="https://aframe.io/releases/0.5.0/aframe.min.js"></script>
+  <script src="https://unpkg.com/aframe-text-geometry-component@^0.5.0/dist/aframe-text-geometry-component.min.js"></script>
 </head>
 
 <body>
@@ -39,8 +39,8 @@ Install and use by directly including the [browser files](dist):
       <a-asset-item id="optimerBoldFont" src="https://rawgit.com/mrdoob/three.js/dev/examples/fonts/optimer_bold.typeface.json"></a-asset-item>
     </a-assets>
 
-    <a-entity text="text: What's up"></a-entity>
-    <a-entity text="text: Dog?; font: #optimerBoldFont"></a-entity>
+    <a-entity text-geometry="value: What's up"></a-entity>
+    <a-entity text-geometry="value: Dog?; font: #optimerBoldFont"></a-entity>
   </a-scene>
 </body>
 ```
@@ -50,29 +50,32 @@ Install and use by directly including the [browser files](dist):
 Install via NPM:
 
 ```bash
-npm install aframe-text-component
+npm install aframe-text-geometry-component
 ```
 
 Then register and use.
 
 ```js
 require('aframe');
-require('aframe-text-component');
+require('aframe-text-geometry-component');
 ```
 
 ## Using Different Fonts
 
 The text component uses `typeface.json` files, which are Web Fonts converted to
 JSON for three.js.  Typeface fonts can be generated from fonts using this
-[typeface font generator](http://gero3.github.io/facetype.js/). You can also
-find some sample generated fonts in the `examples/fonts` directory in the
-[three.js repository](https://github.com/mrdoob/three.js).
+**[typeface font generator](http://gero3.github.io/facetype.js/)**. Select JSON
+format and we recommend restricting the character set to only the characters
+you need. You may also have to check *reverse font direction* if you get odd font results.
+
+You can also find some sample generated fonts in the `examples/fonts` directory
+in the [three.js repository](https://github.com/mrdoob/three.js).
 
 By default, the text geometry component points to Helvetiker (Regular). Each
 font is fairly large, from at least 60KB to hundreds of KBs.
 
 To include a font for use with the text component, it is recommended to define
-it in `<a-asset-item>` and point to the font with a selector.
+it in `<a-asset-item>` and point at it with a selector.
 
 For example in HTML:
 
@@ -80,8 +83,8 @@ For example in HTML:
 <html>
   <head>
     <title>My A-Frame Scene</title>
-    <script src="https://aframe.io/releases/0.4.0/aframe.min.js"></script>
-    <script src="https://unpkg.com/aframe-text-component/dist/aframe-text-component.min.js"></script>
+    <script src="https://aframe.io/releases/0.5.0/aframe.min.js"></script>
+    <script src="https://unpkg.com/aframe-text-geometry-component/dist/aframe-text-geometry-component.min.js"></script>
     <script src="myfont.typeface.js"></script>
   </head>
   <body>
@@ -91,8 +94,8 @@ For example in HTML:
         <a-mixin id="boldFont" text="font: #optimerBoldFont"></a-mixin>
       </a-assets>
 
-      <a-entity mixin="boldFont" text="text: What's up"></a-entity>
-      <a-entity text="text: Dog?; font: #optimerBoldFont"></a-entity>
+      <a-entity mixin="boldFont" text-geometry="value: What's up"></a-entity>
+      <a-entity text-geometry="value: Dog?; font: #optimerBoldFont"></a-entity>
     </a-scene>
   </body>
 </html>
@@ -103,7 +106,7 @@ we don't have to XHR the font file separately at runtime:
 
 ```js
 require('aframe');
-require('aframe-text-component');
+require('aframe-text-geometry-component');
 
 var fontJson = require('./fonts/myfont.typeface.json');
 var el = document.createElement('a-entity');
@@ -116,7 +119,7 @@ The text geometry component defines just the geometry. We can apply any
 three.js material to the geometry:
 
 ```html
-<a-entity text="text: HELLO" material="color: red; src: #texture"></a-entity>
+<a-entity text="value: HELLO" material="color: red; src: #texture"></a-entity>
 ```
 
 See the [Vaporwave

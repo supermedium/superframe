@@ -53,7 +53,7 @@
 
 	var fontLoader = new THREE.FontLoader();
 
-	AFRAME.registerComponent('text', {
+	AFRAME.registerComponent('text-geometry', {
 	  schema: {
 	    bevelEnabled: {default: false},
 	    bevelSize: {default: 8, min: 0},
@@ -63,8 +63,8 @@
 	    height: {default: 0.05, min: 0},
 	    size: {default: 0.5, min: 0},
 	    style: {default: 'normal', oneOf: ['normal', 'italics']},
-	    text: {default: ''},
-	    weight: {default: 'normal', oneOf: ['normal', 'bold']}
+	    weight: {default: 'normal', oneOf: ['normal', 'bold']},
+	    value: {default: ''}
 	  },
 
 	  /**
@@ -81,11 +81,11 @@
 	      fontLoader.load(data.font, function (response) {
 	        var textData = AFRAME.utils.clone(data);
 	        textData.font = response;
-	        mesh.geometry = new THREE.TextGeometry(data.text, textData);
+	        mesh.geometry = new THREE.TextGeometry(data.value, textData);
 	      });
 	    } else if (data.font.constructor === Object) {
 	      // Set font if already have a typeface.json through setAttribute.
-	      mesh.geometry = new THREE.TextGeometry(data.text, data);
+	      mesh.geometry = new THREE.TextGeometry(data.value, data);
 	    } else {
 	      error('Must provide `font` (typeface.json) or `fontPath` (string) to text component.');
 	    }
