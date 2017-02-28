@@ -24,14 +24,14 @@ See documentation for individual components:
 - [reverse-look-controls](https://github.com/ngokevin/kframe/tree/master/components/reverse-look-controls/) - Fork of A-Frame v0.3.0 look controls component with reversed mouse drag.
 - [sun-sky](https://github.com/ngokevin/kframe/tree/master/components/sun-sky/) - Gradient sky with adjustable sun in A-Frame
 - [template](https://github.com/ngokevin/kframe/tree/master/components/template/) - Encapsulate groups of entities, use templating engines, and do string interpolations in A-Frame
-- [text](https://github.com/ngokevin/kframe/tree/master/components/text/) - Geometry-based text in A-Frame
+- [text-geometry](https://github.com/ngokevin/kframe/tree/master/components/text-geometry/) - Geometry-based text for A-Frame
 - [webvr-recorder](https://github.com/ngokevin/kframe/tree/master/components/webvr-recorder/) - A-Frame component to record WebVR pose and events to localStorage or JSON. Then replay them without needing VR.
 
 
 ## Local Installation
 
 Go to the folder of the component or scene you wish to develop and check out
-its README. Generally the steps involve:
+its README. The steps generally involve:
 
 ```bash
 git clone git@github.com:ngokevin/kframe && cd kframe
@@ -40,5 +40,5 @@ npm install
 npm run dev  # (or sometimes `npm run start`)
 ```
 
-Then a page should open in your browser. You can develop on the source code and
-the server will handle live compilation and bundling.
+A page should open in your browser. You can develop on the source code and the
+server will handle live compilation and bundling.

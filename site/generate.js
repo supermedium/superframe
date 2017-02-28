@@ -11,6 +11,8 @@ nunjucks.configure('site/templates');
 
 // Get component data.
 var components = glob.sync('components/*').map(function (componentPath) {
+  if (!fs.existsSync(path.join(componentPath, 'package.json'))) { return; }
+
   // Get component metadata.
   var json = require('../' + path.join(componentPath, 'package.json'));
 
@@ -52,7 +54,7 @@ var components = glob.sync('components/*').map(function (componentPath) {
     relativePath: path.join(componentPath, '/'),
     examples: examples
   };
-});
+}).filter(component => component);
 
 // Final templating context.
 var ctx = {components: components};
