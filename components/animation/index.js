@@ -112,7 +112,7 @@ AFRAME.registerComponent('animation', {
     var data = this.data;
     var self = this;
 
-    if (!this.animation || !this.animationIsPlaying) { return; }
+    if (!this.animation || this.animationIsPlaying) { return; }
 
     // Delay.
     if (data.delay) {
