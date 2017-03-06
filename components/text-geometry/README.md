@@ -123,6 +123,6 @@ three.js material to the geometry:
 ```
 
 See the [Vaporwave
-Example](https://ngokevin.github.io/kframe/components/text/examples/vaporwave/)
+Example](https://ngokevin.github.io/kframe/components/text-geometry/examples/vaporwave/)
 by [Ada Rose Edwards](https://twitter.com/lady_ada_king) for an example on applying
 materials.
