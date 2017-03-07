@@ -1,6 +1,6 @@
 {
   "name": "aframe-audioanalyser-component",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "description": "Audio visualizations in A-Frame using Web Audio (AnalyserNode)",
   "main": "index.js",
   "scripts": {
@@ -32,7 +32,7 @@
     "aframe-bmfont-text-component": "^0.1.4",
     "aframe-entity-generator-component": "^0.1.0",
     "aframe-layout-component": "^1.2.0",
-    "aframe-template-component": "^3.1.1",
+    "aframe-template-component": "^3.2.0",
     "browserify": "^12.0.1",
     "budo": "^7.1.0",
     "shelljs": "^0.6.0",
