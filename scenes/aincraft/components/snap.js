@@ -11,7 +11,7 @@ AFRAME.registerComponent('snap', {
   },
 
   init: function () {
-    this.originalPos= this.el.getAttribute('position');
+    this.originalPos = this.el.getAttribute('position');
   },
 
   update: function () {

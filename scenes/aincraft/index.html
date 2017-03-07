@@ -4,19 +4,19 @@
     <meta charset="utf-8">
     <title>Aincraft</title>
     <meta name="description" content="Aincraft">
-    <script src="https://rawgit.com/aframevr/aframe/d282656/dist/aframe-master.min.js"></script>
+    <script src="https://aframe.io/releases/0.5.0/aframe.min.js"></script>
+    <script src="https://unpkg.com/aframe-teleport-controls@0.2.x/dist/aframe-teleport-controls.min.js"></script>
     <script src="https://rawgit.com/ngokevin/aframe-motion-capture/343f99/dist/aframe-motion-capture.min.js"></script>
     <script src="components/controller-cursor.js"></script>
     <script src="components/intersection-spawn.js"></script>
     <script src="components/random-color.js"></script>
     <script src="components/snap.js"></script>
-    <script src="components/aframe-teleport-controls.min.js"></script>
   </head>
   <body>
     <a-scene avatar-recorder>
       <a-assets>
-        <img id="groundTexture" src="img/floor.jpg">
-        <img id="skyTexture" src="img/sky.jpg">
+        <img id="groundTexture" src="https://cdn.aframe.io/a-painter/images/floor.jpg">
+        <img id="skyTexture" src="https://cdn.aframe.io/a-painter/images/sky.jpg">
         <a-mixin id="voxel"
            geometry="primitive: box; height: 0.5; width: 0.5; depth: 0.5"
            material="shader: standard"
@@ -25,8 +25,7 @@
         ></a-mixin>
       </a-assets>
 
-      <a-sky id="bg" height="2048" radius="30" src="#skyTexture" theta-length="90"
-             width="2048"></a-sky>
+      <a-sky id="bg" radius="30" src="#skyTexture" theta-length="90"></a-sky>
 
       <a-cylinder id="ground" src="#groundTexture" radius="32" height="0.1"></a-cylinder>
 
