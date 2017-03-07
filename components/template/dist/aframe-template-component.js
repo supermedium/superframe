@@ -118,7 +118,7 @@
 	      templateData[key] = el.dataset[key];
 	    });
 	    if (data.data) {
-	      templateData = extend(templateData, el.getComputedAttribute(data.data));
+	      templateData = extend(templateData, el.getAttribute(data.data));
 	    }
 
 	    var renderedTemplate = renderTemplate(templateCacheItem.template, templateCacheItem.type,
