@@ -15,7 +15,7 @@ AFRAME.registerComponent('scale-y-color', {
     if (time - this.time < 50) { return; }
     this.time = time;
 
-    var scaleY = el.getComputedAttribute('scale').y;
+    var scaleY = el.getAttribute('scale').y;
     var percentage = scaleY / data.maxScale;
     el.setAttribute('material', 'color', '#' + rgbToHex(
       (data.to.x - data.from.x) * percentage,

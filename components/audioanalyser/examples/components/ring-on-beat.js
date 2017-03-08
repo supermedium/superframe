@@ -33,7 +33,7 @@ AFRAME.registerComponent('ring-on-beat', {
    */
   tick: function () {
     this.rings.forEach(function (ringEl) {
-      var scale = ringEl.getComputedAttribute('scale');
+      var scale = ringEl.getAttribute('scale');
       ringEl.setAttribute('scale', {
         x: scale.x * 1.06 + .05,
         y: scale.y * 1.06 + .05,
