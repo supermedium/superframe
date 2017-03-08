@@ -3,7 +3,7 @@
 An animation component for [A-Frame](https://aframe.io) using
 [anime.js](https://github.com/juliangarnier/anime).
 
-![animation](https://cloud.githubusercontent.com/assets/674727/16903995/34a56db0-4c42-11e6-9bd1-356b291f2d93.gif)
+![animation](https://cloud.githubusercontent.com/assets/674727/23724348/3991d594-0401-11e7-9b90-31ef43ee7e54.gif)
 
 ### Why?
 
@@ -31,6 +31,7 @@ A-Frame has an `<a-animation>` API out of the box. Why build a component version
 - **Faster Development:** Being detached from the A-Frame core library means faster
   iteration of features. Due to being easier to maintain, having more features, and
   not being tied to A-Frame versions, we can add things quickly such as timeline support.
+- **anime.js**: anime.js has great performance over Tween.js and tons of great animation features.
 
 ### API
 
