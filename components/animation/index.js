@@ -13,6 +13,9 @@ var styleParser = utils.styleParser.parse;
 
 /**
  * Animation component for A-Frame.
+ *
+ * @member {boolean} animationIsPlaying - Used during initialization and scene resume to see
+ *  if animation should be playing.
  */
 AFRAME.registerComponent('animation', {
   schema: {
@@ -95,24 +98,30 @@ AFRAME.registerComponent('animation', {
     this.addEventListeners();
   },
 
+  /**
+   * `remove` handler.
+   */
   remove: function () {
     this.pauseAnimation();
     this.removeEventListeners();
   },
 
+  /**
+   * `pause` handler.
+   */
   pause: function () {
     this.pauseAnimation();
     this.removeEventListeners();
   },
 
   /**
-   * Called after update.
+   * `play` handler.
    */
   play: function () {
     var data = this.data;
     var self = this;
 
-    if (!this.animation || this.animationIsPlaying) { return; }
+    if (!this.animation || !this.animationIsPlaying) { return; }
 
     // Delay.
     if (data.delay) {
@@ -164,30 +173,21 @@ AFRAME.registerComponent('animation', {
   },
 
   playAnimation: function () {
-    var propType = getPropertyType(this.el, this.data.property);
-    var updateConfig = configDefault;
-    if (propType === 'vec2' || propType === 'vec3' || propType === 'vec4') {
-      updateConfig = configVector;
-    }
     this.config = updateConfig(this.el, this.data, this.config);
     this.animation = anime(this.config);
     this.animation.play();
-    this.animationIsPlaying = true;
   },
 
   pauseAnimation: function () {
     this.animation.pause();
-    this.animationIsPlaying = false;
   },
 
   resumeAnimation: function () {
     this.animation.play();
-    this.animationIsPlaying = true;
   },
 
   restartAnimation: function () {
     this.animation.restart();
-    this.animationIsPlaying = true;
   }
 });
 
