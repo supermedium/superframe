@@ -88,6 +88,8 @@ AFRAME.registerComponent('animation', {
     // Stop previous animation.
     this.pauseAnimation();
 
+    if (!this.data.startEvents.length) { this.animationIsPlaying = true; }
+
     // Play animation if no holding event.
     this.removeEventListeners();
     this.addEventListeners();
