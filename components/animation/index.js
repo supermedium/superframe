@@ -173,7 +173,6 @@ AFRAME.registerComponent('animation', {
   },
 
   playAnimation: function () {
-    this.config = updateConfig(this.el, this.data, this.config);
     this.animation = anime(this.config);
     this.animation.play();
   },
