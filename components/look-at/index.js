@@ -2,7 +2,7 @@ var debug = AFRAME.utils.debug;
 var coordinates = AFRAME.utils.coordinates;
 
 var warn = debug('components:look-at:warn');
-var isCoordinate = coordinates.isCoordinate;
+var isCoordinates = coordinates.isCoordinates;
 
 delete AFRAME.components['look-at'];
 
@@ -21,7 +21,7 @@ AFRAME.registerComponent('look-at', {
 
     parse: function (value) {
       // A static position to look at.
-      if (isCoordinate(value) || typeof value === 'object') {
+      if (isCoordinates(value) || typeof value === 'object') {
         return coordinates.parse(value);
       }
       // A selector to a target entity.
