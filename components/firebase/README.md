@@ -4,6 +4,8 @@
 
 A Firebase component for [A-Frame](https://aframe.io).
 
+![](https://cloud.githubusercontent.com/assets/674727/24439774/2640bef6-1405-11e7-90d7-c39b4f876ce1.png)
+
 Comes with a Firebase broadcast component for multiuser experiences
 out-of-the-box by syncing entities' component data to Firebase realtime
 database. The parent-child relationships between entities are maintained as

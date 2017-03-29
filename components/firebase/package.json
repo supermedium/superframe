@@ -1,6 +1,6 @@
 {
   "name": "aframe-firebase-component",
-  "version": "4.0.1",
+  "version": "4.0.2",
   "description": "Multi-user in A-Frame using Firebase",
   "main": "index.js",
   "scripts": {
