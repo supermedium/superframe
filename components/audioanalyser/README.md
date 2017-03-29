@@ -22,6 +22,7 @@ Not tested on mobile.
 | enableWaveform        | Whether or not to store waveform data. Disable if not using.         | true          |
 | fftSize               | Frequency domain.                                                    | 2048          |
 | smoothingTimeConstant | How smooth the frequency data is returned.                           | 0.8           |
+| src                   | Selector to an audio element or path to audio file.                  | ''            |
 | unique                | Whether to share the audio instance with other visualizing entities. | false         |
 
 ### Members
