@@ -11,6 +11,7 @@ AFRAME.registerComponent('entity-placer', {
       if (!grabEntity.getAttribute('geometry')) { return; }
 
       el.sceneEl.object3D.updateMatrixWorld();
+      el.parentEl.object3D.updateMatrixWorld();
       grabEntity.object3D.updateMatrixWorld(true);
       grabEntity.object3D.matrixWorld.decompose(positionHelper, quaternionHelper, scaleHelper);
       var rotation = new THREE.Euler().setFromQuaternion(quaternionHelper, 'XYZ');
