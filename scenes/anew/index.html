@@ -8,15 +8,17 @@
     <script id="motionCapture" src="https://unpkg.com/aframe-motion-capture-components@0.1.2/dist/aframe-motion-capture-components.min.js"></script>
     <script id="physics" src="https://unpkg.com/aframe-physics-system@1.3.2/dist/aframe-physics-system.min.js"></script>
     <script id="teleport" src="https://unpkg.com/aframe-teleport-controls@0.2.0/dist/aframe-teleport-controls.min.js"></script>
+    <script src="components/entity-placer.js"></script>
+    <script src="components/gamestate.js"></script>
     <script src="components/palette-handler.js"></script>
   </head>
   <body>
-    <a-scene avatar-replayer="src: recordings/palette.json">
+    <a-scene gamestate>
       <a-assets>
         <img id="groundTexture" src="img/floor.jpg">
         <img id="skyTexture" src="img/sky.jpg">
         <a-mixin id="primitive" material="color: #888"></a-mixin>
-        <a-mixin id="color" geometry="primitive: box; depth: 0.001; height: 0.01; width: 0.01" material="shader: flat"></a-mixin>
+        <a-mixin id="color" geometry="primitive: box; depth: 0.001; height: 0.01; width: 0.01"></a-mixin>
       </a-assets>
 
       <!-- Hands. -->
@@ -50,9 +52,10 @@
       <a-entity id="rightHand"
         hand-controls="right"
         controller-cursor
-        raycaster="far: 0.25"
-        palette-handler>
-        <a-entity id="grabSlot"></a-entity>
+        raycaster="far: 0.1"
+        palette-handler
+        entity-placer>
+        <a-entity id="grabSlot" position="0 0 -0.25"></a-entity>
       </a-entity>
 
       <!-- Environment. -->
