@@ -3,24 +3,21 @@ AFRAME.registerComponent('entity-placer', {
     var el = this.el;
     var grabEntity = el.querySelector('#grabSlot');
 
-    var positionHelper = new THREE.Vector3();
-    var quaternionHelper = new THREE.Quaternion();
-    var scaleHelper = new THREE.Vector3();
-
     el.addEventListener('triggerdown', function (evt) {
+      var newEntity;
+      var rotation;
+
       if (!grabEntity.getAttribute('geometry')) { return; }
 
       el.sceneEl.object3D.updateMatrixWorld();
       el.parentEl.object3D.updateMatrixWorld();
       grabEntity.object3D.updateMatrixWorld(true);
-      grabEntity.object3D.matrixWorld.decompose(positionHelper, quaternionHelper, scaleHelper);
-      var rotation = new THREE.Euler().setFromQuaternion(quaternionHelper, 'XYZ');
+      rotation = grabEntity.object3D.getWorldRotation();
 
-      var newEntity = document.createElement('a-entity');
+      newEntity = document.createElement('a-entity');
       newEntity.setAttribute('geometry', grabEntity.getAttribute('geometry'), true);
       newEntity.setAttribute('material', grabEntity.getAttribute('material'), true);
-      newEntity.setAttribute('position', positionHelper);
-
+      newEntity.setAttribute('position', grabEntity.object3D.getWorldPosition());
       newEntity.setAttribute('rotation', {
         x: THREE.Math.radToDeg(rotation.x),
         y: THREE.Math.radToDeg(rotation.y),
