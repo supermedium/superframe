@@ -1,6 +1,15 @@
 /* global AFRAME */
 AFRAME.registerComponent('gamestate', {
   schema: {
+    // Initial state.
+    activePrimitive: {
+      default: {
+        material: {color: 'red'}
+      },
+      parse: function (val) {
+        return val;
+      }
+    },
     entities: {type: 'array'}
   },
 
@@ -15,16 +24,31 @@ AFRAME.registerComponent('gamestate', {
 
     el.emit('gamestateinitialized', {state: initialState});
 
+    // Add entity to list of entities.
     registerHandler('entityplaced', function (newState, data) {
-      // Modify newState.
       var entity = data.detail;
       newState.entities.push({
-        geometry: entity.getAttribute('geometry'),
-        material: entity.getAttribute('material'),
+        geometry: entity.getDOMAttribute('geometry'),
+        material: entity.getDOMAttribute('material'),
         position: entity.getAttribute('position'),
         rotation: entity.getAttribute('rotation'),
         scale: entity.getAttribute('scale')
       });
+      return newState;
+    });
+
+    // Update active primitive geometry.
+    registerHandler('paletteprimitiveselect', function (newState, data) {
+      data = data.detail;
+      newState.activePrimitive.geometry = data.geometry;
+      newState.activePrimitive.scale = data.scale;
+      return newState;
+    });
+
+    // Update active primitive material.
+    registerHandler('palettecolorselect', function (newState, data) {
+      data = data.detail;
+      newState.activePrimitive.material = {color: data.color};
       return newState;
     });
 

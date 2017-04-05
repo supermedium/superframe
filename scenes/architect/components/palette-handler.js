@@ -1,8 +1,14 @@
 AFRAME.registerComponent('palette-handler', {
   init: function () {
     var el = this.el;
-    var grabSlot = el.querySelector('#grabSlot');
+    var activePrimitiveEl = el.querySelector('#activePrimitive');
     this.hasSelectedPrimitive = false;
+
+     // Hook up to game state.
+     var activePrimitive;
+     el.sceneEl.addEventListener('gamestateinitialized', function (evt) {
+       activePrimitive = el.sceneEl.getAttribute('gamestate').activePrimitive;
+     });
 
     // Select primitive from palette with mousedown.
     el.addEventListener('mousedown', function (evt) {
@@ -12,13 +18,22 @@ AFRAME.registerComponent('palette-handler', {
 
       // Select primitive.
       if (targetEl.getAttribute('mixin').indexOf('primitive') !== -1) {
-        grabSlot.setAttribute('geometry', targetEl.getAttribute('geometry'), true);
-        grabSlot.setAttribute('scale', {x: 3, y: 3, z: 3});
+        var geometry = targetEl.getDOMAttribute('geometry');
+        // Set.
+        activePrimitiveEl.setAttribute('geometry', geometry);
+        activePrimitiveEl.setAttribute('material', activePrimitive.material);
+        // Emit.
+        el.emit('paletteprimitiveselect', {
+          geometry: geometry,
+          scale: {x: 3, y: 3, z: 3}
+        });
       }
 
       // Select color.
       if (targetEl.getAttribute('mixin').indexOf('color') !== -1) {
-        grabSlot.setAttribute('material', targetEl.getAttribute('material'), true);
+        var color = targetEl.getAttribute('material').color;
+        // Emit.
+        el.emit('palettecolorselect', {color: color});
       }
 
       this.hasSelectedPrimitive = true;
@@ -30,11 +45,11 @@ AFRAME.registerComponent('palette-handler', {
       el.emit('primitivedragrelease');
     });
 
-    // Reset grabSlot once primitive is placed.
+    // Reset activePrimitiveEl once primitive is placed.
     el.parentNode.addEventListener('entityplaced', function (evt) {
       this.hasSelectedPrimitive = false;
-      grabSlot.removeAttribute('geometry');
-      grabSlot.removeAttribute('material');
+      activePrimitiveEl.removeAttribute('geometry');
+      activePrimitiveEl.removeAttribute('material');
     });
   }
 });
