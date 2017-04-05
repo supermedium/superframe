@@ -10,11 +10,12 @@
     <script id="teleport" src="https://unpkg.com/aframe-teleport-controls@0.2.0/dist/aframe-teleport-controls.min.js"></script>
     <script src="components/create-thing-button.js"></script>
     <script src="components/gamestate.js"></script>
+    <script src="components/html-exporter.js"></script>
     <script src="components/palette-handler.js"></script>
     <script src="components/primitive-placer.js"></script>
   </head>
   <body>
-    <a-scene avatar-replayer="src: recordings/dragPlace.json; spectatorMode: true" gamestate>
+    <a-scene avatar-replayer="src: recordings/dragPlace.json; spectatorMode: true" html-exporter gamestate>
       <a-assets>
         <img id="groundTexture" src="img/floor.jpg">
         <img id="skyTexture" src="img/sky.jpg">

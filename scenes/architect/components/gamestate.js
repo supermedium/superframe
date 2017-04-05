@@ -56,7 +56,7 @@ AFRAME.registerComponent('gamestate', {
     // Update active primitive material.
     registerHandler('createthingbuttonpress', function (newState, data) {
       // Move staged primitives to entities.
-      newState.entities.push(newState.stagedPrimitives);
+      newState.entities.push(newState.stagedPrimitives.slice());
 
       // Reset staged primitives.
       newState.stagedPrimitives.length = 0;
