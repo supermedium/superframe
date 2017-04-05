@@ -10,7 +10,8 @@ AFRAME.registerComponent('gamestate', {
         return val;
       }
     },
-    entities: {type: 'array'}
+    entities: {type: 'array', default: []},
+    stagedPrimitives: {type: 'array', default: []}
   },
 
   init: function () {
@@ -24,10 +25,10 @@ AFRAME.registerComponent('gamestate', {
 
     el.emit('gamestateinitialized', {state: initialState});
 
-    // Add entity to list of entities.
-    registerHandler('entityplaced', function (newState, data) {
+    // Add primitive to staged primitives.
+    registerHandler('primitiveplace', function (newState, data) {
       var entity = data.detail;
-      newState.entities.push({
+      newState.stagedPrimitives.push({
         geometry: entity.getDOMAttribute('geometry'),
         material: entity.getDOMAttribute('material'),
         position: entity.getAttribute('position'),
@@ -49,6 +50,16 @@ AFRAME.registerComponent('gamestate', {
     registerHandler('palettecolorselect', function (newState, data) {
       data = data.detail;
       newState.activePrimitive.material = {color: data.color};
+      return newState;
+    });
+
+    // Update active primitive material.
+    registerHandler('createthingbuttonpress', function (newState, data) {
+      // Move staged primitives to entities.
+      newState.entities.push(newState.stagedPrimitives);
+
+      // Reset staged primitives.
+      newState.stagedPrimitives.length = 0;
       return newState;
     });
 

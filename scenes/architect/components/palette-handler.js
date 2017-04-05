@@ -46,7 +46,7 @@ AFRAME.registerComponent('palette-handler', {
     });
 
     // Reset activePrimitiveEl once primitive is placed.
-    el.parentNode.addEventListener('entityplaced', function (evt) {
+    el.parentNode.addEventListener('primitiveplace', function (evt) {
       this.hasSelectedPrimitive = false;
       activePrimitiveEl.removeAttribute('geometry');
       activePrimitiveEl.removeAttribute('material');

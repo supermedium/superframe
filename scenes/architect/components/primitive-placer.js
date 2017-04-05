@@ -1,4 +1,4 @@
-AFRAME.registerComponent('entity-placer', {
+AFRAME.registerComponent('primitive-placer', {
   init: function () {
     var el = this.el;
     var activePrimitiveEl = el.querySelector('#activePrimitive');
@@ -36,7 +36,7 @@ AFRAME.registerComponent('entity-placer', {
 
       // Emit.
       newEntity.addEventListener('loaded', function () {
-        el.sceneEl.emit('entityplaced', newEntity);
+        el.sceneEl.emit('primitiveplace', newEntity);
         console.log('Primitive placed', newEntity);
       });
 

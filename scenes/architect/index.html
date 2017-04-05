@@ -1,4 +1,4 @@
-e!DOCTYPE html>
+<!DOCTYPE html>
 <html>
   <head>
     <meta charset="utf-8">
@@ -8,12 +8,13 @@ e!DOCTYPE html>
     <script id="motionCapture" src="https://unpkg.com/aframe-motion-capture-components@0.1.3/dist/aframe-motion-capture-components.min.js"></script>
     <script id="physics" src="https://unpkg.com/aframe-physics-system@1.3.2/dist/aframe-physics-system.min.js"></script>
     <script id="teleport" src="https://unpkg.com/aframe-teleport-controls@0.2.0/dist/aframe-teleport-controls.min.js"></script>
-    <script src="components/entity-placer.js"></script>
+    <script src="components/create-thing-button.js"></script>
     <script src="components/gamestate.js"></script>
     <script src="components/palette-handler.js"></script>
+    <script src="components/primitive-placer.js"></script>
   </head>
   <body>
-    <a-scene avatar-replayer="spectatorMode: true" gamestate>
+    <a-scene avatar-replayer="src: recordings/dragPlace.json; spectatorMode: true" gamestate>
       <a-assets>
         <img id="groundTexture" src="img/floor.jpg">
         <img id="skyTexture" src="img/sky.jpg">
@@ -29,7 +30,7 @@ e!DOCTYPE html>
         <a-entity scale="3 3 3">
           <a-entity id="palette" geometry="primitive: box; depth: 0.008; height: 0.15; width: 0.15" material="color: #333" position="0 0.015 0.015" rotation="-90 90 0">
 
-            <a-entity id="createButton" geometry="primitive: plane; height: 0.005; width: 0.04" material="color: #111" text="value: Confirm; align: center" position="0 0.04 0.05"></a-entity>
+            <a-entity id="createThingButton" create-thing-button geometry="primitive: plane; height: 0.005; width: 0.04" material="color: #111" text="value: Confirm; align: center" position="0 0.04 0.05"></a-entity>
 
             <!-- Primitives. -->
             <a-entity id="primitives" layout="type: line; margin: 0.03" position="-0.05 0 0.015">
@@ -57,7 +58,7 @@ e!DOCTYPE html>
         controller-cursor
         raycaster="far: 0.1"
         palette-handler
-        entity-placer>
+        primitive-placer>
         <a-entity id="activePrimitive" position="0 0 -0.25"></a-entity>
       </a-entity>
 
