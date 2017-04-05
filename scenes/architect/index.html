@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+e!DOCTYPE html>
 <html>
   <head>
     <meta charset="utf-8">
@@ -13,7 +13,7 @@
     <script src="components/palette-handler.js"></script>
   </head>
   <body>
-    <a-scene avatar-replayer gamestate>
+    <a-scene avatar-replayer="spectatorMode: true" gamestate>
       <a-assets>
         <img id="groundTexture" src="img/floor.jpg">
         <img id="skyTexture" src="img/sky.jpg">
@@ -28,6 +28,9 @@
         <!-- Palette. -->
         <a-entity scale="3 3 3">
           <a-entity id="palette" geometry="primitive: box; depth: 0.008; height: 0.15; width: 0.15" material="color: #333" position="0 0.015 0.015" rotation="-90 90 0">
+
+            <a-entity id="createButton" geometry="primitive: plane; height: 0.005; width: 0.04" material="color: #111" text="value: Confirm; align: center" position="0 0.04 0.05"></a-entity>
+
             <!-- Primitives. -->
             <a-entity id="primitives" layout="type: line; margin: 0.03" position="-0.05 0 0.015">
               <a-entity mixin="primitive" geometry="primitive: box; depth: 0.01; height: 0.01; width: 0.01"></a-entity>
