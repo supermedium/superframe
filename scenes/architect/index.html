@@ -9,6 +9,7 @@
     <script id="motionCapture" src="https://unpkg.com/aframe-motion-capture-components@0.1.3/dist/aframe-motion-capture-components.min.js"></script>
     <script id="physics" src="https://unpkg.com/aframe-physics-system@1.3.2/dist/aframe-physics-system.min.js"></script>
     <script id="teleport" src="https://unpkg.com/aframe-teleport-controls@0.2.0/dist/aframe-teleport-controls.min.js"></script>
+    <script src="systems/primitive-scaler.js"></script>
     <script src="components/create-thing-button.js"></script>
     <script src="components/gamestate.js"></script>
     <script src="components/html-exporter.js"></script>
@@ -16,9 +17,10 @@
     <script src="components/primitive-deleter.js"></script>
     <script src="components/primitive-mover.js"></script>
     <script src="components/primitive-placer.js"></script>
+    <script src="components/primitive-scaler.js"></script>
   </head>
   <body>
-    <a-scene avatar-replayer="src: recordings/positioning.json; spectatorMode: true" html-exporter gamestate>
+    <a-scene avatar-replayer="src: recordings/scaling.json; spectatorMode: true" html-exporter gamestate>
       <a-assets>
         <img id="groundTexture" src="img/floor.jpg">
         <img id="skyTexture" src="img/sky.jpg">
@@ -31,7 +33,8 @@
       <!-- Hands. -->
       <a-entity id="leftHand"
         hand-controls="left"
-        teleport-controls="type: parabolic; collisionEntities: #ground">
+        teleport-controls="type: parabolic; collisionEntities: #ground"
+        primitive-scaler>
         <!-- Palette. -->
         <a-entity scale="3 3 3">
           <a-entity id="palette" geometry="primitive: box; depth: 0.008; height: 0.15; width: 0.15" material="color: #333" position="0 0.015 0.015" rotation="-90 90 0">
@@ -66,7 +69,8 @@
         palette-handler
         primitive-deleter
         primitive-mover
-        primitive-placer>
+        primitive-placer
+        primitive-scaler>
         <a-entity id="activePrimitive" position="0 0 -0.25"></a-entity>
       </a-entity>
 
