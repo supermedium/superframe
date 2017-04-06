@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <script src="https://rawgit.com/aframevr/aframe/ee12d49/dist/aframe-master.min.js"></script>
     <script id="cursor" src="https://unpkg.com/aframe-controller-cursor-component@0.2.6/dist/aframe-controller-cursor-component.min.js"></script>
+    <script id="eventSet" src="https://unpkg.com/aframe-event-set-component@%5E3.0.x/dist/aframe-event-set-component.min.js"></script>
     <script id="layout" src="https://unpkg.com/aframe-layout-component@4.0.2/dist/aframe-layout-component.min.js"></script>
     <script id="motionCapture" src="https://unpkg.com/aframe-motion-capture-components@0.1.3/dist/aframe-motion-capture-components.min.js"></script>
     <script id="physics" src="https://unpkg.com/aframe-physics-system@1.3.2/dist/aframe-physics-system.min.js"></script>
@@ -13,15 +14,16 @@
     <script src="components/html-exporter.js"></script>
     <script src="components/palette-handler.js"></script>
     <script src="components/primitive-deleter.js"></script>
+    <script src="components/primitive-mover.js"></script>
     <script src="components/primitive-placer.js"></script>
   </head>
   <body>
-    <a-scene avatar-replayer="src: recordings/deletion.json; spectatorMode: true" html-exporter gamestate>
+    <a-scene avatar-replayer="src: recordings/positioning.json; spectatorMode: true" html-exporter gamestate>
       <a-assets>
         <img id="groundTexture" src="img/floor.jpg">
         <img id="skyTexture" src="img/sky.jpg">
-        <a-mixin id="primitive" material="color: #888"></a-mixin>
-        <a-mixin id="color" geometry="primitive: box; depth: 0.001; height: 0.01; width: 0.01"></a-mixin>
+        <a-mixin id="primitive" material="color: #888" event-set__mouseenter="_event: mouseenter; material.color: #555; material.opacity: 0.75" event-set__mouseleave="_event: mouseleave; material.color: #888; material.opacity: 1"></a-mixin>
+        <a-mixin id="color" geometry="primitive: box; depth: 0.001; height: 0.01; width: 0.01" event-set__mouseenter="_event: mouseenter; material.opacity: 0.75" event-set__mouseleave="_event: mouseleave; material.opacity: 1"></a-mixin>
         <audio id="deleteSound" src="audio/delete.mp3"></audio>
         <audio id="dingSound" src="audio/ding.mp3"></audio>
       </a-assets>
@@ -60,9 +62,10 @@
       <a-entity id="rightHand"
         hand-controls="right"
         controller-cursor
-        raycaster="far: 0.1"
+        raycaster="far: 0.2"
         palette-handler
         primitive-deleter
+        primitive-mover
         primitive-placer>
         <a-entity id="activePrimitive" position="0 0 -0.25"></a-entity>
       </a-entity>

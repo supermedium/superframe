@@ -10,6 +10,7 @@ AFRAME.registerComponent('gamestate', {
         return val;
       }
     },
+    entityId: {default: 0},
     entities: {type: 'array', default: []},
     stagedPrimitives: {type: 'array', default: []}
   },
@@ -28,7 +29,10 @@ AFRAME.registerComponent('gamestate', {
     // Add primitive to staged primitives.
     registerHandler('primitiveplace', function (newState, data) {
       var entity = data.detail;
+      entity.id = newState.entityId++;
+      entity.classList.add('stagedPrimitive');
       newState.stagedPrimitives.push({
+        id: entity.id,
         geometry: entity.getDOMAttribute('geometry'),
         material: entity.getDOMAttribute('material'),
         position: entity.getAttribute('position'),
@@ -63,6 +67,32 @@ AFRAME.registerComponent('gamestate', {
       return newState;
     });
 
+    // Delete primitive.
+    registerHandler('primitivedelete', function (newState, data) {
+      var deletedEntityId = data.detail.id;
+      var i;
+      var stagedPrimitive;
+
+      // Clone array for clean state.
+      newState.stagedPrimitives = newState.stagedPrimitives.slice();
+
+      // Remove from stagedPrimitives array.
+      for (i = 0; i < newState.stagedPrimitives.length; i++) {
+        stagedPrimitive = newState.stagedPrimitives[i];
+        if (stagedPrimitive.id === deletedEntityId) {
+          newState.stagedPrimitives.splice(i, 1);
+          break;
+        }
+      }
+
+      // TODO: If not in stagedPrimitives, but in entities, then delete the group.
+      return newState;
+    });
+
+    /**
+     * TODO: Synchronous option for triggering a handler.
+     * Pass entire event detail into handler.
+     */
     function registerHandler (event, handler) {
       el.addEventListener(event, function (param) {
         var newState = handler(AFRAME.utils.extend({}, state), param);

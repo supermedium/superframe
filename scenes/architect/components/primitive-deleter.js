@@ -11,11 +11,15 @@ AFRAME.registerComponent('primitive-deleter', {
 
       if (!intersectedPrimitive) { return; }
 
+      if (!intersectedPrimitive.classList.contains('stagedPrimitive')) { return; }
+
       console.log('Deleting primitive', cursorComponent.intersectedEl);
       intersectedPrimitive.parentNode.removeChild(intersectedPrimitive);
 
-      deleteSound.volume = 0.3;
+      deleteSound.volume = 0.1;
       deleteSound.play();
+
+      el.emit('primitivedelete', {id: intersectedPrimitive.id});
     });
 
     // TODO: Figure out why gripup not firing.
