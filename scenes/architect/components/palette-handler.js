@@ -17,7 +17,7 @@ AFRAME.registerComponent('palette-handler', {
       if (!targetEl) { return; }
 
       // Select primitive.
-      if (targetEl.getAttribute('mixin').indexOf('primitive') !== -1) {
+      if (targetEl.classList.contains('primitive')) {
         var geometry = targetEl.getDOMAttribute('geometry');
         // Set.
         activePrimitiveEl.setAttribute('geometry', geometry);
@@ -25,18 +25,18 @@ AFRAME.registerComponent('palette-handler', {
         // Emit.
         el.emit('paletteprimitiveselect', {
           geometry: geometry,
+          // TODO: Larger scale.
           scale: {x: 3, y: 3, z: 3}
         });
+        this.hasSelectedPrimitive = true;
       }
 
       // Select color.
-      if (targetEl.getAttribute('mixin').indexOf('color') !== -1) {
+      if (targetEl.classList.contains('color')) {
         var color = targetEl.getAttribute('material').color;
         // Emit.
         el.emit('palettecolorselect', {color: color});
       }
-
-      this.hasSelectedPrimitive = true;
     });
 
     // Release primitive, pass off to entity-placer.

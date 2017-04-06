@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <script src="aframe-master.min.js"></script>
+    <script src="https://rawgit.com/aframevr/aframe/ee12d49/dist/aframe-master.min.js"></script>
     <script id="cursor" src="https://unpkg.com/aframe-controller-cursor-component@0.2.6/dist/aframe-controller-cursor-component.min.js"></script>
     <script id="layout" src="https://unpkg.com/aframe-layout-component@4.0.2/dist/aframe-layout-component.min.js"></script>
     <script id="motionCapture" src="https://unpkg.com/aframe-motion-capture-components@0.1.3/dist/aframe-motion-capture-components.min.js"></script>
@@ -12,15 +12,18 @@
     <script src="components/gamestate.js"></script>
     <script src="components/html-exporter.js"></script>
     <script src="components/palette-handler.js"></script>
+    <script src="components/primitive-deleter.js"></script>
     <script src="components/primitive-placer.js"></script>
   </head>
   <body>
-    <a-scene avatar-replayer="src: recordings/dragPlace.json; spectatorMode: true" html-exporter gamestate>
+    <a-scene avatar-replayer="src: recordings/deletion.json; spectatorMode: true" html-exporter gamestate>
       <a-assets>
         <img id="groundTexture" src="img/floor.jpg">
         <img id="skyTexture" src="img/sky.jpg">
         <a-mixin id="primitive" material="color: #888"></a-mixin>
         <a-mixin id="color" geometry="primitive: box; depth: 0.001; height: 0.01; width: 0.01"></a-mixin>
+        <audio id="deleteSound" src="audio/delete.mp3"></audio>
+        <audio id="dingSound" src="audio/ding.mp3"></audio>
       </a-assets>
 
       <!-- Hands. -->
@@ -35,20 +38,20 @@
 
             <!-- Primitives. -->
             <a-entity id="primitives" layout="type: line; margin: 0.03" position="-0.05 0 0.015">
-              <a-entity mixin="primitive" geometry="primitive: box; depth: 0.01; height: 0.01; width: 0.01"></a-entity>
-              <a-entity mixin="primitive" geometry="primitive: sphere; radius: 0.01"></a-entity>
-              <a-entity mixin="primitive" geometry="primitive: cylinder; height: 0.01; radius: 0.01"></a-entity>
-              <a-entity mixin="primitive" geometry="primitive: torus; radius: 0.01; radiusTubular: 0.001"></a-entity>
+              <a-entity class="primitive" mixin="primitive" geometry="primitive: box; depth: 0.01; height: 0.01; width: 0.01"></a-entity>
+              <a-entity class="primitive" mixin="primitive" geometry="primitive: sphere; radius: 0.01"></a-entity>
+              <a-entity class="primitive" mixin="primitive" geometry="primitive: cylinder; height: 0.01; radius: 0.01"></a-entity>
+              <a-entity class="primitive" mixin="primitive" geometry="primitive: torus; radius: 0.01; radiusTubular: 0.001"></a-entity>
             </a-entity>
 
             <!-- Colors. -->
             <a-entity id="colors" layout="type: line; margin: 0.02" position="-0.05 -0.05 0.015">
-              <a-entity mixin="color" material="color: red"></a-entity>
-              <a-entity mixin="color" material="color: orange"></a-entity>
-              <a-entity mixin="color" material="color: yellow"></a-entity>
-              <a-entity mixin="color" material="color: green"></a-entity>
-              <a-entity mixin="color" material="color: blue"></a-entity>
-              <a-entity mixin="color" material="color: purple"></a-entity>
+              <a-entity class="color" mixin="color" material="color: red"></a-entity>
+              <a-entity class="color" mixin="color" material="color: orange"></a-entity>
+              <a-entity class="color" mixin="color" material="color: yellow"></a-entity>
+              <a-entity class="color" mixin="color" material="color: green"></a-entity>
+              <a-entity class="color" mixin="color" material="color: blue"></a-entity>
+              <a-entity class="color" mixin="color" material="color: purple"></a-entity>
             </a-entity>
           </a-entity>
         </a-entity>
@@ -59,13 +62,14 @@
         controller-cursor
         raycaster="far: 0.1"
         palette-handler
+        primitive-deleter
         primitive-placer>
         <a-entity id="activePrimitive" position="0 0 -0.25"></a-entity>
       </a-entity>
 
       <!-- Environment. -->
       <a-sky id="bg" radius="30" src="#skyTexture" theta-length="90"></a-sky>
-      <a-cylinder id="ground" src="#groundTexture" radius="32" height="0.1"></a-cylinder>
+      <a-cylinder id="ground" src="#groundTexture" radius="32" height="0.1" static-body></a-cylinder>
     </a-scene>
   </body>
 </html>

@@ -2,6 +2,8 @@ AFRAME.registerComponent('primitive-placer', {
   init: function () {
     var el = this.el;
     var activePrimitiveEl = el.querySelector('#activePrimitive');
+    var dingSound = document.querySelector('#dingSound');
+    dingSound.volume = 0.3;
 
     // Hook up to game state.
     var activePrimitive;
@@ -37,6 +39,7 @@ AFRAME.registerComponent('primitive-placer', {
       // Emit.
       newEntity.addEventListener('loaded', function () {
         el.sceneEl.emit('primitiveplace', newEntity);
+        dingSound.play();
         console.log('Primitive placed', newEntity);
       });
 
