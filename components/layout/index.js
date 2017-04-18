@@ -8,7 +8,7 @@ AFRAME.registerComponent('layout', {
     margin: {default: 1, min: 0, if: {type: ['box', 'line']}},
     plane: {default: 'xy'},
     radius: {default: 1, min: 0, if: {type: ['circle', 'cube', 'dodecahedron', 'pyramid']}},
-    reverse: {default: 'false'},
+    reverse: {default: false},
     type: {default: 'line', oneOf: ['box', 'circle', 'cube', 'dodecahedron', 'line',
                                     'pyramid']}
   },
