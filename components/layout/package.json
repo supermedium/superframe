@@ -1,11 +1,10 @@
 {
   "name": "aframe-layout-component",
-  "version": "4.0.2",
+  "version": "4.1.0",
   "description": "Position and layout child entities in 3D space for A-Frame",
   "main": "index.js",
   "scripts": {
-    "build": "browserify examples/main.js -o examples/build.js",
-    "dev": "budo examples/main.js:examples/build.js --port 8005 --live --open",
+    "dev": "budo index.js:dist/aframe-layout-component.min.js --port 7005 --live --open",
     "dist": "webpack index.js dist/aframe-layout-component.js && webpack -p index.js dist/aframe-layout-component.min.js",
     "postpublish": "npm run dist",
     "test": "karma start ./tests/karma.conf.js"
@@ -31,7 +30,6 @@
   },
   "homepage": "https://github.com/ngokevin/kframe/tree/components/layout#readme",
   "devDependencies": {
-    "aframe": "^0.4.0",
     "browserify": "^12.0.1",
     "budo": "^7.1.0",
     "chai": "^3.4.1",
