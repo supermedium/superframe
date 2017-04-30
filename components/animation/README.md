@@ -51,11 +51,11 @@ entity by name-spacing the component with double underscores (`__`):
 | Property    | Description                                                                                                                           | Default Value | Values                  |
 | --------    | -----------                                                                                                                           | ------------- | ------                  |
 | delay       | How long (milliseconds) to wait before starting.                                                                                      | 0             |                         |
-| dir         | Which dir to go from `from` to `to`.                                                                                            | normal        | alternate, reverse      |
+| dir         | Which dir to go from `from` to `to`.                                                                                                  | normal        | alternate, reverse      |
 | dur         | How long (milliseconds) each cycle of the animation is.                                                                               | 1000          |                         |
 | easing      | Easing function of animation. To ease in, ease out, ease in and out.                                                                  | easeInQuad    | See [easings](#easings) |
 | elasticity  | How much to bounce (higher is stronger).                                                                                              | 400           |                         |
-| loop        | Whether to repeat animation indefinitely.                                                                                             | false         |                         |
+| loop        | How many times the animation should repeat. If the value is `true`, the animation will repeat infinitely.                             | 0             |                         |
 | pauseEvents | Comma-separated list of events to listen to to pause.                                                                                 | null          |
 | property    | Property to animate. Can be a component name, a dot-delimited property of a component (e.g., `material.color`), or a plain attribute. |               |                         |
 | round       | Whether to round values.                                                                                                              | false         |                         |
@@ -99,8 +99,8 @@ Install and use by directly including the [browser files](dist):
 ```html
 <head>
   <title>My A-Frame Scene</title>
-  <script src="https://aframe.io/releases/0.3.0/aframe.min.js"></script>
-  <script src="https://unpkg.com/aframe-animation-component@^3.2.0/dist/aframe-animation-component.min.js"></script>
+  <script src="https://aframe.io/releases/0.5.0/aframe.min.js"></script>
+  <script src="https://unpkg.com/aframe-animation-component/dist/aframe-animation-component.min.js"></script>
 </head>
 
 <body>

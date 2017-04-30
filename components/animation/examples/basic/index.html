@@ -3,18 +3,20 @@
     <title>Basic</title>
     <meta name="description" content="Animating various properties of various objects"></meta>
     <meta property="og:image" content="https://raw.githubusercontent.com/ngokevin/kframe/master/components/animation/examples/basic/preview.gif"></meta>
-    <script src="../build.js"></script>
+    <script src="https://aframe.io/releases/0.5.0/aframe.min.js"></script>
+    <script src="../../dist/aframe-animation-component.min.js"></script>
+    <script src="https://unpkg.com/aframe-template-component@3.2.1/dist/aframe-template-component.min.js"></script>
   </head>
   <body>
     <a-scene>
       <a-assets>
-        <script id="orbiter" type="template/nunjucks">
+        <script id="orbiter" type="text/html">
           <a-entity animation__rotate="property: rotation; dur: 2000;
-                                       easing: {{ easing }}; loop: true; to: 0 360 0">
+                                       easing: ${easing}; loop: true; to: 0 360 0">
             <a-sphere radius=".08" color="#CCC"
                       animation__color="property: material.color; dir: alternate;
                                         dur: 400; loop: true; to: #333"
-                      position="{{ orbitradius }} 0 0">
+                      position="${orbitradius} 0 0">
             </a-sphere>
           </a-entity>
         </script>
@@ -42,8 +44,6 @@
                   position="0 0.6 0"></a-entity>
         <a-entity template="src: #orbiter" data-orbitradius="1.2" data-easing="easeOutSine"
                   position="0 0.9 0"></a-entity>
-        <a-entity template="src: #orbiter" data-orbitradius="1.8" data-easing="easeInOutBounce"
-                  position="0 1.2 0"></a-entity>
         <a-entity template="src: #orbiter" data-orbitradius="1.5" data-easing="easeInBack"
                   position="0 1.5 0"></a-entity>
       </a-entity>

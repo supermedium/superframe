@@ -1,26 +1,23 @@
 <html>
   <head>
-    <title>Repeat</title>
+    <title>Loop (Repeats)</title>
     <meta name="description" content="Testing the animation.repeat property"></meta>
     <meta property="og:image" content="https://raw.githubusercontent.com/ngokevin/kframe/master/components/animation/examples/repeat/preview.gif"></meta>
-    <script src="../build.js"></script>
+    <script src="https://aframe.io/releases/0.5.0/aframe.min.js"></script>
+    <script src="../../dist/aframe-animation-component.min.js"></script>
   </head>
   <body>
     <a-scene>
-      <a-entity id="container" position="0 0 -4">
-        <a-box color="#F55" position="-2 0 -2"
-               animation="property: rotation; dir: alternate; repeat: 0; to: 0 45 0"></a-box>
-        <a-box color="#F55" position="0 0 -2"
-               animation="property: rotation; dir: alternate; repeat: 2; to: 0 45 0"></a-box>
-        <a-box color="#F55" position="2 0 -2"
-               animation="property: rotation; dir: alternate; repeat: 4; to: 0 45 0"></a-box>
+      <a-mixin id="box" material="color: #F55" animation="property: rotation; to: 0 45 0"></a-mixin>
 
-        <a-box color="#F55" position="-2 2 -2"
-               animation="property: rotation; repeat: 0; to: 0 45 0"></a-box>
-        <a-box color="#F55" position="0 2 -2"
-               animation="property: rotation; repeat: 2; to: 0 45 0"></a-box>
-        <a-box color="#F55" position="2 2 -2"
-               animation="property: rotation; repeat: 4; to: 0 45 0"></a-box>
+      <a-entity id="container" position="0 0 -4">
+        <a-box mixin="box" position="-2 2 -2" animation="loop: 1"></a-box>
+        <a-box mixin="box" position="0 2 -2" animation="loop: 4"></a-box>
+        <a-box mixin="box" position="2 2 -2" animation="loop: 8"></a-box>
+
+        <a-box mixin="box" position="-2 0 -2" animation="dir: alternate; loop: 1"></a-box>
+        <a-box mixin="box" position="0 0 -2" animation="dir: alternate; loop: 4"></a-box>
+        <a-box mixin="box" position="2 0 -2" animation="dir: alternate; loop: 8"></a-box>
       </a-entity>
 
       <!-- Sky. -->

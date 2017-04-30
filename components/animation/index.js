@@ -25,9 +25,16 @@ AFRAME.registerComponent('animation', {
     easing: {default: 'easeInQuad'},
     elasticity: {default: 400},
     from: {default: ''},
-    loop: {default: false},
+    loop: {
+      default: 0,
+      parse: function (value) {
+        // Boolean or integer.
+        if (value === 'true') { return true; }
+        if (value === 'false') { return false; }
+        return parseInt(value, 10);
+      }
+    },
     property: {default: ''},
-    repeat: {default: 0},
     startEvents: {type: 'array'},
     pauseEvents: {type: 'array'},
     resumeEvents: {type: 'array'},
@@ -45,7 +52,6 @@ AFRAME.registerComponent('animation', {
     this.pauseAnimationBound = this.pauseAnimation.bind(this);
     this.resumeAnimationBound = this.resumeAnimation.bind(this);
     this.restartAnimationBound = this.restartAnimation.bind(this);
-    this.repeat = 0;
   },
 
   update: function () {
@@ -58,7 +64,6 @@ AFRAME.registerComponent('animation', {
     if (!data.property) { return; }
 
     // Base config.
-    this.repeat = data.repeat;
     var config = {
       autoplay: false,
       begin: function () {
@@ -68,8 +73,6 @@ AFRAME.registerComponent('animation', {
       complete: function () {
         el.emit('animationcomplete');
         el.emit(attrName + '-complete');
-        // Repeat.
-        if (--self.repeat > 0) { self.animation.play(); }
       },
       direction: data.dir,
       duration: data.dur,
@@ -196,10 +199,10 @@ AFRAME.registerComponent('animation', {
 function configDefault (el, data, config) {
   var from = data.from || getComponentProperty(el, data.property);
   return AFRAME.utils.extend({}, config, {
-    targets: [{aframeProperty: from}],
+    targets: {aframeProperty: from},
     aframeProperty: data.to,
-    update: function () {
-      setComponentProperty(el, data.property, this.targets[0].aframeProperty);
+    update: function (anim) {
+      setComponentProperty(el, data.property, anim.animatables[0].target.aframeProperty);
     }
   });
 }
@@ -213,8 +216,8 @@ function configVector (el, data, config) {
   var to = AFRAME.utils.coordinates.parse(data.to);
   return AFRAME.utils.extend({}, config, {
     targets: [from],
-    update: function () {
-      setComponentProperty(el, data.property, this.targets[0]);
+    update: function (anim) {
+      setComponentProperty(el, data.property, anim.animatables[0].target);
     }
   }, to);
 }

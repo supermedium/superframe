@@ -71,9 +71,16 @@
 	    easing: {default: 'easeInQuad'},
 	    elasticity: {default: 400},
 	    from: {default: ''},
-	    loop: {default: false},
+	    loop: {
+	      default: 0,
+	      parse: function (value) {
+	        // Boolean or integer.
+	        if (value === 'true') { return true; }
+	        if (value === 'false') { return false; }
+	        return parseInt(value, 10);
+	      }
+	    },
 	    property: {default: ''},
-	    repeat: {default: 0},
 	    startEvents: {type: 'array'},
 	    pauseEvents: {type: 'array'},
 	    resumeEvents: {type: 'array'},
@@ -91,7 +98,6 @@
 	    this.pauseAnimationBound = this.pauseAnimation.bind(this);
 	    this.resumeAnimationBound = this.resumeAnimation.bind(this);
 	    this.restartAnimationBound = this.restartAnimation.bind(this);
-	    this.repeat = 0;
 	  },
 
 	  update: function () {
@@ -104,7 +110,6 @@
 	    if (!data.property) { return; }
 
 	    // Base config.
-	    this.repeat = data.repeat;
 	    var config = {
 	      autoplay: false,
 	      begin: function () {
@@ -114,8 +119,6 @@
 	      complete: function () {
 	        el.emit('animationcomplete');
 	        el.emit(attrName + '-complete');
-	        // Repeat.
-	        if (--self.repeat > 0) { self.animation.play(); }
 	      },
 	      direction: data.dir,
 	      duration: data.dur,
@@ -242,10 +245,10 @@
 	function configDefault (el, data, config) {
 	  var from = data.from || getComponentProperty(el, data.property);
 	  return AFRAME.utils.extend({}, config, {
-	    targets: [{aframeProperty: from}],
+	    targets: {aframeProperty: from},
 	    aframeProperty: data.to,
-	    update: function () {
-	      setComponentProperty(el, data.property, this.targets[0].aframeProperty);
+	    update: function (anim) {
+	      setComponentProperty(el, data.property, anim.animatables[0].target.aframeProperty);
 	    }
 	  });
 	}
@@ -259,8 +262,8 @@
 	  var to = AFRAME.utils.coordinates.parse(data.to);
 	  return AFRAME.utils.extend({}, config, {
 	    targets: [from],
-	    update: function () {
-	      setComponentProperty(el, data.property, this.targets[0]);
+	    update: function (anim) {
+	      setComponentProperty(el, data.property, anim.animatables[0].target);
 	    }
 	  }, to);
 	}
@@ -286,645 +289,32 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*
-	 * Anime v1.1.3
-	 * http://anime-js.com
-	 * JavaScript animation engine
-	 * Copyright (c) 2016 Julian Garnier
-	 * http://juliangarnier.com
-	 * Released under the MIT license
-	 */
-
-	(function (root, factory) {
-	  if (true) {
-	    // AMD. Register as an anonymous module.
-	    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory), __WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ? (__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-	  } else if (typeof module === 'object' && module.exports) {
-	    // Node. Does not work with strict CommonJS, but
-	    // only CommonJS-like environments that support module.exports,
-	    // like Node.
-	    module.exports = factory();
-	  } else {
-	    // Browser globals (root is window)
-	    root.anime = factory();
-	  }
-	}(this, function () {
-
-	  var version = '1.1.3';
-
-	  // Defaults
-
-	  var defaultSettings = {
-	    duration: 1000,
-	    delay: 0,
-	    loop: false,
-	    autoplay: true,
-	    direction: 'normal',
-	    easing: 'easeOutElastic',
-	    elasticity: 400,
-	    round: false,
-	    begin: undefined,
-	    update: undefined,
-	    complete: undefined
-	  }
-
-	  // Transforms
-
-	  var validTransforms = ['translateX', 'translateY', 'translateZ', 'rotate', 'rotateX', 'rotateY', 'rotateZ', 'scale', 'scaleX', 'scaleY', 'scaleZ', 'skewX', 'skewY'];
-	  var transform, transformStr = 'transform';
-
-	  // Utils
-
-	  var is = {
-	    arr: function(a) { return Array.isArray(a) },
-	    obj: function(a) { return Object.prototype.toString.call(a).indexOf('Object') > -1 },
-	    svg: function(a) { return a instanceof SVGElement },
-	    dom: function(a) { return a.nodeType || is.svg(a) },
-	    num: function(a) { return !isNaN(parseInt(a)) },
-	    str: function(a) { return typeof a === 'string' },
-	    fnc: function(a) { return typeof a === 'function' },
-	    und: function(a) { return typeof a === 'undefined' },
-	    nul: function(a) { return typeof a === 'null' },
-	    hex: function(a) { return /(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i.test(a) },
-	    rgb: function(a) { return /^rgb/.test(a) },
-	    hsl: function(a) { return /^hsl/.test(a) },
-	    col: function(a) { return (is.hex(a) || is.rgb(a) || is.hsl(a)) }
-	  }
-
-	  // Easings functions adapted from http://jqueryui.com/
-
-	  var easings = (function() {
-	    var eases = {};
-	    var names = ['Quad', 'Cubic', 'Quart', 'Quint', 'Expo'];
-	    var functions = {
-	      Sine: function(t) { return 1 + Math.sin(Math.PI / 2 * t - Math.PI / 2); },
-	      Circ: function(t) { return 1 - Math.sqrt( 1 - t * t ); },
-	      Elastic: function(t, m) {
-	        if( t === 0 || t === 1 ) return t;
-	        var p = (1 - Math.min(m, 998) / 1000), st = t / 1, st1 = st - 1, s = p / ( 2 * Math.PI ) * Math.asin( 1 );
-	        return -( Math.pow( 2, 10 * st1 ) * Math.sin( ( st1 - s ) * ( 2 * Math.PI ) / p ) );
-	      },
-	      Back: function(t) { return t * t * ( 3 * t - 2 ); },
-	      Bounce: function(t) {
-	        var pow2, bounce = 4;
-	        while ( t < ( ( pow2 = Math.pow( 2, --bounce ) ) - 1 ) / 11 ) {}
-	        return 1 / Math.pow( 4, 3 - bounce ) - 7.5625 * Math.pow( ( pow2 * 3 - 2 ) / 22 - t, 2 );
-	      }
-	    }
-	    names.forEach(function(name, i) {
-	      functions[name] = function(t) {
-	        return Math.pow( t, i + 2 );
-	      }
-	    });
-	    Object.keys(functions).forEach(function(name) {
-	      var easeIn = functions[name];
-	      eases['easeIn' + name] = easeIn;
-	      eases['easeOut' + name] = function(t, m) { return 1 - easeIn(1 - t, m); };
-	      eases['easeInOut' + name] = function(t, m) { return t < 0.5 ? easeIn(t * 2, m) / 2 : 1 - easeIn(t * -2 + 2, m) / 2; };
-	      eases['easeOutIn' + name] = function(t, m) { return t < 0.5 ? (1 - easeIn(1 - 2 * t, m)) / 2 : (easeIn(t * 2 - 1, m) + 1) / 2; };
-	    });
-	    eases.linear = function(t) { return t; };
-	    return eases;
-	  })();
-
-	  // Strings
-
-	  var numberToString = function(val) {
-	    return (is.str(val)) ? val : val + '';
-	  }
-
-	  var stringToHyphens = function(str) {
-	    return str.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
-	  }
-
-	  var selectString = function(str) {
-	    if (is.col(str)) return false;
-	    try {
-	      var nodes = document.querySelectorAll(str);
-	      return nodes;
-	    } catch(e) {
-	      return false;
-	    }
-	  }
-
-	  // Numbers
-
-	  var random = function(min, max) {
-	    return Math.floor(Math.random() * (max - min + 1)) + min;
-	  }
-
-	  // Arrays
-
-	  var flattenArray = function(arr) {
-	    return arr.reduce(function(a, b) {
-	      return a.concat(is.arr(b) ? flattenArray(b) : b);
-	    }, []);
-	  }
-
-	  var toArray = function(o) {
-	    if (is.arr(o)) return o;
-	    if (is.str(o)) o = selectString(o) || o;
-	    if (o instanceof NodeList || o instanceof HTMLCollection) return [].slice.call(o);
-	    return [o];
-	  }
-
-	  var arrayContains = function(arr, val) {
-	    return arr.some(function(a) { return a === val; });
-	  }
-
-	  var groupArrayByProps = function(arr, propsArr) {
-	    var groups = {};
-	    arr.forEach(function(o) {
-	      var group = JSON.stringify(propsArr.map(function(p) { return o[p]; }));
-	      groups[group] = groups[group] || [];
-	      groups[group].push(o);
-	    });
-	    return Object.keys(groups).map(function(group) {
-	      return groups[group];
-	    });
-	  }
-
-	  var removeArrayDuplicates = function(arr) {
-	    return arr.filter(function(item, pos, self) {
-	      return self.indexOf(item) === pos;
-	    });
-	  }
-
-	  // Objects
-
-	  var cloneObject = function(o) {
-	    var newObject = {};
-	    for (var p in o) newObject[p] = o[p];
-	    return newObject;
-	  }
-
-	  var mergeObjects = function(o1, o2) {
-	    for (var p in o2) o1[p] = !is.und(o1[p]) ? o1[p] : o2[p];
-	    return o1;
-	  }
-
-	  // Colors
-
-	  var hexToRgb = function(hex) {
-	    var rgx = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
-	    var hex = hex.replace(rgx, function(m, r, g, b) { return r + r + g + g + b + b; });
-	    var rgb = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	    var r = parseInt(rgb[1], 16);
-	    var g = parseInt(rgb[2], 16);
-	    var b = parseInt(rgb[3], 16);
-	    return 'rgb(' + r + ',' + g + ',' + b + ')';
-	  }
-
-	  var hslToRgb = function(hsl) {
-	    var hsl = /hsl\((\d+),\s*([\d.]+)%,\s*([\d.]+)%\)/g.exec(hsl);
-	    var h = parseInt(hsl[1]) / 360;
-	    var s = parseInt(hsl[2]) / 100;
-	    var l = parseInt(hsl[3]) / 100;
-	    var hue2rgb = function(p, q, t) {
-	      if (t < 0) t += 1;
-	      if (t > 1) t -= 1;
-	      if (t < 1/6) return p + (q - p) * 6 * t;
-	      if (t < 1/2) return q;
-	      if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
-	      return p;
-	    }
-	    var r, g, b;
-	    if (s == 0) {
-	      r = g = b = l;
-	    } else {
-	      var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-	      var p = 2 * l - q;
-	      r = hue2rgb(p, q, h + 1/3);
-	      g = hue2rgb(p, q, h);
-	      b = hue2rgb(p, q, h - 1/3);
-	    }
-	    return 'rgb(' + r * 255 + ',' + g * 255 + ',' + b * 255 + ')';
-	  }
-
-	  var colorToRgb = function(val) {
-	    if (is.rgb(val)) return val;
-	    if (is.hex(val)) return hexToRgb(val);
-	    if (is.hsl(val)) return hslToRgb(val);
-	  }
-
-	  // Units
-
-	  var getUnit = function(val) {
-	    return /([\+\-]?[0-9|auto\.]+)(%|px|pt|em|rem|in|cm|mm|ex|pc|vw|vh|deg)?/.exec(val)[2];
-	  }
-
-	  var addDefaultTransformUnit = function(prop, val, intialVal) {
-	    if (getUnit(val)) return val;
-	    if (prop.indexOf('translate') > -1) return getUnit(intialVal) ? val + getUnit(intialVal) : val + 'px';
-	    if (prop.indexOf('rotate') > -1 || prop.indexOf('skew') > -1) return val + 'deg';
-	    return val;
-	  }
-
-	  // Values
-
-	  var getCSSValue = function(el, prop) {
-	    // First check if prop is a valid CSS property
-	    if (prop in el.style) {
-	      // Then return the property value or fallback to '0' when getPropertyValue fails
-	      return getComputedStyle(el).getPropertyValue(stringToHyphens(prop)) || '0';
-	    }
-	  }
-
-	  var getTransformValue = function(el, prop) {
-	    var defaultVal = prop.indexOf('scale') > -1 ? 1 : 0;
-	    var str = el.style.transform;
-	    if (!str) return defaultVal;
-	    var rgx = /(\w+)\((.+?)\)/g;
-	    var match = [];
-	    var props = [];
-	    var values = [];
-	    while (match = rgx.exec(str)) {
-	      props.push(match[1]);
-	      values.push(match[2]);
-	    }
-	    var val = values.filter(function(f, i) { return props[i] === prop; });
-	    return val.length ? val[0] : defaultVal;
-	  }
-
-	  var getAnimationType = function(el, prop) {
-	    if ( is.dom(el) && arrayContains(validTransforms, prop)) return 'transform';
-	    if ( is.dom(el) && (el.getAttribute(prop) || (is.svg(el) && el[prop]))) return 'attribute';
-	    if ( is.dom(el) && (prop !== 'transform' && getCSSValue(el, prop))) return 'css';
-	    if (!is.nul(el[prop]) && !is.und(el[prop])) return 'object';
-	  }
-
-	  var getInitialTargetValue = function(target, prop) {
-	    switch (getAnimationType(target, prop)) {
-	      case 'transform': return getTransformValue(target, prop);
-	      case 'css': return getCSSValue(target, prop);
-	      case 'attribute': return target.getAttribute(prop);
-	    }
-	    return target[prop] || 0;
-	  }
-
-	  var getValidValue = function(values, val, originalCSS) {
-	    if (is.col(val)) return colorToRgb(val);
-	    if (getUnit(val)) return val;
-	    var unit = getUnit(values.to) ? getUnit(values.to) : getUnit(values.from);
-	    if (!unit && originalCSS) unit = getUnit(originalCSS);
-	    return unit ? val + unit : val;
-	  }
-
-	  var decomposeValue = function(val) {
-	    var rgx = /-?\d*\.?\d+/g;
-	    return {
-	      original: val,
-	      numbers: numberToString(val).match(rgx) ? numberToString(val).match(rgx).map(Number) : [0],
-	      strings: numberToString(val).split(rgx)
-	    }
-	  }
-
-	  var recomposeValue = function(numbers, strings, initialStrings) {
-	    return strings.reduce(function(a, b, i) {
-	      var b = (b ? b : initialStrings[i - 1]);
-	      return a + numbers[i - 1] + b;
-	    });
-	  }
-
-	  // Animatables
-
-	  var getAnimatables = function(targets) {
-	    var targets = targets ? (flattenArray(is.arr(targets) ? targets.map(toArray) : toArray(targets))) : [];
-	    return targets.map(function(t, i) {
-	      return { target: t, id: i };
-	    });
-	  }
-
-	  // Properties
-
-	  var getProperties = function(params, settings) {
-	    var props = [];
-	    for (var p in params) {
-	      if (!defaultSettings.hasOwnProperty(p) && p !== 'targets') {
-	        var prop = is.obj(params[p]) ? cloneObject(params[p]) : {value: params[p]};
-	        prop.name = p;
-	        props.push(mergeObjects(prop, settings));
-	      }
-	    }
-	    return props;
-	  }
-
-	  var getPropertiesValues = function(target, prop, value, i) {
-	    var values = toArray( is.fnc(value) ? value(target, i) : value);
-	    return {
-	      from: (values.length > 1) ? values[0] : getInitialTargetValue(target, prop),
-	      to: (values.length > 1) ? values[1] : values[0]
-	    }
-	  }
-
-	  // Tweens
-
-	  var getTweenValues = function(prop, values, type, target) {
-	    var valid = {};
-	    if (type === 'transform') {
-	      valid.from = prop + '(' + addDefaultTransformUnit(prop, values.from, values.to) + ')';
-	      valid.to = prop + '(' + addDefaultTransformUnit(prop, values.to) + ')';
-	    } else {
-	      var originalCSS = (type === 'css') ? getCSSValue(target, prop) : undefined;
-	      valid.from = getValidValue(values, values.from, originalCSS);
-	      valid.to = getValidValue(values, values.to, originalCSS);
-	    }
-	    return { from: decomposeValue(valid.from), to: decomposeValue(valid.to) };
-	  }
-
-	  var getTweensProps = function(animatables, props) {
-	    var tweensProps = [];
-	    animatables.forEach(function(animatable, i) {
-	      var target = animatable.target;
-	      return props.forEach(function(prop) {
-	        var animType = getAnimationType(target, prop.name);
-	        if (animType) {
-	          var values = getPropertiesValues(target, prop.name, prop.value, i);
-	          var tween = cloneObject(prop);
-	          tween.animatables = animatable;
-	          tween.type = animType;
-	          tween.from = getTweenValues(prop.name, values, tween.type, target).from;
-	          tween.to = getTweenValues(prop.name, values, tween.type, target).to;
-	          tween.round = (is.col(values.from) || tween.round) ? 1 : 0;
-	          tween.delay = (is.fnc(tween.delay) ? tween.delay(target, i, animatables.length) : tween.delay) / animation.speed;
-	          tween.duration = (is.fnc(tween.duration) ? tween.duration(target, i, animatables.length) : tween.duration) / animation.speed;
-	          tweensProps.push(tween);
-	        }
-	      });
-	    });
-	    return tweensProps;
-	  }
-
-	  var getTweens = function(animatables, props) {
-	    var tweensProps = getTweensProps(animatables, props);
-	    var splittedProps = groupArrayByProps(tweensProps, ['name', 'from', 'to', 'delay', 'duration']);
-	    return splittedProps.map(function(tweenProps) {
-	      var tween = cloneObject(tweenProps[0]);
-	      tween.animatables = tweenProps.map(function(p) { return p.animatables });
-	      tween.totalDuration = tween.delay + tween.duration;
-	      return tween;
-	    });
-	  }
-
-	  var reverseTweens = function(anim, delays) {
-	    anim.tweens.forEach(function(tween) {
-	      var toVal = tween.to;
-	      var fromVal = tween.from;
-	      var delayVal = anim.duration - (tween.delay + tween.duration);
-	      tween.from = toVal;
-	      tween.to = fromVal;
-	      if (delays) tween.delay = delayVal;
-	    });
-	    anim.reversed = anim.reversed ? false : true;
-	  }
-
-	  var getTweensDuration = function(tweens) {
-	    return Math.max.apply(Math, tweens.map(function(tween){ return tween.totalDuration; }));
-	  }
-
-	  var getTweensDelay = function(tweens) {
-	    return Math.min.apply(Math, tweens.map(function(tween){ return tween.delay; }));
-	  }
-
-	  // will-change
-
-	  var getWillChange = function(anim) {
-	    var props = [];
-	    var els = [];
-	    anim.tweens.forEach(function(tween) {
-	      if (tween.type === 'css' || tween.type === 'transform' ) {
-	        props.push(tween.type === 'css' ? stringToHyphens(tween.name) : 'transform');
-	        tween.animatables.forEach(function(animatable) { els.push(animatable.target); });
-	      }
-	    });
-	    return {
-	      properties: removeArrayDuplicates(props).join(', '),
-	      elements: removeArrayDuplicates(els)
-	    }
-	  }
-
-	  var setWillChange = function(anim) {
-	    var willChange = getWillChange(anim);
-	    willChange.elements.forEach(function(element) {
-	      element.style.willChange = willChange.properties;
-	    });
-	  }
-
-	  var removeWillChange = function(anim) {
-	    var willChange = getWillChange(anim);
-	    willChange.elements.forEach(function(element) {
-	      element.style.removeProperty('will-change');
-	    });
-	  }
-
-	  /* Svg path */
-
-	  var getPathProps = function(path) {
-	    var el = is.str(path) ? selectString(path)[0] : path;
-	    return {
-	      path: el,
-	      value: el.getTotalLength()
-	    }
-	  }
-
-	  var snapProgressToPath = function(tween, progress) {
-	    var pathEl = tween.path;
-	    var pathProgress = tween.value * progress;
-	    var point = function(offset) {
-	      var o = offset || 0;
-	      var p = progress > 1 ? tween.value + o : pathProgress + o;
-	      return pathEl.getPointAtLength(p);
-	    }
-	    var p = point();
-	    var p0 = point(-1);
-	    var p1 = point(+1);
-	    switch (tween.name) {
-	      case 'translateX': return p.x;
-	      case 'translateY': return p.y;
-	      case 'rotate': return Math.atan2(p1.y - p0.y, p1.x - p0.x) * 180 / Math.PI;
-	    }
-	  }
-
-	  // Progress
-
-	  var getTweenProgress = function(tween, time) {
-	    var elapsed = Math.min(Math.max(time - tween.delay, 0), tween.duration);
-	    var percent = elapsed / tween.duration;
-	    var progress = tween.to.numbers.map(function(number, p) {
-	      var start = tween.from.numbers[p];
-	      var eased = easings[tween.easing](percent, tween.elasticity);
-	      var val = tween.path ? snapProgressToPath(tween, eased) : start + eased * (number - start);
-	      val = tween.round ? Math.round(val * tween.round) / tween.round : val;
-	      return val;
-	    });
-	    return recomposeValue(progress, tween.to.strings, tween.from.strings);
-	  }
-
-	  var setAnimationProgress = function(anim, time) {
-	    var transforms;
-	    anim.currentTime = time;
-	    anim.progress = (time / anim.duration) * 100;
-	    for (var t = 0; t < anim.tweens.length; t++) {
-	      var tween = anim.tweens[t];
-	      tween.currentValue = getTweenProgress(tween, time);
-	      var progress = tween.currentValue;
-	      for (var a = 0; a < tween.animatables.length; a++) {
-	        var animatable = tween.animatables[a];
-	        var id = animatable.id;
-	        var target = animatable.target;
-	        var name = tween.name;
-	        switch (tween.type) {
-	          case 'css': target.style[name] = progress; break;
-	          case 'attribute': target.setAttribute(name, progress); break;
-	          case 'object': target[name] = progress; break;
-	          case 'transform':
-	          if (!transforms) transforms = {};
-	          if (!transforms[id]) transforms[id] = [];
-	          transforms[id].push(progress);
-	          break;
-	        }
-	      }
-	    }
-	    if (transforms) {
-	      if (!transform) transform = (getCSSValue(document.body, transformStr) ? '' : '-webkit-') + transformStr;
-	      for (var t in transforms) {
-	        anim.animatables[t].target.style[transform] = transforms[t].join(' ');
-	      }
-	    }
-	  }
-
-	  // Animation
-
-	  var createAnimation = function(params) {
-	    var anim = {};
-	    anim.animatables = getAnimatables(params.targets);
-	    anim.settings = mergeObjects(params, defaultSettings);
-	    anim.properties = getProperties(params, anim.settings);
-	    anim.tweens = getTweens(anim.animatables, anim.properties);
-	    anim.duration = anim.tweens.length ? getTweensDuration(anim.tweens) : params.duration;
-	    anim.delay = anim.tweens.length ? getTweensDelay(anim.tweens) : params.delay;
-	    anim.currentTime = 0;
-	    anim.progress = 0;
-	    anim.ended = false;
-	    return anim;
-	  }
-
-	  // Public
-
-	  var animations = [];
-	  var raf = 0;
-
-	  var engine = (function() {
-	    var play = function() { raf = requestAnimationFrame(step); };
-	    var step = function(t) {
-	      if (animations.length) {
-	        for (var i = 0; i < animations.length; i++) animations[i].tick(t);
-	        play();
-	      } else {
-	        cancelAnimationFrame(raf);
-	        raf = 0;
-	      }
-	    }
-	    return play;
-	  })();
-
-	  var animation = function(params) {
-
-	    var anim = createAnimation(params);
-	    var time = {};
-
-	    anim.tick = function(now) {
-	      anim.ended = false;
-	      if (!time.start) time.start = now;
-	      time.current = Math.min(Math.max(time.last + now - time.start, 0), anim.duration);
-	      setAnimationProgress(anim, time.current);
-	      var s = anim.settings;
-	      if (time.current >= anim.delay) {
-	        if (s.begin) s.begin(anim); s.begin = undefined;
-	        if (s.update) s.update(anim);
-	      }
-	      if (time.current >= anim.duration) {
-	        if (s.loop) {
-	          time.start = now;
-	          if (s.direction === 'alternate') reverseTweens(anim, true);
-	          if (is.num(s.loop)) s.loop--;
-	        } else {
-	          anim.ended = true;
-	          anim.pause();
-	          if (s.complete) s.complete(anim);
-	        }
-	        time.last = 0;
-	      }
-	    }
-
-	    anim.seek = function(progress) {
-	      setAnimationProgress(anim, (progress / 100) * anim.duration);
-	    }
-
-	    anim.pause = function() {
-	      removeWillChange(anim);
-	      var i = animations.indexOf(anim);
-	      if (i > -1) animations.splice(i, 1);
-	    }
-
-	    anim.play = function(params) {
-	      anim.pause();
-	      if (params) anim = mergeObjects(createAnimation(mergeObjects(params, anim.settings)), anim);
-	      time.start = 0;
-	      time.last = anim.ended ? 0 : anim.currentTime;
-	      var s = anim.settings;
-	      if (s.direction === 'reverse') reverseTweens(anim);
-	      if (s.direction === 'alternate' && !s.loop) s.loop = 1;
-	      setWillChange(anim);
-	      animations.push(anim);
-	      if (!raf) engine();
-	    }
-
-	    anim.restart = function() {
-	      if (anim.reversed) reverseTweens(anim);
-	      anim.pause();
-	      anim.seek(0);
-	      anim.play();
-	    }
-
-	    if (anim.settings.autoplay) anim.play();
-
-	    return anim;
-
-	  }
-
-	  // Remove one or multiple targets from all active animations.
-
-	  var remove = function(elements) {
-	    var targets = flattenArray(is.arr(elements) ? elements.map(toArray) : toArray(elements));
-	    for (var i = animations.length-1; i >= 0; i--) {
-	      var animation = animations[i];
-	      var tweens = animation.tweens;
-	      for (var t = tweens.length-1; t >= 0; t--) {
-	        var animatables = tweens[t].animatables;
-	        for (var a = animatables.length-1; a >= 0; a--) {
-	          if (arrayContains(targets, animatables[a].target)) {
-	            animatables.splice(a, 1);
-	            if (!animatables.length) tweens.splice(t, 1);
-	            if (!tweens.length) animation.pause();
-	          }
-	        }
-	      }
-	    }
-	  }
-
-	  animation.version = version;
-	  animation.speed = 1;
-	  animation.list = animations;
-	  animation.remove = remove;
-	  animation.easings = easings;
-	  animation.getValue = getInitialTargetValue;
-	  animation.path = getPathProps;
-	  animation.random = random;
-
-	  return animation;
-
-	}));
-
+	 2017 Julian Garnier
+	 Released under the MIT license
+	*/
+	var $jscomp$this=this;
+	(function(v,p){ true?!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_FACTORY__ = (p), __WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ? (__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__)):"object"===typeof module&&module.exports?module.exports=p():v.anime=p()})(this,function(){function v(a){if(!g.col(a))try{return document.querySelectorAll(a)}catch(b){}}function p(a){return a.reduce(function(a,d){return a.concat(g.arr(d)?p(d):d)},[])}function w(a){if(g.arr(a))return a;g.str(a)&&(a=v(a)||a);return a instanceof NodeList||a instanceof HTMLCollection?[].slice.call(a):[a]}function F(a,b){return a.some(function(a){return a===b})}
+	function A(a){var b={},d;for(d in a)b[d]=a[d];return b}function G(a,b){var d=A(a),c;for(c in a)d[c]=b.hasOwnProperty(c)?b[c]:a[c];return d}function B(a,b){var d=A(a),c;for(c in b)d[c]=g.und(a[c])?b[c]:a[c];return d}function S(a){a=a.replace(/^#?([a-f\d])([a-f\d])([a-f\d])$/i,function(a,b,d,h){return b+b+d+d+h+h});var b=/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(a);a=parseInt(b[1],16);var d=parseInt(b[2],16),b=parseInt(b[3],16);return"rgb("+a+","+d+","+b+")"}function T(a){function b(a,b,c){0>
+	c&&(c+=1);1<c&&--c;return c<1/6?a+6*(b-a)*c:.5>c?b:c<2/3?a+(b-a)*(2/3-c)*6:a}var d=/hsl\((\d+),\s*([\d.]+)%,\s*([\d.]+)%\)/g.exec(a);a=parseInt(d[1])/360;var c=parseInt(d[2])/100,d=parseInt(d[3])/100;if(0==c)c=d=a=d;else{var e=.5>d?d*(1+c):d+c-d*c,l=2*d-e,c=b(l,e,a+1/3),d=b(l,e,a);a=b(l,e,a-1/3)}return"rgb("+255*c+","+255*d+","+255*a+")"}function x(a){if(a=/([\+\-]?[0-9#\.]+)(%|px|pt|em|rem|in|cm|mm|ex|pc|vw|vh|deg|rad|turn)?/.exec(a))return a[2]}function U(a){if(-1<a.indexOf("translate"))return"px";
+	if(-1<a.indexOf("rotate")||-1<a.indexOf("skew"))return"deg"}function H(a,b){return g.fnc(a)?a(b.target,b.id,b.total):a}function C(a,b){if(b in a.style)return getComputedStyle(a).getPropertyValue(b.replace(/([a-z])([A-Z])/g,"$1-$2").toLowerCase())||"0"}function I(a,b){if(g.dom(a)&&F(V,b))return"transform";if(g.dom(a)&&(a.getAttribute(b)||g.svg(a)&&a[b]))return"attribute";if(g.dom(a)&&"transform"!==b&&C(a,b))return"css";if(null!=a[b])return"object"}function W(a,b){var d=U(b),d=-1<b.indexOf("scale")?
+	1:0+d;a=a.style.transform;if(!a)return d;for(var c=[],e=[],l=[],h=/(\w+)\((.+?)\)/g;c=h.exec(a);)e.push(c[1]),l.push(c[2]);a=l.filter(function(a,c){return e[c]===b});return a.length?a[0]:d}function J(a,b){switch(I(a,b)){case "transform":return W(a,b);case "css":return C(a,b);case "attribute":return a.getAttribute(b)}return a[b]||0}function K(a,b){var d=/^(\*=|\+=|-=)/.exec(a);if(!d)return a;b=parseFloat(b);a=parseFloat(a.replace(d[0],""));switch(d[0][0]){case "+":return b+a;case "-":return b-a;case "*":return b*
+	a}}function D(a){return g.obj(a)&&a.hasOwnProperty("totalLength")}function X(a,b){function d(c){c=void 0===c?0:c;return a.el.getPointAtLength(1<=b+c?b+c:0)}var c=d(),e=d(-1),l=d(1);switch(a.property){case "x":return c.x;case "y":return c.y;case "angle":return 180*Math.atan2(l.y-e.y,l.x-e.x)/Math.PI}}function L(a,b){var d=/-?\d*\.?\d+/g;a=D(a)?a.totalLength:a;if(g.col(a))b=g.rgb(a)?a:g.hex(a)?S(a):g.hsl(a)?T(a):void 0;else{var c=x(a);a=c?a.substr(0,a.length-c.length):a;b=b?a+b:a}b+="";return{original:b,
+	numbers:b.match(d)?b.match(d).map(Number):[0],strings:b.split(d)}}function Y(a,b){return b.reduce(function(b,c,e){return b+a[e-1]+c})}function M(a){return(a?p(g.arr(a)?a.map(w):w(a)):[]).filter(function(a,d,c){return c.indexOf(a)===d})}function Z(a){var b=M(a);return b.map(function(a,c){return{target:a,id:c,total:b.length}})}function aa(a,b){var d=A(b);if(g.arr(a)){var c=a.length;2!==c||g.obj(a[0])?g.fnc(b.duration)||(d.duration=b.duration/c):a={value:a}}return w(a).map(function(a,c){c=c?0:b.delay;
+	a=g.obj(a)&&!D(a)?a:{value:a};g.und(a.delay)&&(a.delay=c);return a}).map(function(a){return B(a,d)})}function ba(a,b){var d={},c;for(c in a){var e=H(a[c],b);g.arr(e)&&(e=e.map(function(a){return H(a,b)}),1===e.length&&(e=e[0]));d[c]=e}d.duration=parseFloat(d.duration);d.delay=parseFloat(d.delay);return d}function ca(a){return g.arr(a)?y.apply(this,a):N[a]}function da(a,b){var d;return a.tweens.map(function(c){c=ba(c,b);var e=c.value,l=J(b.target,a.name),h=d?d.to.original:l,h=g.arr(e)?e[0]:h,m=K(g.arr(e)?
+	e[1]:e,h),l=x(m)||x(h)||x(l);c.isPath=D(e);c.from=L(h,l);c.to=L(m,l);c.start=d?d.end:a.offset;c.end=c.start+c.delay+c.duration;c.easing=ca(c.easing);c.elasticity=(1E3-Math.min(Math.max(c.elasticity,1),999))/1E3;g.col(c.from.original)&&(c.round=1);return d=c})}function ea(a,b){return p(a.map(function(a){return b.map(function(b){var c=I(a.target,b.name);if(c){var d=da(b,a);b={type:c,property:b.name,animatable:a,tweens:d,duration:d[d.length-1].end,delay:d[0].delay}}else b=void 0;return b})})).filter(function(a){return!g.und(a)})}
+	function O(a,b,d){var c="delay"===a?Math.min:Math.max;return b.length?c.apply(Math,b.map(function(b){return b[a]})):d[a]}function fa(a){var b=G(ga,a),d=G(ha,a),c=Z(a.targets),e=[],g=B(b,d),h;for(h in a)g.hasOwnProperty(h)||"targets"===h||e.push({name:h,offset:g.offset,tweens:aa(a[h],d)});a=ea(c,e);return B(b,{children:[],animatables:c,animations:a,duration:O("duration",a,d),delay:O("delay",a,d)})}function n(a){function b(){return window.Promise&&new Promise(function(a){return Q=a})}function d(a){return f.reversed?
+	f.duration-a:a}function c(a){for(var b=0,c={},d=f.animations,e={};b<d.length;){var g=d[b],h=g.animatable,m=g.tweens;e.tween=m.filter(function(b){return a<b.end})[0]||m[m.length-1];e.isPath$1=e.tween.isPath;e.round=e.tween.round;e.eased=e.tween.easing(Math.min(Math.max(a-e.tween.start-e.tween.delay,0),e.tween.duration)/e.tween.duration,e.tween.elasticity);m=Y(e.tween.to.numbers.map(function(a){return function(b,c){c=a.isPath$1?0:a.tween.from.numbers[c];b=c+a.eased*(b-c);a.isPath$1&&(b=X(a.tween.value,
+	b));a.round&&(b=Math.round(b*a.round)/a.round);return b}}(e)),e.tween.to.strings);ia[g.type](h.target,g.property,m,c,h.id);g.currentValue=m;b++;e={isPath$1:e.isPath$1,tween:e.tween,eased:e.eased,round:e.round}}if(c)for(var k in c)E||(E=C(document.body,"transform")?"transform":"-webkit-transform"),f.animatables[k].target.style[E]=c[k].join(" ");f.currentTime=a;f.progress=a/f.duration*100}function e(a){if(f[a])f[a](f)}function g(){f.remaining&&!0!==f.remaining&&f.remaining--}function h(a){var h=f.duration,
+	l=f.offset,n=f.delay,P=f.currentTime,q=f.reversed,r=d(a),r=Math.min(Math.max(r,0),h);if(f.children){var p=f.children;if(r>=f.currentTime)for(var u=0;u<p.length;u++)p[u].seek(r);else for(u=p.length;u--;)p[u].seek(r)}r>l&&r<h?(c(r),!f.began&&r>=n&&(f.began=!0,e("begin")),e("run")):(r<=l&&0!==P&&(c(0),q&&g()),r>=h&&P!==h&&(c(h),q||g()));a>=h&&(f.remaining?(t=m,"alternate"===f.direction&&(f.reversed=!f.reversed)):(f.pause(),"Promise"in window&&(Q(),R=b()),f.completed||(f.completed=!0,e("complete"))),
+	k=0);e("update")}a=void 0===a?{}:a;var m,t,k=0,Q=null,R=b(),f=fa(a);f.reset=function(){var a=f.direction,b=f.loop;f.currentTime=0;f.progress=0;f.paused=!0;f.began=!1;f.completed=!1;f.reversed="reverse"===a;f.remaining="alternate"===a&&1===b?2:b;for(a=f.children.length;a--;)b=f.children[a],b.seek(b.offset),b.reset()};f.tick=function(a){m=a;t||(t=m);h((k+m-t)*n.speed)};f.seek=function(a){h(d(a))};f.pause=function(){var a=q.indexOf(f);-1<a&&q.splice(a,1);f.paused=!0};f.play=function(){f.paused&&(f.paused=
+	!1,t=0,k=d(f.currentTime),q.push(f),z||ja())};f.reverse=function(){f.reversed=!f.reversed;t=0;k=d(f.currentTime)};f.restart=function(){f.pause();f.reset();f.play()};f.finished=R;f.reset();f.autoplay&&f.play();return f}var ga={update:void 0,begin:void 0,run:void 0,complete:void 0,loop:1,direction:"normal",autoplay:!0,offset:0},ha={duration:1E3,delay:0,easing:"easeOutElastic",elasticity:500,round:0},V="translateX translateY translateZ rotate rotateX rotateY rotateZ scale scaleX scaleY scaleZ skewX skewY".split(" "),
+	E,g={arr:function(a){return Array.isArray(a)},obj:function(a){return-1<Object.prototype.toString.call(a).indexOf("Object")},svg:function(a){return a instanceof SVGElement},dom:function(a){return a.nodeType||g.svg(a)},str:function(a){return"string"===typeof a},fnc:function(a){return"function"===typeof a},und:function(a){return"undefined"===typeof a},hex:function(a){return/(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i.test(a)},rgb:function(a){return/^rgb/.test(a)},hsl:function(a){return/^hsl/.test(a)},col:function(a){return g.hex(a)||
+	g.rgb(a)||g.hsl(a)}},y=function(){function a(a,d,c){return(((1-3*c+3*d)*a+(3*c-6*d))*a+3*d)*a}return function(b,d,c,e){if(0<=b&&1>=b&&0<=c&&1>=c){var g=new Float32Array(11);if(b!==d||c!==e)for(var h=0;11>h;++h)g[h]=a(.1*h,b,c);return function(h){if(b===d&&c===e)return h;if(0===h)return 0;if(1===h)return 1;for(var m=0,k=1;10!==k&&g[k]<=h;++k)m+=.1;--k;var k=m+(h-g[k])/(g[k+1]-g[k])*.1,l=3*(1-3*c+3*b)*k*k+2*(3*c-6*b)*k+3*b;if(.001<=l){for(m=0;4>m;++m){l=3*(1-3*c+3*b)*k*k+2*(3*c-6*b)*k+3*b;if(0===l)break;
+	var n=a(k,b,c)-h,k=k-n/l}h=k}else if(0===l)h=k;else{var k=m,m=m+.1,f=0;do n=k+(m-k)/2,l=a(n,b,c)-h,0<l?m=n:k=n;while(1e-7<Math.abs(l)&&10>++f);h=n}return a(h,d,e)}}}}(),N=function(){function a(a,b){return 0===a||1===a?a:-Math.pow(2,10*(a-1))*Math.sin(2*(a-1-b/(2*Math.PI)*Math.asin(1))*Math.PI/b)}var b="Quad Cubic Quart Quint Sine Expo Circ Back Elastic".split(" "),d={In:[[.55,.085,.68,.53],[.55,.055,.675,.19],[.895,.03,.685,.22],[.755,.05,.855,.06],[.47,0,.745,.715],[.95,.05,.795,.035],[.6,.04,.98,
+	.335],[.6,-.28,.735,.045],a],Out:[[.25,.46,.45,.94],[.215,.61,.355,1],[.165,.84,.44,1],[.23,1,.32,1],[.39,.575,.565,1],[.19,1,.22,1],[.075,.82,.165,1],[.175,.885,.32,1.275],function(b,c){return 1-a(1-b,c)}],InOut:[[.455,.03,.515,.955],[.645,.045,.355,1],[.77,0,.175,1],[.86,0,.07,1],[.445,.05,.55,.95],[1,0,0,1],[.785,.135,.15,.86],[.68,-.55,.265,1.55],function(b,c){return.5>b?a(2*b,c)/2:1-a(-2*b+2,c)/2}]},c={linear:y(.25,.25,.75,.75)},e={},l;for(l in d)e.type=l,d[e.type].forEach(function(a){return function(d,
+	e){c["ease"+a.type+b[e]]=g.fnc(d)?d:y.apply($jscomp$this,d)}}(e)),e={type:e.type};return c}(),ia={css:function(a,b,d){return a.style[b]=d},attribute:function(a,b,d){return a.setAttribute(b,d)},object:function(a,b,d){return a[b]=d},transform:function(a,b,d,c,e){c[e]||(c[e]=[]);c[e].push(b+"("+d+")")}},q=[],z=0,ja=function(){function a(){z=requestAnimationFrame(b)}function b(b){var c=q.length;if(c){for(var d=0;d<c;)q[d]&&q[d].tick(b),d++;a()}else cancelAnimationFrame(z),z=0}return a}();n.version="2.0.2";
+	n.speed=1;n.running=q;n.remove=function(a){a=M(a);for(var b=q.length;b--;)for(var d=q[b],c=d.animations,e=c.length;e--;)F(a,c[e].animatable.target)&&(c.splice(e,1),c.length||d.pause())};n.getValue=J;n.path=function(a,b){var d=g.str(a)?v(a)[0]:a,c=b||100;return function(a){return{el:d,property:a,totalLength:d.getTotalLength()*(c/100)}}};n.setDashoffset=function(a){var b=a.getTotalLength();a.setAttribute("stroke-dasharray",b);return b};n.bezier=y;n.easings=N;n.timeline=function(a){var b=n(a);b.pause();
+	b.duration=0;b.add=function(a){b.children.forEach(function(a){a.began=!0;a.completed=!0});w(a).forEach(function(a){var c=b.duration,d=a.offset;a.autoplay=!1;a.offset=g.und(d)?c:K(d,c);b.seek(a.offset);a=n(a);a.duration>c&&(b.duration=a.duration);a.began=!0;b.children.push(a)});b.reset();b.seek(0);b.autoplay&&b.restart();return b};return b};n.random=function(a,b){return Math.floor(Math.random()*(b-a+1))+a};return n});
 
 /***/ }
 /******/ ]);
