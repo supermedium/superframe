@@ -14,8 +14,8 @@ var styleParser = utils.styleParser.parse;
 /**
  * Animation component for A-Frame.
  *
- * @member {boolean} animationIsPlaying - Used during initialization and scene resume to see
- *  if animation should be playing.
+ * @member {object} animation - anime.js instance.
+ * @member {boolean} animationIsPlaying - Control if animation is playing.
  */
 AFRAME.registerComponent('animation', {
   schema: {
@@ -48,31 +48,32 @@ AFRAME.registerComponent('animation', {
     this.animation = null;
     this.animationIsPlaying = false;
     this.config = null;
-    this.playAnimationBound = this.playAnimation.bind(this);
     this.pauseAnimationBound = this.pauseAnimation.bind(this);
-    this.resumeAnimationBound = this.resumeAnimation.bind(this);
+    this.beginAnimationBound = this.beginAnimation.bind(this);
     this.restartAnimationBound = this.restartAnimation.bind(this);
+    this.resumeAnimationBound = this.resumeAnimation.bind(this);
   },
 
   update: function () {
     var attrName = this.attrName;
+    var config;
     var data = this.data;
     var el = this.el;
     var propType = getPropertyType(el, data.property);
     var self = this;
+    var updateConfig;
+
+    this.animationIsPlaying = false;
 
     if (!data.property) { return; }
 
     // Base config.
-    var config = {
+    config = {
       autoplay: false,
-      begin: function () {
-        el.emit('animationbegin');
-        el.emit(attrName + '-begin');
-      },
       complete: function () {
-        el.emit('animationcomplete');
-        el.emit(attrName + '-complete');
+        console.log("HO");
+        el.emit('animationcomplete', config);
+        el.emit(attrName + '-complete', config);
       },
       direction: data.dir,
       duration: data.dur,
@@ -82,23 +83,24 @@ AFRAME.registerComponent('animation', {
     };
 
     // Customize config based on property type.
-    var updateConfig = configDefault;
+    updateConfig = configDefault;
     if (propType === 'vec2' || propType === 'vec3' || propType === 'vec4') {
       updateConfig = configVector;
     }
 
-    // Config.
+    // Create config.
     this.config = updateConfig(el, data, config);
-    this.animation = anime(this.config);
 
     // Stop previous animation.
     this.pauseAnimation();
 
-    if (!this.data.startEvents.length) { this.animationIsPlaying = true; }
+    // Start new animation.
+    this.startAnimation();
+  },
 
-    // Play animation if no holding event.
-    this.removeEventListeners();
-    this.addEventListeners();
+  tick: function (t) {
+    if (!this.animationIsPlaying) { return; }
+    this.animation.tick(t);
   },
 
   /**
@@ -113,38 +115,77 @@ AFRAME.registerComponent('animation', {
    * `pause` handler.
    */
   pause: function () {
+    this.paused = true;
+    this.pausedWasPlaying = true;
     this.pauseAnimation();
     this.removeEventListeners();
   },
 
   /**
-   * `play` handler.
+   * `play` handler only for resuming scene.
    */
   play: function () {
-    var data = this.data;
-    var self = this;
-
-    if (!this.animation || !this.animationIsPlaying) { return; }
-
-    // Delay.
-    if (data.delay) {
-      setTimeout(play, data.delay);
-    } else {
-      play();
-    }
-
-    function play () {
-      self.playAnimation();
-      self.addEventListeners();
+    if (!this.paused) { return; }
+    this.paused = false;
+    this.addEventListeners();
+    if (this.pausedWasPlaying) {
+      this.resumeAnimation();
+      this.pausedWasPlaying = false;
     }
   },
 
-  addEventListeners: function () {
-    var self = this;
+  /**
+   * Start animation from scratch.
+   */
+  startAnimation: function () {
     var data = this.data;
     var el = this.el;
+    var self = this;
+
+    this.animationIsPlaying = false;
+    this.animation = anime(this.config);
+
+    this.removeEventListeners();
+    this.addEventListeners();
+
+    // Delay animation.
+    if (data.delay) {
+      setTimeout(this.beginAnimationBound, data.delay);
+      return;
+    }
+
+    // Wait for start events for animation.
+    if (data.startEvents && data.startEvents.length) { return; }
+
+    // Play animation.
+    this.beginAnimation();
+  },
+
+  pauseAnimation: function () {
+    this.animationIsPlaying = false;
+  },
+
+  beginAnimation: function () {
+    var el = this.el;
+    this.animationIsPlaying = true;
+    el.emit('animationbegin');
+    el.emit(this.attrName + '-begin');
+  },
+
+  restartAnimation: function () {
+    this.animation.restart();
+  },
+
+  resumeAnimation: function () {
+    this.animationIsPlaying = true;
+  },
+
+  addEventListeners: function () {
+    var data = this.data;
+    var el = this.el;
+    var self = this;
     data.startEvents.map(function (eventName) {
-      el.addEventListener(eventName, self.playAnimationBound);
+      el.addEventListener(eventName, self.beginAnimationBound);
     });
     data.pauseEvents.map(function (eventName) {
       el.addEventListener(eventName, self.pauseAnimationBound);
@@ -158,11 +199,11 @@ AFRAME.registerComponent('animation', {
   },
 
   removeEventListeners: function () {
-    var self = this;
     var data = this.data;
     var el = this.el;
+    var self = this;
     data.startEvents.map(function (eventName) {
-      el.removeEventListener(eventName, self.playAnimationBound);
+      el.removeEventListener(eventName, self.beginAnimationBound);
     });
     data.pauseEvents.map(function (eventName) {
       el.removeEventListener(eventName, self.pauseAnimationBound);
@@ -173,23 +214,6 @@ AFRAME.registerComponent('animation', {
     data.restartEvents.map(function (eventName) {
       el.removeEventListener(eventName, self.restartAnimationBound);
     });
-  },
-
-  playAnimation: function () {
-    this.animation = anime(this.config);
-    this.animation.play();
-  },
-
-  pauseAnimation: function () {
-    this.animation.pause();
-  },
-
-  resumeAnimation: function () {
-    this.animation.play();
-  },
-
-  restartAnimation: function () {
-    this.animation.restart();
   }
 });
 
