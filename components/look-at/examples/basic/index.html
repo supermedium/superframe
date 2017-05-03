@@ -9,6 +9,7 @@
   </head>
   <body>
     <a-scene>
+      <a-entity id="look-cam" camera="userHeight: 1.6" look-controls wasd-controls></a-entity>
       <a-entity id="container" position="0 0 -4">
         <!-- A target entity -->
         <a-sphere id="target" color="#404040" radius="0.5">
@@ -34,7 +35,7 @@
           position="4 0 1"></a-box>
 
         <!-- This entity looks at the camera. Use WASD controls to test it -->
-        <a-box width="2" depth="2" height="2" color="#FFC65D" look-at="[camera]"
+        <a-box width="2" depth="2" height="2" color="#FFC65D" look-at="#look-cam"
           position="-6 2.5 -2"></a-box>
       </a-entity>
 
