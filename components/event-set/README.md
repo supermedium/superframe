@@ -1,7 +1,11 @@
 ## aframe-event-set-component
 
 An [A-Frame](https://aframe.io) component to register event listeners that set
-properties. Replacement for old undocumented Declarative Events API.
+properties.
+
+[Remix an example on Glitch](https://glitch.com/~aframe-event-set-component/)
+
+[Try the example on Glitch](https://aframe-event-set-component.glitch.me/)
 
 ### Properties
 
@@ -33,7 +37,7 @@ Install and use by directly including the [browser files](dist):
 ```html
 <head>
   <title>My A-Frame Scene</title>
-  <script src="https://aframe.io/releases/0.3.0/aframe.min.js"></script>
+  <script src="https://aframe.io/releases/0.5.0/aframe.min.js"></script>
   <script src="https://unpkg.com/aframe-event-set-component@^3.0.0/dist/aframe-event-set-component.min.js"></script>
 </head>
 
