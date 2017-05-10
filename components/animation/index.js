@@ -71,7 +71,6 @@ AFRAME.registerComponent('animation', {
     config = {
       autoplay: false,
       complete: function () {
-        console.log("HO");
         el.emit('animationcomplete', config);
         el.emit(attrName + '-complete', config);
       },
