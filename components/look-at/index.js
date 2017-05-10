@@ -2,7 +2,7 @@ var debug = AFRAME.utils.debug;
 var coordinates = AFRAME.utils.coordinates;
 
 var warn = debug('components:look-at:warn');
-var isCoordinates = coordinates.isCoordinates;
+var isCoordinates = coordinates.isCoordinate;
 
 delete AFRAME.components['look-at'];
 
