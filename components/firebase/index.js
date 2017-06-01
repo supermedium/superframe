@@ -81,7 +81,7 @@ AFRAME.registerSystem('firebase', {
 
     // Components.
     Object.keys(data).forEach(function setComponent (componentName) {
-      setComponentProperty(entity, componentName, data[componentName]);
+      setComponentProperty(entity, componentName, data[componentName], "|");
     });
 
     parentEl.appendChild(entity);
@@ -97,7 +97,7 @@ AFRAME.registerSystem('firebase', {
     var entity = this.entities[id];
     Object.keys(components).forEach(function setComponent (componentName) {
       if (componentName === 'parentId') { return; }
-      setComponentProperty(entity, componentName, components[componentName]);
+      setComponentProperty(entity, componentName, components[componentName], "|");
     });
   },
 
