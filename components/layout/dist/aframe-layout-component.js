@@ -57,7 +57,8 @@
 	    reverse: {default: false},
 	    type: {default: 'line', oneOf: ['box', 'circle', 'cube', 'dodecahedron', 'line',
 	                                    'pyramid']},
-	    angle: {default: 10, min:0, max: 360, if: {type: ['circle']}}
+	    fill: {default: true, if: {type: ['circle']}},
+	    angle: {type: 'number', default: false, min:0, max: 360, if: {type: ['circle']}}
 	  },
 
 	  /**
@@ -190,7 +191,7 @@
 	  for (var i = 0; i < numChildren; i++) {
 	    var rad;
 
-	    if (!data.angle) {
+	    if (isNaN(data.angle)) {
 	      rad = i * (2 * Math.PI) / numChildren;
 	    } else {
 	      rad = i * data.angle * 0.01745329252; // angle to radian
