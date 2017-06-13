@@ -45,7 +45,8 @@ AFRAME.registerComponent('log', {
   schema: {
     channel: {type: 'string'},
     filter: {type: 'string'},
-    max: {default: 100}
+    max: {default: 100},
+    showErrors: {default: true}
   },
 
   init: function () {
@@ -61,6 +62,10 @@ AFRAME.registerComponent('log', {
       if (!evt.detail) { return; }
       self.receiveLog(evt.detail.message, evt.detail.channel);
     });
+
+    window.onerror = function (errorMsg, url, lineNumber, column, errorObj) {
+      self.receiveLog('Error: ' + errorMsg);
+    }
   },
 
   receiveLog: function (message, channel) {
