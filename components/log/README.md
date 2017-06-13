@@ -53,7 +53,7 @@ Primitive with a default plane geometry, black material, and light green text.
 #### Logging Via Events
 
 ```js
-document.querySelector('a-scene').emit('log', {message: 'hello', channel: 'bar});
+document.querySelector('a-scene').emit('log', {message: 'hello', channel: 'bar'});
 ```
 
 ### Installation
