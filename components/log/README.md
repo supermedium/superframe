@@ -5,7 +5,7 @@
 
 In-VR console logs for [A-Frame](https://aframe.io).
 
-![logging](https://user-images.githubusercontent.com/674727/27067358-7d48377e-4fbf-11e7-9367-fc012cf10eef.gif)
+![logging](https://user-images.githubusercontent.com/674727/27067447-d875c6ac-4fbf-11e7-94ed-b127d7468dd3.gif)
 
 ### API
 
