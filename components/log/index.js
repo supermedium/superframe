@@ -6,9 +6,14 @@ if (typeof AFRAME === 'undefined') {
 
 AFRAME.registerPrimitive('a-log', {
   defaultComponents: {
-    geometry: {primitive: 'plane'},
+    geometry: {primitive: 'plane', height: 5},
+    log: {},
     material: {color: '#111'},
     text: {color: 'lightgreen'}
+  },
+
+  mappings: {
+    channel: 'log.channel'
   }
 });
 

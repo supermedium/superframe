@@ -2,7 +2,7 @@
   <head>
     <title>A-Frame Log Component - Basic</title>
     <meta name="description" content="Basic example for Log component."></meta>
-    <script src="https://aframe.io/releases/0.5.0/aframe.min.js"></script>
+    <script src="../../node_modules/aframe/dist/aframe-master.js"></script>
     <script src="../../dist/aframe-log-component.min.js"></script>
     <script src="https://unpkg.com/aframe-layout-component@4.1.0/dist/aframe-layout-component.min.js"></script>
   </head>
@@ -26,15 +26,15 @@
 
         logRandomColor: function () {
           var colors = ['red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet'];
-          this.el.emit('log', {id: 'colorz', message: colors[Math.floor(Math.random() * 7)]});
+          AFRAME.log(colors[Math.floor(Math.random() * 7)], 'colorz');
         },
 
         logRandomNumber: function () {
-          this.el.emit('log', {id: 'numberz', message: Math.random() * 10000});
+          AFRAME.log(Math.random() * 10000, 'numberz');
         },
 
         tick: function (t) {
-          this.el.emit('log', {id: 'time', message: 'Time: ' + t});
+          AFRAME.log('Time: ' + t, 'time');
         }
       });
     </script>
@@ -46,9 +46,9 @@
       </a-assets>
 
       <a-entity layout="type: line; margin: 1.2" position="-2 0 -3">
-        <a-entity log="id: colorz" geometry="primitive: plane; height: 5" material="color: #222; shader: flat"></a-entity>
-        <a-entity log="id: numberz" geometry="primitive: plane; height: 5" material="color: #111; shader: flat" text="color: lightgreen"></a-entity>
-        <a-entity log="id: time" geometry="primitive: plane; height: 5" material="color: #FAFAFA" text="color: #111"></a-entity>
+        <a-entity log="channel: colorz" geometry="primitive: plane; height: 5" material="color: #222; shader: flat"></a-entity>
+        <a-log channel="numberz"></a-log>
+        <a-entity log="channel: time" geometry="primitive: plane; height: 5" material="color: #FAFAFA" text="color: #111"></a-entity>
         <a-entity log="filter: o" geometry="primitive: plane; height: 5" material="opacity: 0.5"></a-entity>
         <a-entity log geometry="primitive: plane; height: 5" material="color: #002B36" text="color: #6E878F"></a-entity>
       </a-entity>

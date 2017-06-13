@@ -5,6 +5,8 @@
 
 In-VR console logs for [A-Frame](https://aframe.io).
 
+![logging](https://user-images.githubusercontent.com/674727/27067358-7d48377e-4fbf-11e7-9367-fc012cf10eef.gif)
+
 ### API
 
 #### AFRAME.log (message, channel)
@@ -89,3 +91,7 @@ Then require and use.
 require('aframe');
 require('aframe-log-component');
 ```
+
+### Roadmap
+
+- Allow listening and outputting from vanilla `console.log`s.
