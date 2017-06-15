@@ -6,9 +6,9 @@ if (typeof AFRAME === 'undefined') {
 
 AFRAME.registerPrimitive('a-log', {
   defaultComponents: {
-    geometry: {primitive: 'plane', height: 2.5},
+    geometry: {primitive: 'plane', height: 2.5, width: 1.5},
     log: {},
-    material: {color: '#111', shader: 'flat'},
+    material: {color: '#111', shader: 'flat', side: 'double'},
     text: {color: 'lightgreen'}
   },
 
@@ -24,8 +24,8 @@ AFRAME.registerSystem('log', {
 
     // Register global function to adding logs.
     AFRAME.log = function (message, channel) {
+      logs.push([message, channel]);
       loggers.forEach(function (loggerComponent) {
-        logs.push([message, channel]);
         loggerComponent.receiveLog(message, channel);
       });
     };

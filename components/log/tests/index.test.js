@@ -32,7 +32,7 @@ suite('log component', function () {
       });
     });
 
-    test('sends previous logs to logger upon registration', function () {
+    test('sends previous logs to logger upon registration', function (done) {
       var loggerEl;
 
       AFRAME.log('hello');
@@ -41,7 +41,8 @@ suite('log component', function () {
 
       loggerEl.addEventListener('componentinitialized', function (evt) {
         if (evt.detail.name !== 'log') { return; }
-        assert.equal(loggerEl.components.log[0], 'hello');
+        assert.equal(loggerEl.components.log.logs[0], 'hello');
+        done();
       });
 
       loggerEl.setAttribute('log', '');
