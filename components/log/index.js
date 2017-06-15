@@ -9,7 +9,7 @@ AFRAME.registerPrimitive('a-log', {
     geometry: {primitive: 'plane', height: 5},
     log: {},
     material: {color: '#111', shader: 'flat', side: 'double'},
-    text: {color: 'lightgreen'}
+    text: {color: 'lightgreen', baseline: 'top', align: 'center', height: 5}
   },
 
   mappings: {
@@ -18,7 +18,12 @@ AFRAME.registerPrimitive('a-log', {
 });
 
 AFRAME.registerSystem('log', {
+  schema: {
+    console: {default: true}
+  },
+
   init: function () {
+    var data = this.data;
     var logs = this.logs = [];
     var loggers = this.loggers = [];
 
@@ -28,6 +33,10 @@ AFRAME.registerSystem('log', {
       loggers.forEach(function (loggerComponent) {
         loggerComponent.receiveLog(message, channel);
       });
+
+      if (data.console) {
+        console.log('[log:' + (channel || '') + '] ' + message);
+      }
     };
   },
 
