@@ -31,6 +31,22 @@ suite('log component', function () {
         done();
       });
     });
+
+    test('sends previous logs to logger upon registration', function () {
+      var loggerEl;
+
+      AFRAME.log('hello');
+
+      loggerEl = document.createElement('a-entity');
+
+      loggerEl.addEventListener('componentinitialized', function (evt) {
+        if (evt.detail.name !== 'log') { return; }
+        assert.equal(loggerEl.components.log[0], 'hello');
+      });
+
+      loggerEl.setAttribute('log', '');
+      el.sceneEl.appendChild(loggerEl);
+    });
   });
 
   suite('logging', function () {

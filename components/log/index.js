@@ -19,11 +19,13 @@ AFRAME.registerPrimitive('a-log', {
 
 AFRAME.registerSystem('log', {
   init: function () {
+    var logs = this.logs = [];
     var loggers = this.loggers = [];
 
     // Register global function to adding logs.
     AFRAME.log = function (message, channel) {
       loggers.forEach(function (loggerComponent) {
+        logs.push([message, channel]);
         loggerComponent.receiveLog(message, channel);
       });
     };
@@ -31,6 +33,9 @@ AFRAME.registerSystem('log', {
 
   registerLogger: function (component) {
     this.loggers.push(component);
+    this.logs.forEach(function (log) {
+      component.receiveLog.apply(component, log);
+    });
   },
 
   unregisterLogger: function (component) {
