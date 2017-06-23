@@ -43,7 +43,7 @@ We move then entire group around while maintaining the layout:
 | Property | Description                                                                                        | Default Value |
 |----------|----------------------------------------------------------------------------------------------------|---------------|
 | type     | Type of layout. Can be one of `box`, `circle`, `cube`, `dodecahedron`, `line`, `pyramid`.          | `line`        |
-| column   | Number of columns (for type `box`).                                                                | 1             |
+| columns  | Number of columns (for type `box`).                                                                | 1             |
 | margin   | Margin in meters (for type `box`, `line`).                                                         | 1             |
 | plane    | Which plane direction for 2D layout. Can be `xy`, `yz`, or `xz` (for type `box`, `circle`, `line`) | `xy`          |
 | radius   | Radius in meters (for type `circle`, `cube`, `dodecahedron`, `pyramid`.                            | 1             |
