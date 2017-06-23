@@ -6,9 +6,9 @@
     "build": "NODE_ENV=production webpack --config webpack-dev.config.js",
     "dev": "webpack-dev-server --config webpack-dev.config.js",
     "dist": "webpack --module-bind 'glsl=shader' index.js dist/kframe.js && webpack -p --module-bind 'glsl=shader' index.js dist/kframe.min.js",
-    "generate": "node site/generate",
     "postpublish": "npm run dist",
     "test": "echo \"Error: no test specified\" && exit 1",
+    "site": "node site/generate",
     "start": "http-server"
   },
   "repository": {
