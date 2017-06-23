@@ -56,7 +56,9 @@
 	    radius: {default: 1, min: 0, if: {type: ['circle', 'cube', 'dodecahedron', 'pyramid']}},
 	    reverse: {default: false},
 	    type: {default: 'line', oneOf: ['box', 'circle', 'cube', 'dodecahedron', 'line',
-	                                    'pyramid']}
+	                                    'pyramid']},
+	    fill: {default: true, if: {type: ['circle']}},
+	    angle: {type: 'number', default: false, min:0, max: 360, if: {type: ['circle']}}
 	  },
 
 	  /**
@@ -187,7 +189,14 @@
 	  var positions = [];
 
 	  for (var i = 0; i < numChildren; i++) {
-	    var rad = i * (2 * Math.PI) / numChildren;
+	    var rad;
+
+	    if (isNaN(data.angle)) {
+	      rad = i * (2 * Math.PI) / numChildren;
+	    } else {
+	      rad = i * data.angle * 0.01745329252; // angle to radian
+	    }
+
 	    var position = [
 	      startPosition.x,
 	      startPosition.y,

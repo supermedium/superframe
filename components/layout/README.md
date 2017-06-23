@@ -48,6 +48,7 @@ We move then entire group around while maintaining the layout:
 | plane    | Which plane direction for 2D layout. Can be `xy`, `yz`, or `xz` (for type `box`, `circle`, `line`) | `xy`          |
 | radius   | Radius in meters (for type `circle`, `cube`, `dodecahedron`, `pyramid`.                            | 1             |
 | reverse  | Whether to reverse direction of layout.                                                            | false         |
+| angle    | For type `circle`, set this to position items `angle` degrees apart                                | false         |
 
 ### Usage
 
