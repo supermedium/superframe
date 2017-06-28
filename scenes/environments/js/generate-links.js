@@ -21,11 +21,13 @@ AFRAME.registerComponent('generate-links', {
       if (window.location.search.indexOf(link.href.substring(1)) !== -1) { return; }
 
       linkEl = document.createElement('a-entity');
+      linkEl.setAttribute('look-at', 'a-camera');
       linkEl.setAttribute('link', {
         href: link.href,
         src: link.image,
         title: link.title
       });
+      linkEl.setAttribute('scale', {x: 0.5, y: 0.5, z: 1});
       this.el.appendChild(linkEl);
     });
   }

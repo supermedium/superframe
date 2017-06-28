@@ -1,0 +1,16 @@
+{
+  "name": "environments",
+  "private": true,
+  "version": "1.0.0",
+  "license": "MIT",
+  "dependencies": {
+    "easyrtc": "^1.1.0",
+    "express": "^4.15.3",
+    "http": "0.0.0",
+    "serve-static": "^1.12.3",
+    "socket.io": "^2.0.3"
+  },
+  "scripts": {
+    "start": "node server.js"
+  }
+}

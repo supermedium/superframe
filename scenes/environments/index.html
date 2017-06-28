@@ -4,23 +4,69 @@
     <meta charset="utf-8">
     <title>Environments</title>
     <meta name="description" content="Environments">
-    <script src="js/aframe-master.min.js"></script>
+    <script src="http://localhost:9000/build/aframe-master.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.5/socket.io.min.js"></script>
+    <script src="easyrtc/easyrtc.js"></script>
     <script src="js/env-from-query.js"></script>
     <script src="js/generate-links.js"></script>
     <script src="js/link-controls.js"></script>
+    <script src="js/multiuser.js"></script>
     <script src="https://rawgit.com/feiss/aframe-environment-component/master/aframe-environment-component.min.js"></script>
     <script src="https://unpkg.com/aframe-layout-component@4.2.0/dist/aframe-layout-component.min.js"></script>
-    <script>
-    </script>
+    <script src="https://unpkg.com/aframe-look-at-component@0.5.1/dist/aframe-look-at-component.min.js"></script>
+    <script src="https://unpkg.com/networked-aframe@0.2.0/dist/networked-aframe.min.js"></script>
   </head>
   <body>
-    <a-scene env-from-query debug="true">
-      <a-entity id="links" generate-links layout="type: circle; radius: 5"></a-entity>
+    <a-scene multiuser env-from-query debug="true">
+      <a-assets>
+        <script id="headTemplate" type="text/html">
+          <a-entity class="avatar">
+            <a-sphere class="head"
+              color="#5985ff"
+              scale="0.45 0.5 0.4"
+              random-color
+            ></a-sphere>
+            <a-entity class="face"
+              position="0 0.05 0"
+            >
+              <a-sphere class="eye"
+                color="#efefef"
+                position="0.16 0.1 -0.35"
+                scale="0.12 0.12 0.12"
+              >
+                <a-sphere class="pupil"
+                  color="#000"
+                  position="0 0 -1"
+                  scale="0.2 0.2 0.2"
+                ></a-sphere>
+              </a-sphere>
+              <a-sphere class="eye"
+                color="#efefef"
+                position="-0.16 0.1 -0.35"
+                scale="0.12 0.12 0.12"
+              >
+                <a-sphere class="pupil"
+                  color="#000"
+                  position="0 0 -1"
+                  scale="0.2 0.2 0.2"
+                ></a-sphere>
+              </a-sphere>
+            </a-entity>
+          </a-entity>
+        </script>
+        <script id="leftHandTemplate" type="text/html">
+          <a-sphere radius="0.1"></a-sphere>
+        </script>
+        <script id="rightHandTemplate" type="text/html">
+          <a-sphere radius="0.1"></a-sphere>
+        </script>
+      </a-assets>
 
-      <a-entity link-controls="hand: left"></a-entity>
-      <a-entity link-controls="hand: right"></a-entity>
+      <a-camera networked="template: #headTemplate; showLocalTemplate: false"><a-cursor></a-cursor></a-camera>
+      <a-entity link-controls="left" networked="template: #leftHandTemplate"></a-entity>
+      <a-entity link-controls="right" networked="template: #rightHandTemplate"></a-entity>
 
-      <a-camera><a-cursor></a-cursor></a-camera>
+      <a-entity id="links" generate-links layout="type: circle; radius: 5; plane: xz" position="0 1 0"></a-entity>
     </a-scene>
   </body>
 </html>
