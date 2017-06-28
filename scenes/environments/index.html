@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Environments</title>
+    <meta name="description" content="Environments">
+    <script src="js/aframe-master.min.js"></script>
+    <script src="js/env-from-query.js"></script>
+    <script src="js/generate-links.js"></script>
+    <script src="js/link-controls.js"></script>
+    <script src="https://rawgit.com/feiss/aframe-environment-component/master/aframe-environment-component.min.js"></script>
+    <script src="https://unpkg.com/aframe-layout-component@4.2.0/dist/aframe-layout-component.min.js"></script>
+    <script>
+    </script>
+  </head>
+  <body>
+    <a-scene env-from-query debug="true">
+      <a-entity id="links" generate-links layout="type: circle; radius: 5"></a-entity>
+
+      <a-entity link-controls="hand: left"></a-entity>
+      <a-entity link-controls="hand: right"></a-entity>
+
+      <a-camera><a-cursor></a-cursor></a-camera>
+    </a-scene>
+  </body>
+</html>
