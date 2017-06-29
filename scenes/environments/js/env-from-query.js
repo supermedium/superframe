@@ -2,9 +2,7 @@
 AFRAME.registerComponent('env-from-query', {
   init: function () {
     var params = this.getUrlParams();
-    this.el.setAttribute('environment', {
-      preset: params.env || 'forest'
-    });
+    this.el.setAttribute('environment', {preset: params.env || 'forest'});
   },
 
   getUrlParams: function () {

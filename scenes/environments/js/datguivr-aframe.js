@@ -21,6 +21,7 @@ AFRAME.registerComponent('datgui', {
     const gui = dat.GUIVR.create( this.data.name );
     this.el.setObject3D('gui', gui );
     this.el.gui = gui;
+    this.gui = gui;
 
     const scene = this.el.sceneEl.object3D;
 

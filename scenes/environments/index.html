@@ -17,17 +17,12 @@
     <script src="https://unpkg.com/aframe-randomizer-components@3.0.2/dist/aframe-randomizer-components.min.js"></script>
     <script src="https://unpkg.com/networked-aframe@0.2.0/dist/networked-aframe.min.js"></script>
     <script src="https://rawgit.com/dataarts/dat.guiVR/master/build/datguivr.min.js"></script>
+    <script src="https://unpkg.com/aframe-teleport-controls@0.2.0/dist/aframe-teleport-controls.min.js"></script>
     <script src="js/datguivr-aframe.js"></script>
     <script src="js/datgui-handlers.js"></script>
-    <script>
-      NAF.schemas.add({
-        template: '#environmentTemplate',
-        components: ['environment']
-      });
-    </script>
   </head>
   <body>
-    <a-scene multiuser env-from-query>
+    <a-scene multiuser env-from-query env-subscribe>
       <a-assets>
         <img id="arches" src="img/arches.png">
         <img id="checkboard" src="img/checkerboard.png">
@@ -84,13 +79,32 @@
       </a-assets>
 
       <a-camera networked="template: #headTemplate; showLocalTemplate: false"><a-cursor></a-cursor></a-camera>
-      <a-entity link-controls="left" networked="template: #leftHandTemplate"></a-entity>
-      <a-entity link-controls="right" networked="template: #rightHandTemplate"></a-entity>
+      <a-entity link-controls="left" networked="template: #leftHandTemplate" teleport-controls></a-entity>
+      <a-entity link-controls="right" networked="template: #rightHandTemplate" teleport-controls></a-entity>
 
       <a-entity id="links" generate-links layout="type: circle; radius: 5; plane: xz" position="0 1 0"></a-entity>
 
-      <a-datgui name="Environment" position="0 2 -1">
-        <a-gui-slider id="numDressing" name="Num Dressing" step="10" min="0" max="1000" update-dressing-amount></a-gui-slider>
+      <a-datgui name="Environment" position="0 2 -1" gui-inputs>
+        <a-gui-dropdown update-dressing>
+          <a-gui-option value="none">None</a-gui-option>
+          <a-gui-option value="cubes">Cubes</a-gui-option>
+          <a-gui-option value="pyramids">Pyramids</a-gui-option>
+          <a-gui-option value="cylinders">Cylinders</a-gui-option>
+          <a-gui-option value="towers">Towers</a-gui-option>
+          <a-gui-option value="mushrooms">Mushrooms</a-gui-option>
+          <a-gui-option value="trees">Trees</a-gui-option>
+          <a-gui-option value="appratus">Apparatus</a-gui-option>
+          <a-gui-option value="torii">Torii</a-gui-option>
+        </a-gui-dropdown>
+        <a-gui-slider name="Dressing Amount" step="10" min="0" max="1000" update-dressing-amount></a-gui-slider>
+        <a-gui-slider name="Dressing Scale" step="1" min="1" max="10" update-dressing-scale></a-gui-slider>
+
+        <a-gui-dropdown update-ground-texture>
+          <a-gui-option value="none">None</a-gui-option>
+          <a-gui-option value="checkerboard">Checkerboard</a-gui-option>
+          <a-gui-option value="squares">Squares</a-gui-option>
+          <a-gui-option value="walkernoise">Walker Noise</a-gui-option>
+        </a-gui-dropdown>
       </a-datgui>
     </a-scene>
   </body>
