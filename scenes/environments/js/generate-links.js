@@ -1,15 +1,15 @@
 var LINKS = [
-  {href: '?env=arches', image: 'img/arches.png', title: 'Arches'},
-  {href: '?env=checkboard', image: 'img/checkerboard.png', title: 'Checkerboard'},
-  {href: '?env=egypt', image: 'img/egypt.png', title: 'Egypt'},
-  {href: '?env=forest', image: 'img/forest.png', title: 'Forest'},
-  {href: '?env=goaland', image: 'img/goaland.png', title: 'Goaland'},
-  {href: '?env=goldmine', image: 'img/goldmine.png', title: 'Goldmine'},
-  {href: '?env=japan', image: 'img/japan.png', title: 'Japan'},
-  {href: '?env=poison', image: 'img/poison.png', title: 'Poison'},
-  {href: '?env=threetowers', image: 'img/threetowers.png', title: 'Three Towers'},
-  {href: '?env=tron', image: 'img/tron.png', title: 'Tron'},
-  {href: '?env=yavapai', image: 'img/yavapai.png', title: 'Yavapai'},
+  {href: '?env=arches', image: '#arches', title: 'Arches'},
+  {href: '?env=checkboard', image: '#checkerboard', title: 'Checkerboard'},
+  {href: '?env=egypt', image: '#egypt', title: 'Egypt'},
+  {href: '?env=forest', image: '#forest', title: 'Forest'},
+  {href: '?env=goaland', image: '#goaland', title: 'Goaland'},
+  {href: '?env=goldmine', image: '#goldmine', title: 'Goldmine'},
+  {href: '?env=japan', image: '#japan', title: 'Japan'},
+  {href: '?env=poison', image: '#poison', title: 'Poison'},
+  {href: '?env=threetowers', image: '#threetowers', title: 'Three Towers'},
+  {href: '?env=tron', image: '#tron', title: 'Tron'},
+  {href: '?env=yavapai', image: '#yavapai', title: 'Yavapai'},
 ];
 
 AFRAME.registerComponent('generate-links', {

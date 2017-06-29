@@ -14,11 +14,32 @@
     <script src="https://rawgit.com/feiss/aframe-environment-component/master/aframe-environment-component.min.js"></script>
     <script src="https://unpkg.com/aframe-layout-component@4.2.0/dist/aframe-layout-component.min.js"></script>
     <script src="https://unpkg.com/aframe-look-at-component@0.5.1/dist/aframe-look-at-component.min.js"></script>
+    <script src="https://unpkg.com/aframe-randomizer-components@3.0.2/dist/aframe-randomizer-components.min.js"></script>
     <script src="https://unpkg.com/networked-aframe@0.2.0/dist/networked-aframe.min.js"></script>
+    <script src="https://rawgit.com/dataarts/dat.guiVR/master/build/datguivr.min.js"></script>
+    <script src="js/datguivr-aframe.js"></script>
+    <script src="js/datgui-handlers.js"></script>
+    <script>
+      NAF.schemas.add({
+        template: '#environmentTemplate',
+        components: ['environment']
+      });
+    </script>
   </head>
   <body>
-    <a-scene multiuser env-from-query debug="true">
+    <a-scene multiuser env-from-query>
       <a-assets>
+        <img id="arches" src="img/arches.png">
+        <img id="checkboard" src="img/checkerboard.png">
+        <img id="egypt" src="img/egypt.png">
+        <img id="forest" src="img/forest.png">
+        <img id="goaland" src="img/goaland.png">
+        <img id="goldmine" src="img/goldmine.png">
+        <img id="japan" src="img/japan.png">
+        <img id="poison" src="img/poison.png">
+        <img id="threetowers" src="img/threetowers.png">
+        <img id="tron" src="img/tron.png">
+        <img id="yavapai" src="img/yavapai.png">
         <script id="headTemplate" type="text/html">
           <a-entity class="avatar">
             <a-sphere class="head"
@@ -67,6 +88,10 @@
       <a-entity link-controls="right" networked="template: #rightHandTemplate"></a-entity>
 
       <a-entity id="links" generate-links layout="type: circle; radius: 5; plane: xz" position="0 1 0"></a-entity>
+
+      <a-datgui name="Environment" position="0 2 -1">
+        <a-gui-slider id="numDressing" name="Num Dressing" step="10" min="0" max="1000" update-dressing-amount></a-gui-slider>
+      </a-datgui>
     </a-scene>
   </body>
 </html>
