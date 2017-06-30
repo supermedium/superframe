@@ -50,16 +50,19 @@ entity by name-spacing the component with double underscores (`__`):
 
 | Property    | Description                                                                                                                           | Default Value | Values                  |
 | --------    | -----------                                                                                                                           | ------------- | ------                  |
+| property    | Property to animate. Can be a component name, a dot-delimited property of a component (e.g., `material.color`), or a plain attribute. |               |                         |
+| to       | Target value at end of animation                                                                                      | null             |                         |
 | delay       | How long (milliseconds) to wait before starting.                                                                                      | 0             |                         |
 | dir         | Which dir to go from `from` to `to`.                                                                                                  | normal        | alternate, reverse      |
 | dur         | How long (milliseconds) each cycle of the animation is.                                                                               | 1000          |                         |
 | easing      | Easing function of animation. To ease in, ease out, ease in and out.                                                                  | easeInQuad    | See [easings](#easings) |
 | elasticity  | How much to bounce (higher is stronger).                                                                                              | 400           |                         |
 | loop        | How many times the animation should repeat. If the value is `true`, the animation will repeat infinitely.                             | 0             |                         |
-| pauseEvents | Comma-separated list of events to listen to to pause.                                                                                 | null          |
-| property    | Property to animate. Can be a component name, a dot-delimited property of a component (e.g., `material.color`), or a plain attribute. |               |                         |
 | round       | Whether to round values.                                                                                                              | false         |                         |
-| startEvents | Comma-separated list of events to listen to before playing. Animation will not autoplay if specified.                                 | null          |
+| startEvents | Comma-separated list of events to listen to before playing. Animation will not autoplay if specified.                                 | null          |  |
+| pauseEvents | Comma-separated list of events to listen to to pause.                                                                                 | null          |  |
+| resumeEvents | Comma-separated list of events to listen to to resume after pausing.                                                                                 | null          |  |
+| restartEvents | Comma-separated list of events to listen to to restart from beginning.                                                                                 | null          |  |
 
 
 #### Easings
