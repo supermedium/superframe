@@ -57,7 +57,7 @@ Install and use by directly including the [browser files](dist):
 <head>
   <title>Audio Visualizer</title>
   <script src="https://aframe.io/releases/0.3.1/aframe.min.js"></script>
-  <script src="https://unpkg.com/aframe-audioanalyser-component@^3.0.0/dist/aframe-audioanalyser-component.min.js"></script>
+  <script src="https://unpkg.com/aframe-audioanalyser-component@^3.0.3/dist/aframe-audioanalyser-component.min.js"></script>
 </head>
 
 <body>
@@ -66,7 +66,7 @@ Install and use by directly including the [browser files](dist):
       <audio id="song" src="rickroll.mp3" autoplay loop></audio>
     </a-assets>
     <a-entity
-      audio-analyser="#song"
+      audioanalyser="src: #song"
       component-that-does-stuff-with-audio-analyser-data
     ></a-entity>
   </a-scene>
