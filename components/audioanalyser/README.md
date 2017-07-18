@@ -66,7 +66,7 @@ Install and use by directly including the [browser files](dist):
       <audio id="song" src="rickroll.mp3" autoplay loop></audio>
     </a-assets>
     <a-entity
-      audio-analyser="#song"
+      audioanalyser="src: #song"
       component-that-does-stuff-with-audio-analyser-data
     ></a-entity>
   </a-scene>
