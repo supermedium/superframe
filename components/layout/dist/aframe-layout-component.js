@@ -106,7 +106,6 @@
 	    var numChildren = children.length;
 	    var positionFn;
 	    var positions;
-	    var startPosition = el.getAttribute('position');
 
 	    // Calculate different positions based on layout shape.
 	    switch (data.type) {
@@ -136,7 +135,7 @@
 	      }
 	    }
 
-	    positions = positionFn(data, numChildren, startPosition);
+	    positions = positionFn(data, numChildren);
 	    if (data.reverse) { positions.reverse(); }
 	    setPositions(children, positions);
 	  },
@@ -153,7 +152,7 @@
 	/**
 	 * Get positions for `box` layout.
 	 */
-	function getBoxPositions (data, numChildren, startPosition) {
+	function getBoxPositions (data, numChildren) {
 	  var position;
 	  var positions = [];
 	  var rows = Math.ceil(numChildren / data.columns);
@@ -184,7 +183,7 @@
 	/**
 	 * Get positions for `circle` layout.
 	 */
-	function getCirclePositions (data, numChildren, startPosition) {
+	function getCirclePositions (data, numChildren) {
 	  var positions = [];
 
 	  for (var i = 0; i < numChildren; i++) {
@@ -196,22 +195,18 @@
 	      rad = i * data.angle * 0.01745329252;  // Angle to radian.
 	    }
 
-	    var position = [
-	      startPosition.x,
-	      startPosition.y,
-	      startPosition.z
-	    ];
+	    var position = [];
 	    if (data.plane.indexOf('x') === 0) {
-	      position[0] += data.radius * Math.cos(rad);
+	      position[0] = data.radius * Math.cos(rad);
 	    }
 	    if (data.plane.indexOf('y') === 0) {
-	      position[1] += data.radius * Math.cos(rad);
+	      position[1] = data.radius * Math.cos(rad);
 	    }
 	    if (data.plane.indexOf('y') === 1) {
-	      position[1] += data.radius * Math.sin(rad);
+	      position[1] = data.radius * Math.sin(rad);
 	    }
 	    if (data.plane.indexOf('z') === 1) {
-	      position[2] += data.radius * Math.sin(rad);
+	      position[2] = data.radius * Math.sin(rad);
 	    }
 	    positions.push(position);
 	  }
@@ -223,16 +218,16 @@
 	 * Get positions for `line` layout.
 	 * TODO: 3D margins.
 	 */
-	function getLinePositions (data, numChildren, startPosition) {
+	function getLinePositions (data, numChildren) {
 	  data.columns = numChildren;
-	  return getBoxPositions(data, numChildren, startPosition);
+	  return getBoxPositions(data, numChildren);
 	}
 	module.exports.getLinePositions = getLinePositions;
 
 	/**
 	 * Get positions for `cube` layout.
 	 */
-	function getCubePositions (data, numChildren, startPosition) {
+	function getCubePositions (data, numChildren) {
 	  return transform([
 	    [1, 0, 0],
 	    [0, 1, 0],
@@ -240,14 +235,14 @@
 	    [-1, 0, 0],
 	    [0, -1, 0],
 	    [0, 0, -1],
-	  ], startPosition, data.radius / 2);
+	  ], data.radius / 2);
 	}
 	module.exports.getCubePositions = getCubePositions;
 
 	/**
 	 * Get positions for `dodecahedron` layout.
 	 */
-	function getDodecahedronPositions (data, numChildren, startPosition) {
+	function getDodecahedronPositions (data, numChildren) {
 	  var PHI = (1 + Math.sqrt(5)) / 2;
 	  var B = 1 / PHI;
 	  var C = 2 - PHI;
@@ -275,14 +270,14 @@
 	    [NB, NB, NB],
 	    [NC, 0, 1],
 	    [NC, 0, -1],
-	  ], startPosition, data.radius / 2);
+	  ], data.radius / 2);
 	}
 	module.exports.getDodecahedronPositions = getDodecahedronPositions;
 
 	/**
 	 * Get positions for `pyramid` layout.
 	 */
-	function getPyramidPositions (data, numChildren, startPosition) {
+	function getPyramidPositions (data, numChildren) {
 	  var SQRT_3 = Math.sqrt(3);
 	  var NEG_SQRT_1_3 = -1 / Math.sqrt(3);
 	  var DBL_SQRT_2_3 = 2 * Math.sqrt(2 / 3);
@@ -292,7 +287,7 @@
 	    [-1, 0, NEG_SQRT_1_3],
 	    [1, 0, NEG_SQRT_1_3],
 	    [0, DBL_SQRT_2_3, 0]
-	  ], startPosition, data.radius / 2);
+	  ], data.radius / 2);
 	}
 	module.exports.getPyramidPositions = getPyramidPositions;
 
@@ -302,11 +297,10 @@
 	 * @params {array} positions - Array of coordinates in array form.
 	 * @returns {array} positions
 	 */
-	function transform (positions, translate, scale) {
-	  translate = [translate.x, translate.y, translate.z];
+	function transform (positions, scale) {
 	  return positions.map(function (position) {
 	    return position.map(function (point, i) {
-	      return point * scale + translate[i];
+	      return point * scale;
 	    });
 	  });
 	};
