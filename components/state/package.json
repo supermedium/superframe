@@ -1,12 +1,13 @@
 {
-  "name": "aframe-redux-component",
-  "version": "3.0.2",
-  "description": "Hook in Redux reducers, data bindings, and action dispatches for A-Frame",
+  "name": "aframe-state-component",
+  "version": "1.0.0",
+  "description": "State management using declarative binding, pure function state transitions, and event-based action dispatchers, with Redux.",
   "main": "index.js",
+  "unpkg": "dist/aframe-state-component.min.js",
   "scripts": {
     "build": "browserify examples/main.js -o examples/build.js",
     "dev": "budo examples/main.js:examples/build.js --port 8000 --live --open",
-    "dist": "webpack index.js dist/aframe-redux-components.js && webpack -p index.js dist/aframe-redux-components.min.js",
+    "dist": "webpack index.js dist/aframe-state-component.js && webpack -p index.js dist/aframe-state-component.min.js",
     "postpublish": "npm run dist",
     "test": "karma start ./tests/karma.conf.js"
   },
