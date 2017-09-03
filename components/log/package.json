@@ -1,6 +1,6 @@
 {
   "name": "aframe-log-component",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "In-VR console logs for A-Frame.",
   "main": "index.js",
   "cdn": "dist/aframe-log-component.min.js",
