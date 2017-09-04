@@ -51,7 +51,7 @@ module.exports.dispatch = dispatch;
  * add event listeners.
  */
 function initEventProxies (el, store) {
-  let registeredActions = [];
+  var registeredActions = [];
 
   Object.keys(Reducers).forEach(function (reducerName) {
     // Use reducer's declared handlers to know what events to listen to.

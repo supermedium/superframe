@@ -1,4 +1,5 @@
 var webpack = require('webpack');
+var UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 
 var PLUGINS = [
   new webpack.DefinePlugin({
@@ -12,8 +13,13 @@ if (process.env.NODE_ENV === 'production') {
 module.exports = {
   entry: './index.js',
   output: {
-    path: 'dist',
-    filename: process.env.NODE_ENV === 'production' ? 'aframe-redux-component.min.js' : 'aframe-redux-component.js',
+    path: __dirname + '/dist',
+    filename: process.env.NODE_ENV === 'production' ? 'aframe-state-component.min.js' : 'aframe-state-component.js',
   },
-  plugins: PLUGINS
+  plugins: PLUGINS,
+  module: {
+    loaders: [
+      {test: /\.js$/, loader: 'babel-loader'}
+    ]
+  }
 };
