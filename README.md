@@ -21,7 +21,7 @@ See documentation for individual components:
 - [look-at](https://github.com/ngokevin/kframe/tree/master/components/look-at/) - Rotate an entity to face towards another entity in A-Frame
 - [mountain](https://github.com/ngokevin/kframe/tree/master/components/mountain/) - Mountain terrain in A-Frame using randomly-generated height maps
 - [randomizer](https://github.com/ngokevin/kframe/tree/master/components/randomizer/) - Randomize color, position, rotation, and scale in A-Frame
-- [redux](https://github.com/ngokevin/kframe/tree/master/components/redux/) - Hook in Redux reducers, data bindings, and action dispatches for A-Frame
+- [state](https://github.com/ngokevin/kframe/tree/master/components/state/) - State management using declarative binding, pure function state transitions, and event-based action dispatchers, with Redux.
 - [sun-sky](https://github.com/ngokevin/kframe/tree/master/components/sun-sky/) - Gradient sky with adjustable sun in A-Frame
 - [template](https://github.com/ngokevin/kframe/tree/master/components/template/) - Encapsulate groups of entities, use templating engines, and do string interpolations in A-Frame
 - [text-geometry](https://github.com/ngokevin/kframe/tree/master/components/text-geometry/) - Geometry-based text for A-Frame

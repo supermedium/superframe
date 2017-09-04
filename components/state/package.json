@@ -5,11 +5,11 @@
   "main": "index.js",
   "unpkg": "dist/aframe-state-component.min.js",
   "scripts": {
-    "build": "browserify examples/main.js -o examples/build.js",
-    "dev": "budo examples/main.js:examples/build.js --port 8000 --live --open",
+    "dev": "budo index.js:dist/aframe-state-component.min.js --port 7000 --live --open",
     "dist": "webpack index.js dist/aframe-state-component.js && webpack -p index.js dist/aframe-state-component.min.js",
     "postpublish": "npm run dist",
-    "test": "karma start ./tests/karma.conf.js"
+    "test": "karma start ./tests/karma.conf.js",
+    "start": "npm run dev"
   },
   "repository": {
     "type": "git",
@@ -31,6 +31,7 @@
   "homepage": "https://github.com/ngokevin/kframe/tree/components/redux#readme",
   "devDependencies": {
     "aframe-bmfont-text-component": "^0.1.4",
+    "budo": "^10.0.4",
     "semistandard": "^8.0.0",
     "shelljs": "^0.7.0",
     "shx": "^0.1.1",

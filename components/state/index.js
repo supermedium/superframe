@@ -1,10 +1,10 @@
-const Redux = require('redux');
+var Redux = require('redux');
 
-const REDUCERS = {};  // Registered reducers.
-const Reducers = {};  // Reducer instances.
+var REDUCERS = {};  // Registered reducers.
+var Reducers = {};  // Reducer instances.
 
-export function createStore () {
-  const reducers = {};  // Reducer functions.
+function createStore () {
+  var reducers = {};  // Reducer functions.
 
   // Instantiate registered reducers.
   Object.keys(REDUCERS).forEach(function (reducerName) {
@@ -18,6 +18,7 @@ export function createStore () {
     window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
   );
 }
+module.exports.createStore = createStore;
 
 /**
  * Dispatch action to store.
@@ -25,7 +26,7 @@ export function createStore () {
  * @param {string} actionName
  * @param {object} payload
  */
-export function dispatch (store, actionName, payload) {
+function dispatch (store, actionName, payload) {
   store.dispatch(Object.assign({
     type: actionName,
     toJSON: function () {
@@ -42,6 +43,7 @@ export function dispatch (store, actionName, payload) {
     }
   }, payload));
 }
+module.exports.dispatch = dispatch;
 
 /**
  * Proxy events to action dispatches so components can just bubble actions up as events.
@@ -73,7 +75,7 @@ function initEventProxies (el, store) {
 /**
  * Base reducer prototype.
  */
-const Reducer = function () { /* no-op */ };
+var Reducer = function () { /* no-op */ };
 Reducer.prototype = {
   initialState: {},
   handlers: {}
@@ -115,13 +117,13 @@ AFRAME.registerReducer = function (name, definition) {
     if (!definition.handlers[payload.type]) { return state; }
 
     // Remove metadata properties from payload, not relevant to reducer.
-    const toJSON = payload.toJSON;
-    const type = payload.type;
+    var toJSON = payload.toJSON;
+    var type = payload.type;
     delete payload.toJSON;
     delete payload.type;
 
     // Call reducer.
-    const newState = definition.handlers[type].call(NewReducer.prototype, state, payload);
+    var newState = definition.handlers[type].call(NewReducer.prototype, state, payload);
 
     // Re-add metadata properties.
     payload.toJSON = toJSON;
