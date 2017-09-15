@@ -736,7 +736,9 @@ AFRAME.registerComponent('bind', {
     parse: function parse(value) {
       // Parse style-like object.
       var data;
+      var i;
       var properties;
+      var pair;
 
       // Using setAttribute with object, no need to parse.
       if (value.constructor === Object) {
@@ -752,10 +754,10 @@ AFRAME.registerComponent('bind', {
       // Parse style-like object as keys to values.
       data = {};
       properties = value.split(';');
-      properties.forEach(function parsePairs(pairStr) {
-        var pair = pairStr.trim().split(':');
+      for (i = 0; i < properties.length; i++) {
+        pair = properties[i].trim().split(':');
         data[pair[0]] = pair[1];
-      });
+      }
       return data;
     }
   },
@@ -765,8 +767,10 @@ AFRAME.registerComponent('bind', {
   init: function init() {
     this.unsubscribe = null;
 
-    // Whether we need to combine component name (via `this.id`) and property names.
-    this.doComposePropertyType = this.id && this.id in AFRAME.components && !AFRAME.components[this.id].isSingleProp;
+    // Whether we are binding by namespace (e.g., bind__foo="prop1: true").
+    this.isNamespacedBind = this.id && this.id in AFRAME.components && !AFRAME.components[this.id].isSingleProp;
+
+    this.updateObj = {};
   },
 
   update: function update() {
@@ -786,25 +790,24 @@ AFRAME.registerComponent('bind', {
 
     function handler() {
       // Update component with the state.
+      var propertyName;
       var state = el.sceneEl.systems.state.state;
+      var stateSelector;
+      var value;
+
+      if (self.isNamespacedBind) {
+        clearObject(self.updateObj);
+      }
 
       if (_typeof(self.data) !== 'object') {
         AFRAME.utils.entity.setComponentProperty(el, self.id, select(state, self.data));
         return;
       }
 
-      Object.keys(self.data).forEach(function syncComponent(propertyName) {
-        var stateSelector;
-        var value;
-
+      for (propertyName in self.data) {
         // Pointer to a value in the state (e.g., `player.health`).
         stateSelector = self.data[propertyName].trim();
         value = select(state, stateSelector);
-
-        // Instance ID used to namespace to component name.
-        if (self.doComposePropertyType) {
-          propertyName = self.id + '.' + propertyName;
-        }
 
         // Remove component if value is `undefined`.
         if (propertyName in AFRAME.components && value === undefined) {
@@ -813,8 +816,18 @@ AFRAME.registerComponent('bind', {
         }
 
         // Set using dot-delimited property name.
-        AFRAME.utils.entity.setComponentProperty(el, propertyName, value);
-      });
+        if (self.isNamespacedBind) {
+          // Batch if doing namespaced bind.
+          self.updateObj[propertyName] = value;
+        } else {
+          AFRAME.utils.entity.setComponentProperty(el, propertyName, value);
+        }
+      }
+
+      // Batch if doing namespaced bind.
+      if (self.isNamespacedBind) {
+        el.setAttribute(self.id, self.updateObj);
+      }
     }
   },
 
@@ -841,6 +854,13 @@ function select(state, selector) {
   }
   split.length = 0;
   return value;
+}
+
+function clearObject(obj) {
+  var key;
+  for (key in obj) {
+    delete obj[key];
+  }
 }
 
 /***/ }),
