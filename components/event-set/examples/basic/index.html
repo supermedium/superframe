@@ -8,10 +8,10 @@
   <body>
     <a-scene>
       <a-entity geometry="primitive: box" material="color: #FCB241"
-                event-set__1="_event: click; _target: #eye-1; visible: true"
-                event-set__2="_event: click; _target: #eye-2; visible: true"
-                event-set__3="_event: mouseenter; material.color: #5A67A6"
-                event-set__4="_event: mouseleave; material.color: #FCB241"
+                event-set__click="_target: #eye-1; visible: true"
+                event-set__click2="_event: click; _target: #eye-2; visible: true"
+                event-set__mouseenter="material.color: #5A67A6"
+                event-set__mouseleave="material.color: #FCB241"
                 position="-1 0 -2">
         <a-sphere id="eye-1" radius="0.05" position="-0.5 0.7 0.5" visible="false"></a-sphere>
         <a-sphere id="eye-2" radius="0.05" position="0.5 0.7 0.5" visible="false"></a-sphere>

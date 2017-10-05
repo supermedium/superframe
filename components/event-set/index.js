@@ -9,13 +9,17 @@ AFRAME.registerComponent('event-set', {
   schema: {
     default: '',
     parse: function (value) {
-      var obj = styleParser.parse(value);
+      var convertedObj;
+      var hyphened;
+      var key;
+      var obj;
+      obj = styleParser.parse(value);
       // Convert camelCase keys from styleParser to hyphen.
-      var convertedObj = {};
-      Object.keys(obj).forEach(function (key) {
-        var hyphened = key.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+      convertedObj = {};
+      for (key in obj) {
+        hyphened = key.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
         convertedObj[hyphened] = obj[key];
-      });
+      }
       return convertedObj;
     }
   },
@@ -33,26 +37,14 @@ AFRAME.registerComponent('event-set', {
     this.addEventListener();
   },
 
-  /**
-   * Called when a component is removed (e.g., via removeAttribute).
-   * Generally undoes all modifications to the entity.
-   */
   remove: function () {
     this.removeEventListener();
   },
 
-  /**
-   * Called when entity pauses.
-   * Use to stop or remove any dynamic or background behavior such as events.
-   */
   pause: function () {
     this.removeEventListener();
   },
 
-  /**
-   * Called when entity resumes.
-   * Use to continue or add any dynamic or background behavior such as events.
-   */
   play: function () {
     this.addEventListener();
   },
@@ -64,23 +56,27 @@ AFRAME.registerComponent('event-set', {
   updateEventListener: function () {
     var data = this.data;
     var el = this.el;
+    var event;
+    var target;
+    var targetEl;
 
     // Set event listener using `_event`.
-    var event = data._event;
-    var target = data._target;
+    event = data._event || this.id;
+    target = data._target;
     delete data._event;
     delete data._target;
 
     // Decide the target to `setAttribute` on.
-    var targetEl = target ? el.sceneEl.querySelector(target) : el;
+    targetEl = target ? el.sceneEl.querySelector(target) : el;
 
     this.eventName = event;
     this.eventHandler = function handler () {
+      var propName;
       // Set attributes.
-      Object.keys(data).forEach(function setAttribute (propName) {
+      for (propName in data) {
         AFRAME.utils.entity.setComponentProperty.call(this, targetEl, propName,
                                                       data[propName]);
-      });
+      }
     };
   },
 

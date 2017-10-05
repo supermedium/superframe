@@ -8,6 +8,7 @@
     "dev": "budo examples/main.js:examples/build.js --port 8000 --live --open",
     "dist": "webpack index.js dist/aframe-event-set-component.js && webpack -p index.js dist/aframe-event-set-component.min.js",
     "lint": "semistandard -v | snazzy",
+    "start": "npm run dev",
     "postpublish": "npm run dist"
   },
   "repository": {
