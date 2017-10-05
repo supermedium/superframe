@@ -57,7 +57,7 @@ Install and use by directly including the [browser files](dist):
 <head>
   <title>My A-Frame Scene</title>
   <script src="https://aframe.io/releases/0.6.1/aframe.min.js"></script>
-  <script src="https://unpkg.com/aframe-state-component/"></script>
+  <script src="https://unpkg.com/aframe-state-component/dist/aframe-state-component.min.js"></script>
   <script>
     AFRAME.registerReducer('foo', {
       initialState: {
