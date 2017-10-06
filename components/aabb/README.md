@@ -15,6 +15,13 @@ For [A-Frame](https://aframe.io).
 | -------- | -----------                                        | ------------- |
 | objects  | Selector of entities to intersection test against. | ''            |
 
+#### Events
+
+| Event    | Description                                                                                                                              |
+| -----    | -----------                                                                                                                              |
+| hitstart | Also emits raycaster-intersection for compatibility with cursor. Emitted on both source and target if target does not have AABB.         |
+| hitend   | Also emits raycaster-intersection-cleared for compatibility with cursor. Emitted on both source and target if target does not have AABB. |
+
 ### Installation
 
 #### Browser
