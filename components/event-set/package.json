@@ -1,6 +1,6 @@
 {
   "name": "aframe-event-set-component",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "description": "Set properties in response to events in A-Frame",
   "main": "index.js",
   "scripts": {
@@ -30,7 +30,7 @@
   },
   "homepage": "https://github.com/ngokevin/kframe/tree/components/event-set#readme",
   "devDependencies": {
-    "aframe": "^0.3.0",
+    "aframe": "^0.7.0",
     "browserify": "^12.0.1",
     "budo": "^7.1.0",
     "semistandard": "^8.0.0",
