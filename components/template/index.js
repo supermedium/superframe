@@ -182,7 +182,7 @@ function getCompiler (type) {
       return compileJadeTemplate;
     }
     case MUSTACHE: {
-      return compileHandlebarsTemplate;
+      return compileMustacheTemplate;
     }
     case NUNJUCKS: {
       return compileNunjucksTemplate;
