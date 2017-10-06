@@ -60,7 +60,7 @@ Install and use by directly including the [browser files](dist):
 <head>
   <title>My A-Frame Scene</title>
   <script src="https://aframe.io/releases/0.5.0/aframe.min.js"></script>
-  <script src="https://unpkg.com/aframe-layout-component@4.1.1/dist/aframe-layout-component.min.js"></script>
+  <script src="https://unpkg.com/aframe-layout-component@4.2.0/dist/aframe-layout-component.min.js"></script>
 </head>
 
 <body>
