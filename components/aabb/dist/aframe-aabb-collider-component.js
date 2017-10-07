@@ -104,6 +104,7 @@
 	  },
 
 	  tick: function (time) {
+	    var boxHelper;
 	    var boundingBox = this.boundingBox;
 	    var clearedIntersectedEls = this.clearedIntersectedEls;
 	    var intersectedEls = this.intersectedEls;
@@ -142,10 +143,21 @@
 	    // Populate intersectedEls array.
 	    intersectedEls.length = 0;
 	    for (i = 0; i < objectEls.length; i++) {
-	      if (!this.data.collideNonVisible && !objectEls[i].getAttribute('visible')) { continue; }
-	      if (this.isIntersecting(objectEls[i])) {
-	        intersectedEls.push(objectEls[i]);
+	      // Don't collide with non-visible if flag set.
+	      if (!this.data.collideNonVisible && !objectEls[i].getAttribute('visible')) {
+	        // Remove box helper if debug flag set and has box helper.
+	        if (this.data.debug) {
+	          boxHelper = objectEls[i].getObject3D('mesh').boxHelper;
+	          if (boxHelper) {
+	            el.sceneEl.object3D.remove(boxHelper);
+	            objectEls[i].getObject3D('mesh').boxHelper = null;
+	          }
+	        }
+	        continue;
 	      }
+
+	      // Check for interection.
+	      if (this.isIntersecting(objectEls[i])) { intersectedEls.push(objectEls[i]); }
 	    }
 
 	    newIntersectedEls.length = 0;
