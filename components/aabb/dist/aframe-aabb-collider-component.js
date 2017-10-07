@@ -50,6 +50,14 @@
 	  throw new Error('Component attempted to register before AFRAME was available.');
 	}
 
+	// Configuration for the MutationObserver used to refresh the whitelist.
+	// Listens for addition/removal of elements and attributes within the scene.
+	var OBSERVER_CONFIG = {
+	  childList: true,
+	  attributes: true,
+	  subtree: true
+	};
+
 	/**
 	 * Implement AABB collision detection for entities with a mesh.
 	 * https://en.wikipedia.org/wiki/Minimum_bounding_box#Axis-aligned_minimum_bounding_box
@@ -58,6 +66,8 @@
 	 */
 	AFRAME.registerComponent('aabb-collider', {
 	  schema: {
+	    collideNonVisible: {default: false},
+	    debug: {default: false},
 	    interval: {default: 80},
 	    objects: {default: ''}
 	  },
@@ -65,6 +75,7 @@
 	  init: function () {
 	    this.clearedIntersectedEls = [];
 	    this.boundingBox = new THREE.Box3();
+	    this.boxHelper = new THREE.BoxHelper();
 	    this.boxMax = new THREE.Vector3();
 	    this.boxMin = new THREE.Vector3();
 	    this.intersectedEls = [];
@@ -73,29 +84,23 @@
 	    this.prevCheckTime = undefined;
 	    this.previousIntersectedEls = [];
 
+	    this.setDirty = this.setDirty.bind(this);
+	    this.observer = new MutationObserver(this.setDirty);
+	    this.dirty = true;
+
 	    this.hitStartEventDetail = {intersectedEls: this.newIntersectedEls};
 	  },
 
-	  /**
-	   * Update list of entities to test for collision.
-	   */
-	  update: function (oldData) {
-	    var el = this.el;
-	    var data = this.data;
-	    var objectEls;
-	    var els;
+	  addEventListeners: function () {
+	    this.observer.observe(this.el.sceneEl, OBSERVER_CONFIG);
+	    this.el.sceneEl.addEventListener('object3dset', this.setDirty);
+	    this.el.sceneEl.addEventListener('object3dremove', this.setDirty);
+	  },
 
-	    // Push entities into list of els to intersect.
-	    if (oldData.objects !== data.objects) {
-	      els = el.sceneEl.querySelectorAll(data.objects);
-	      for (i = 0; i < els.length; i++) {
-	        if (els[i] === el) { continue; }
-	        this.objectEls.push(els[i]);
-	      }
-	    } else {
-	      // If objects not defined, intersect with everything.
-	      this.objectEls = el.sceneEl.children;
-	    }
+	  removeEventListeners: function () {
+	    this.observer.disconnect();
+	    this.el.sceneEl.removeEventListener('object3dset', this.setDirty);
+	    this.el.sceneEl.removeEventListener('object3dremove', this.setDirty);
 	  },
 
 	  tick: function (time) {
@@ -112,7 +117,7 @@
 	    var self = this;
 
 	    // Only check for intersection if interval time has passed.
-	    if (prevCheckTime && (time - prevCheckTime < data.interval)) { return; }
+	    if (prevCheckTime && (time - prevCheckTime < this.data.interval)) { return; }
 	    // Update check time.
 	    this.prevCheckTime = time;
 
@@ -120,16 +125,24 @@
 	    mesh = el.getObject3D('mesh');
 	    if (!mesh) { return; }
 
+	    if (this.dirty) { this.refreshObjects(); }
+
 	    // Update the bounding box to account for rotations and position changes.
 	    boundingBox.setFromObject(mesh);
 	    this.boxMin.copy(boundingBox.min);
 	    this.boxMax.copy(boundingBox.max);
+
+	    if (this.data.debug) {
+	      this.boxHelper.setFromObject(mesh);
+	      if (!this.boxHelper.parent) { el.sceneEl.object3D.add(this.boxHelper); }
+	    }
 
 	    copyArray(previousIntersectedEls, intersectedEls);
 
 	    // Populate intersectedEls array.
 	    intersectedEls.length = 0;
 	    for (i = 0; i < objectEls.length; i++) {
+	      if (!this.data.collideNonVisible && !objectEls[i].getAttribute('visible')) { continue; }
 	      if (this.isIntersecting(objectEls[i])) {
 	        intersectedEls.push(objectEls[i]);
 	      }
@@ -141,7 +154,6 @@
 	        newIntersectedEls.push(intersectedEls[i]);
 	      }
 	    }
-
 
 	    // Emit cleared events on no longer intersected entities.
 	    clearedIntersectedEls.length = 0;
@@ -184,6 +196,7 @@
 	    return function (el) {
 	      var isIntersecting;
 	      var mesh;
+	      var boxHelper;
 	      var boxMin;
 	      var boxMax;
 
@@ -191,19 +204,47 @@
 	      if (!mesh) { return; }
 
 	      boundingBox.setFromObject(mesh);
+
+	      if (this.data.debug) {
+	        if (!mesh.boxHelper) {
+	          mesh.boxHelper = new THREE.BoxHelper(
+	            mesh, new THREE.Color(Math.random(), Math.random(), Math.random()));
+	          el.sceneEl.object3D.add(mesh.boxHelper);
+	        }
+	        mesh.boxHelper.setFromObject(mesh);
+	      }
+
 	      boxMin = boundingBox.min;
 	      boxMax = boundingBox.max;
 	      return (this.boxMin.x <= boxMax.x && this.boxMax.x >= boxMin.x) &&
 	             (this.boxMin.y <= boxMax.y && this.boxMax.y >= boxMin.y) &&
 	             (this.boxMin.z <= boxMax.z && this.boxMax.z >= boxMin.z);
 	    };
-	  })()
+	  })(),
+
+	  /**
+	   * Mark the object list as dirty, to be refreshed before next raycast.
+	   */
+	  setDirty: function () {
+	    this.dirty = true;
+	  },
+
+	  /**
+	   * Update list of objects to test for intersection.
+	   */
+	  refreshObjects: function () {
+	    var data = this.data;
+	    // If objects not defined, intersect with everything.
+	    this.objectEls = data.objects
+	      ? this.el.sceneEl.querySelectorAll(data.objects)
+	      : this.el.sceneEl.children;
+	    this.dirty = false;
+	  }
 	});
 
 	function copyArray (dest, source) {
 	  var i;
-	  dest.length = 0;
-	  for (i = 0; i < source.length; i++) {
+	  dest.length = 0; for (i = 0; i < source.length; i++) {
 	    dest[i] = source[i];
 	  }
 	}

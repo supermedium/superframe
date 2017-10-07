@@ -20,6 +20,8 @@ var OBSERVER_CONFIG = {
  */
 AFRAME.registerComponent('aabb-collider', {
   schema: {
+    collideNonVisible: {default: false},
+    debug: {default: false},
     interval: {default: 80},
     objects: {default: ''}
   },
@@ -27,6 +29,7 @@ AFRAME.registerComponent('aabb-collider', {
   init: function () {
     this.clearedIntersectedEls = [];
     this.boundingBox = new THREE.Box3();
+    this.boxHelper = new THREE.BoxHelper();
     this.boxMax = new THREE.Vector3();
     this.boxMin = new THREE.Vector3();
     this.intersectedEls = [];
@@ -68,7 +71,7 @@ AFRAME.registerComponent('aabb-collider', {
     var self = this;
 
     // Only check for intersection if interval time has passed.
-    if (prevCheckTime && (time - prevCheckTime < data.interval)) { return; }
+    if (prevCheckTime && (time - prevCheckTime < this.data.interval)) { return; }
     // Update check time.
     this.prevCheckTime = time;
 
@@ -83,11 +86,17 @@ AFRAME.registerComponent('aabb-collider', {
     this.boxMin.copy(boundingBox.min);
     this.boxMax.copy(boundingBox.max);
 
+    if (this.data.debug) {
+      this.boxHelper.setFromObject(mesh);
+      if (!this.boxHelper.parent) { el.sceneEl.object3D.add(this.boxHelper); }
+    }
+
     copyArray(previousIntersectedEls, intersectedEls);
 
     // Populate intersectedEls array.
     intersectedEls.length = 0;
     for (i = 0; i < objectEls.length; i++) {
+      if (!this.data.collideNonVisible && !objectEls[i].getAttribute('visible')) { continue; }
       if (this.isIntersecting(objectEls[i])) {
         intersectedEls.push(objectEls[i]);
       }
@@ -99,7 +108,6 @@ AFRAME.registerComponent('aabb-collider', {
         newIntersectedEls.push(intersectedEls[i]);
       }
     }
-
 
     // Emit cleared events on no longer intersected entities.
     clearedIntersectedEls.length = 0;
@@ -136,11 +144,13 @@ AFRAME.registerComponent('aabb-collider', {
    * AABB collision detection.
    * 3D version of https://www.youtube.com/watch?v=ghqD3e37R7E
    */
-  isIntersecting: (function () { var boundingBox = new THREE.Box3();
+  isIntersecting: (function () {
+    var boundingBox = new THREE.Box3();
 
     return function (el) {
       var isIntersecting;
       var mesh;
+      var boxHelper;
       var boxMin;
       var boxMax;
 
@@ -148,6 +158,16 @@ AFRAME.registerComponent('aabb-collider', {
       if (!mesh) { return; }
 
       boundingBox.setFromObject(mesh);
+
+      if (this.data.debug) {
+        if (!mesh.boxHelper) {
+          mesh.boxHelper = new THREE.BoxHelper(
+            mesh, new THREE.Color(Math.random(), Math.random(), Math.random()));
+          el.sceneEl.object3D.add(mesh.boxHelper);
+        }
+        mesh.boxHelper.setFromObject(mesh);
+      }
+
       boxMin = boundingBox.min;
       boxMax = boundingBox.max;
       return (this.boxMin.x <= boxMax.x && this.boxMax.x >= boxMin.x) &&
@@ -169,50 +189,16 @@ AFRAME.registerComponent('aabb-collider', {
   refreshObjects: function () {
     var data = this.data;
     // If objects not defined, intersect with everything.
-    var els = data.objects
+    this.objectEls = data.objects
       ? this.el.sceneEl.querySelectorAll(data.objects)
       : this.el.sceneEl.children;
-    this.objects = flattenChildrenShallow(els);
     this.dirty = false;
   }
 });
 
 function copyArray (dest, source) {
   var i;
-  dest.length = 0;
-  for (i = 0; i < source.length; i++) {
+  dest.length = 0; for (i = 0; i < source.length; i++) {
     dest[i] = source[i];
   }
-}
-
-/**
- * Returns children of each element's object3D group. Children are flattened
- * by one level, removing the THREE.Group wrapper, so that non-recursive
- * raycasting remains useful.
- *
- * @param  {Array<Element>} els
- * @return {Array<THREE.Object3D>}
- */
-function flattenChildrenShallow (els) {
-  var groups = [];
-  var objects = [];
-  var children;
-  var i;
-
-  // Push meshes onto list of objects to intersect.
-  for (i = 0; i < els.length; i++) {
-    if (els[i].object3D) {
-      groups.push(els[i].object3D);
-    }
-  }
-
-  // Each entity's root is a THREE.Group. Return the group's chilrden.
-  for (i = 0; i < groups.length; i++) {
-    children = groups[i].children;
-    if (children && children.length) {
-      objects.push.apply(objects, children);
-    }
-  }
-
-  return objects;
 }
