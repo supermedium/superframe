@@ -14,6 +14,7 @@ For [A-Frame](https://aframe.io).
 | Property | Description                                        | Default Value |
 | -------- | -----------                                        | ------------- |
 | objects  | Selector of entities to intersection test against. | ''            |
+| interval | Milliseconds in between intersection checks.       | 80            |
 
 #### Events
 

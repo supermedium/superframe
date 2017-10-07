@@ -58,6 +58,7 @@
 	 */
 	AFRAME.registerComponent('aabb-collider', {
 	  schema: {
+	    interval: {default: 80},
 	    objects: {default: ''}
 	  },
 
@@ -69,6 +70,7 @@
 	    this.intersectedEls = [];
 	    this.objectEls = [];
 	    this.newIntersectedEls = [];
+	    this.prevCheckTime = undefined;
 	    this.previousIntersectedEls = [];
 
 	    this.hitStartEventDetail = {intersectedEls: this.newIntersectedEls};
@@ -96,7 +98,7 @@
 	    }
 	  },
 
-	  tick: function (t) {
+	  tick: function (time) {
 	    var boundingBox = this.boundingBox;
 	    var clearedIntersectedEls = this.clearedIntersectedEls;
 	    var intersectedEls = this.intersectedEls;
@@ -105,8 +107,14 @@
 	    var mesh;
 	    var newIntersectedEls = this.newIntersectedEls;
 	    var objectEls = this.objectEls;
+	    var prevCheckTime = this.prevCheckTime;
 	    var previousIntersectedEls = this.previousIntersectedEls;
 	    var self = this;
+
+	    // Only check for intersection if interval time has passed.
+	    if (prevCheckTime && (time - prevCheckTime < data.interval)) { return; }
+	    // Update check time.
+	    this.prevCheckTime = time;
 
 	    // No mesh, no collisions
 	    mesh = el.getObject3D('mesh');
