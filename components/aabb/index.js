@@ -45,13 +45,13 @@ AFRAME.registerComponent('aabb-collider', {
     this.hitStartEventDetail = {intersectedEls: this.newIntersectedEls};
   },
 
-  addEventListeners: function () {
+  play: function () {
     this.observer.observe(this.el.sceneEl, OBSERVER_CONFIG);
     this.el.sceneEl.addEventListener('object3dset', this.setDirty);
     this.el.sceneEl.addEventListener('object3dremove', this.setDirty);
   },
 
-  removeEventListeners: function () {
+  remove: function () {
     this.observer.disconnect();
     this.el.sceneEl.removeEventListener('object3dset', this.setDirty);
     this.el.sceneEl.removeEventListener('object3dremove', this.setDirty);
