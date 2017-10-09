@@ -7,6 +7,8 @@ AFRAME.registerComponent('layout', {
     angle: {type: 'number', default: false, min: 0, max: 360, if: {type: ['circle']}},
     columns: {default: 1, min: 0, if: {type: ['box']}},
     margin: {default: 1, min: 0, if: {type: ['box', 'line']}},
+    marginColumn: {default: 1, min: 0, if: {type: ['box']}},
+    marginRow: {default: 1, min: 0, if: {type: ['box']}},
     plane: {default: 'xy'},
     radius: {default: 1, min: 0, if: {type: ['circle', 'cube', 'dodecahedron', 'pyramid']}},
     reverse: {default: false},
@@ -89,7 +91,7 @@ AFRAME.registerComponent('layout', {
       }
     }
 
-    positions = positionFn(data, numChildren);
+    positions = positionFn(data, numChildren, 'margin' in el.getDOMAttribute('layout'));
     if (data.reverse) { positions.reverse(); }
     setPositions(children, positions);
   },
@@ -106,25 +108,34 @@ AFRAME.registerComponent('layout', {
 /**
  * Get positions for `box` layout.
  */
-function getBoxPositions (data, numChildren) {
+function getBoxPositions (data, numChildren, marginDefined) {
+  var marginColumn;
+  var marginRow;
   var position;
   var positions = [];
   var rows = Math.ceil(numChildren / data.columns);
+
+  marginColumn = data.marginColumn;
+  marginRow = data.marginRow;
+  if (marginDefined) {
+    marginColumn = data.margin;
+    marginRow = data.margin;
+  }
 
   for (var row = 0; row < rows; row++) {
     for (var column = 0; column < data.columns; column++) {
       position = [0, 0, 0];
       if (data.plane.indexOf('x') === 0) {
-        position[0] = column * data.margin;
+        position[0] = column * marginColumn;
       }
       if (data.plane.indexOf('y') === 0) {
-        position[1] = column * data.margin;
+        position[1] = column * marginColumn;
       }
       if (data.plane.indexOf('y') === 1) {
-        position[1] = row * data.margin;
+        position[1] = row * marginRow;
       }
       if (data.plane.indexOf('z') === 1) {
-        position[2] = row * data.margin;
+        position[2] = row * marginRow;
       }
       positions.push(position);
     }
@@ -174,7 +185,7 @@ module.exports.getCirclePositions = getCirclePositions;
  */
 function getLinePositions (data, numChildren) {
   data.columns = numChildren;
-  return getBoxPositions(data, numChildren);
+  return getBoxPositions(data, numChildren, true);
 }
 module.exports.getLinePositions = getLinePositions;
 
