@@ -3,33 +3,11 @@ var Redux = require('redux');
 var REDUCERS = {};  // Registered reducers.
 var Reducers = {};  // Reducer instances.
 
-/**
- * Select value from store.
- *
- * @param {object} state - State object.
- * @param {string} selector - Dot-delimited store keys (e.g., game.player.health).
- */
-var select = (function () {
-  var splitSelectors = {};
-  return function (state, selector) {
-    var i;
-    var split;
-    split = splitSelectors[selector] || selector.split('.');
-    splitSelectors[selector] = split;
-    for (i = 0; i < split.length; i++) {
-      state = state[split[i]];
-    }
-    split.length = 0;
-    return value;
-  };
-}
-
 function createStore () {
   var reducers = {};  // Reducer functions.
-  var reducerName;
 
   // Instantiate registered reducers.
-  for (reducerName in REDUCERS) {
+  Object.keys(REDUCERS).forEach(function (reducerName) {
     Reducers[reducerName] = new REDUCERS[reducerName].Reducer();
     reducers[reducerName] = Reducers[reducerName].reducer;
   });
@@ -53,17 +31,15 @@ function dispatch (store, actionName, payload) {
     type: actionName,
     toJSON: function () {
       // toJSON just for redux-devtools-extension to serialize DOM elements.
-      var key;
       var serializedPayload = {};
-      for (key in payload) {
+      Object.keys(payload).forEach(function serialize (key) {
         if (payload[key].tagName) {
           serializedPayload[key] = 'element#' + payload[key].id;
         } else {
           serializedPayload[key] = payload[key];
         }
-      }
-      serializedPayload.type = actionName;
-      return serializedPayload;
+      });
+      return Object.assign({type: actionName}, serializedPayload);
     }
   }, payload));
 }
@@ -75,25 +51,21 @@ module.exports.dispatch = dispatch;
  * add event listeners.
  */
 function initEventProxies (el, store) {
-  var actionName;
-  var reducerName;
-  var registeredActions = [];
+  let registeredActions = [];
 
-  for (reducerName in Reducers) {
+  Object.keys(Reducers).forEach(function (reducerName) {
     // Use reducer's declared handlers to know what events to listen to.
-    for (actionName in Reducers[reducerName].handlers) {
+    Object.keys(Reducers[reducerName].handlers).forEach(function (actionName) {
       // Only need to register one handler for each event.
       if (registeredActions.indexOf(actionName) !== -1) { return; }
       registeredActions.push(actionName);
 
       el.addEventListener(actionName, function dispatchActionFromEvent (evt) {
-        var key;
         var payload = {};
-
-        for (key in evt.detail) {
+        Object.keys(evt.detail).forEach(function addDetailToPayload (key) {
           if (key === 'target') { return; }
           payload[key] = evt.detail[key];
-        }
+        });
         dispatch(store, actionName, payload);
       });
     });
@@ -294,7 +266,25 @@ AFRAME.registerComponent('bind', {
   }
 });
 
+/**
+ * Select value from store.
+ *
+ * @param {object} state - State object.
+ * @param {string} selector - Dot-delimited store keys (e.g., game.player.health).
+ */
+function select (state, selector) {
+  var i;
+  var split;
+  var value = state;
+  split = selector.split('.');
+  for (i = 0; i < split.length; i++) {
+    value = value[split[i]];
+  }
+  split.length = 0;
+  return value;
+}
+
 function clearObject (obj) {
   var key;
-  for (key in obj) { obj[key] = undefined; }
+  for (key in obj) { delete obj[key]; }
 }
