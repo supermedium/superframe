@@ -68,6 +68,7 @@
 	  schema: {
 	    collideNonVisible: {default: false},
 	    debug: {default: false},
+	    enabled: {default: true},
 	    interval: {default: 80},
 	    objects: {default: ''}
 	  },
@@ -116,6 +117,8 @@
 	    var prevCheckTime = this.prevCheckTime;
 	    var previousIntersectedEls = this.previousIntersectedEls;
 	    var self = this;
+
+	    if (!this.data.enabled) { return; }
 
 	    // Only check for intersection if interval time has passed.
 	    if (prevCheckTime && (time - prevCheckTime < this.data.interval)) { return; }
@@ -224,6 +227,7 @@
 	          el.sceneEl.object3D.add(mesh.boxHelper);
 	        }
 	        mesh.boxHelper.setFromObject(mesh);
+	        console.log("YEH");
 	      }
 
 	      boxMin = boundingBox.min;

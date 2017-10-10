@@ -15,6 +15,7 @@ For [A-Frame](https://aframe.io).
 | --------          | -----------                                                   | ------------- |
 | collideNonVisible | Whether to check for collisions against non-visible entities. | false         |
 | debug             | Whether to draw bounding box helpers.                         | false         |
+| enabled           | Whether collision checks are running.                         | true          |
 | objects           | Selector of entities to intersection test against.            | ''            |
 | interval          | Milliseconds in between intersection checks.                  | 80            |
 

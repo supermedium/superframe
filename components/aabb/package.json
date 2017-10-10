@@ -1,6 +1,6 @@
 {
   "name": "aframe-aabb-collider-component",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "An axis-aligned bounding box component for A-Frame.",
   "main": "index.js",
   "cdn": "dist/aframe-aabb-collider-component.min.js",
