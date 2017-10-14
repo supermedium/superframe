@@ -17,7 +17,7 @@ Features:
 Supports:
 
 - Vanilla HTML (with [basic ES6 templating](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals))
-- [Handlebars.js](https://http://handlebarsjs.com/)
+- [Handlebars.js](http://handlebarsjs.com/)
 - [Pug (formerly Jade)](https://pugjs.org)
 - [mustache.js](https://mustache.github.io/)
 - [Nunjucks](https://mozilla.github.io/nunjucks/)
