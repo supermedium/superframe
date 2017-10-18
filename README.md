@@ -10,7 +10,7 @@ Kevin's collection of A-Frame components and scenes.
 
 See documentation for individual components:
 
-- [aabb](https://github.com/ngokevin/kframe/tree/master/components/aabb/) - An axis-aligned bounding box component for A-Frame.
+- [aabb-collider](https://github.com/ngokevin/kframe/tree/master/components/aabb-collider/) - An axis-aligned bounding box component for A-Frame.
 - [animation](https://github.com/ngokevin/kframe/tree/master/components/animation/) - Animations in A-Frame using anime.js
 - [audioanalyser](https://github.com/ngokevin/kframe/tree/master/components/audioanalyser/) - Audio visualizations in A-Frame using Web Audio (AnalyserNode)
 - [broadcast](https://github.com/ngokevin/kframe/tree/master/components/broadcast/) - Multi-user in A-Frame using raw websockets
