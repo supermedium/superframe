@@ -4,8 +4,7 @@
 [![License](http://img.shields.io/npm/l/aframe-aabb-collider-component.svg?style=flat-square)](https://npmjs.org/package/aframe-aabb-collider-component)
 
 An axis-aligned bounding box component for A-Frame. Provides collision
-detection. Developed to be the volume-equivalent of the line-based raycaster
-component, emitting the same events, and compatible with the cursor component.
+detection.
 
 For [A-Frame](https://aframe.io).
 
@@ -21,10 +20,12 @@ For [A-Frame](https://aframe.io).
 
 #### Events
 
-| Event    | Description                                                                                                                              |
-| -----    | -----------                                                                                                                              |
-| hitstart | Also emits raycaster-intersection for compatibility with cursor. Emitted on both source and target if target does not have AABB.         |
-| hitend   | Also emits raycaster-intersection-cleared for compatibility with cursor. Emitted on both source and target if target does not have AABB. |
+| Event           | Description                                                                                                            |
+| -----           | -----------                                                                                                            |
+| hitstart        | Intersection between box and another entity. Emitted on both source and target if target does not have AABB.           |
+| hitend          | No longer intersecting between box and another entity. Emitted on both source and target if target does not have AABB. |
+| hitclosest      | Intersection between the box and the closest entity from its center. Only one entity is "closest" at a time.           |
+| hitclosestclear | The previously closest intersected entity to the box is no longer the closest entity.                                  |
 
 ### Installation
 

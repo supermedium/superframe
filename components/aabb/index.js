@@ -28,11 +28,16 @@ AFRAME.registerComponent('aabb-collider', {
   },
 
   init: function () {
+    this.centerDifferenceVec3 = new THREE.Vector3();
     this.clearedIntersectedEls = [];
     this.boundingBox = new THREE.Box3();
+    this.boxCenter = new THREE.Vector3();
     this.boxHelper = new THREE.BoxHelper();
     this.boxMax = new THREE.Vector3();
     this.boxMin = new THREE.Vector3();
+    this.closestIntersectedEl = null;
+    this.hitClosestClearEventDetail = {};
+    this.hitClosestEventDetail = {};
     this.intersectedEls = [];
     this.objectEls = [];
     this.newIntersectedEls = [];
@@ -61,7 +66,10 @@ AFRAME.registerComponent('aabb-collider', {
   tick: function (time) {
     var boxHelper;
     var boundingBox = this.boundingBox;
+    var centerDifferenceVec3 = this.centerDifferenceVec3;
     var clearedIntersectedEls = this.clearedIntersectedEls;
+    var closestCenterDifference;
+    var newClosestEl;
     var intersectedEls = this.intersectedEls;
     var el = this.el;
     var i;
@@ -89,6 +97,7 @@ AFRAME.registerComponent('aabb-collider', {
     boundingBox.setFromObject(mesh);
     this.boxMin.copy(boundingBox.min);
     this.boxMax.copy(boundingBox.max);
+    boundingBox.getCenter(this.boxCenter);
 
     if (this.data.debug) {
       this.boxHelper.setFromObject(mesh);
@@ -117,6 +126,7 @@ AFRAME.registerComponent('aabb-collider', {
       if (this.isIntersecting(objectEls[i])) { intersectedEls.push(objectEls[i]); }
     }
 
+    // Get newly intersected entities.
     newIntersectedEls.length = 0;
     for (i = 0; i < intersectedEls.length; i++) {
       if (previousIntersectedEls.indexOf(intersectedEls[i]) === -1) {
@@ -127,31 +137,59 @@ AFRAME.registerComponent('aabb-collider', {
     // Emit cleared events on no longer intersected entities.
     clearedIntersectedEls.length = 0;
     for (i = 0; i < previousIntersectedEls.length; i++) {
-      if (intersectedEls.indexOf(previousIntersectedEls[i]) === -1) {
-        if (!previousIntersectedEls[i].hasAttribute('aabb-collider')) {
-          previousIntersectedEls[i].emit('hitend');
-          previousIntersectedEls[i].emit('raycaster-intersected-cleared');
-        }
-        clearedIntersectedEls.push(previousIntersectedEls[i]);
+      if (intersectedEls.indexOf(previousIntersectedEls[i]) !== -1) { continue; }
+      if (!previousIntersectedEls[i].hasAttribute('aabb-collider')) {
+        previousIntersectedEls[i].emit('hitend');
+      }
+      clearedIntersectedEls.push(previousIntersectedEls[i]);
+    }
+
+    // Emit events on intersected entities. Do this after the cleared events.
+    for (i = 0; i < newIntersectedEls.length; i++) {
+      if (newIntersectedEls[i].hasAttribute('aabb-collider')) { continue; }
+      newIntersectedEls[i].emit('hitstart');
+    }
+
+    // Calculate closest intersected entity based on centers.
+    for (i = 0; i < intersectedEls.length; i++) {
+      centerDifferenceVec3
+        .copy(intersectedEls[i].getObject3D('mesh').boundingBoxCenter)
+        .sub(this.boxCenter);
+      if (closestCenterDifference === undefined ||
+          centerDifferenceVec3.length() < closestCenterDifference) {
+        closestCenterDifference = centerDifferenceVec3.length();
+        newClosestEl = intersectedEls[i];
       }
     }
 
-    // Emit events on intersected entities.
-    for (i = 0; i < newIntersectedEls.length; i++) {
-      if (!newIntersectedEls[i].hasAttribute('aabb-collider')) {
-        newIntersectedEls[i].emit('hitstart');
-        newIntersectedEls[i].emit('raycaster-intersected');
+    // Emit events for the new closest entity and the old closest entity.
+    if (!intersectedEls.length && this.closestEl) {
+      // No intersected entities, clear any closest entity.
+      this.hitClosestClearEventDetail.el = this.closestEl;
+      this.closestEl.emit('hitclosestclear');
+      this.closestEl = null;
+      el.emit('hitclosestclear', this.hitClosestClearEventDetail);
+    } else if (newClosestEl !== this.closestEl) {
+      // Clear the previous closest entity.
+      if (this.closestEl) {
+        this.hitClosestClearEventDetail.el = this.closestEl;
+        this.closestEl.emit('hitclosestclear', this.hitClosestClearEventDetail);
+      }
+      if (newClosestEl) {
+        // Emit for the new closest entity.
+        newClosestEl.emit('hitclosest');
+        this.closestEl = newClosestEl;
+        this.hitClosestEventDetail.el = newClosestEl;
+        el.emit('hitclosest', this.hitClosestEventDetail);
       }
     }
 
     if (clearedIntersectedEls.length) {
       el.emit('hitend');
-      el.emit('raycaster-intersection-cleared');
     }
 
     if (newIntersectedEls.length) {
       el.emit('hitstart', this.hitStartEventDetail);
-      el.emit('raycaster-intersection');
     }
   },
 
@@ -181,11 +219,12 @@ AFRAME.registerComponent('aabb-collider', {
           el.sceneEl.object3D.add(mesh.boxHelper);
         }
         mesh.boxHelper.setFromObject(mesh);
-        console.log("YEH");
       }
 
       boxMin = boundingBox.min;
       boxMax = boundingBox.max;
+      mesh.boundingBoxCenter = mesh.boundingBoxCenter || new THREE.Vector3();
+      boundingBox.getCenter(mesh.boundingBoxCenter);
       return (this.boxMin.x <= boxMax.x && this.boxMax.x >= boxMin.x) &&
              (this.boxMin.y <= boxMax.y && this.boxMax.y >= boxMin.y) &&
              (this.boxMin.z <= boxMax.z && this.boxMax.z >= boxMin.z);
@@ -214,7 +253,6 @@ AFRAME.registerComponent('aabb-collider', {
 
 function copyArray (dest, source) {
   var i;
-  dest.length = 0; for (i = 0; i < source.length; i++) {
-    dest[i] = source[i];
-  }
+  dest.length = 0;
+  for (i = 0; i < source.length; i++) { dest[i] = source[i]; }
 }
