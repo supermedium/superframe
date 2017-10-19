@@ -26,6 +26,13 @@ For [A-Frame](https://aframe.io).
 | hitend          | No longer intersecting between box and another entity. Emitted on both source and target if target does not have AABB. |
 | hitclosest      | Intersection between the box and the closest entity from its center. Only one entity is "closest" at a time.           |
 | hitclosestclear | The previously closest intersected entity to the box is no longer the closest entity.                                  |
+#### Members
+
+Accessed via `entity.components['aabb-collider'][<member>]`.
+
+| Name           | Description                         |
+|----------------|-------------------------------------|
+| intersectedEls | Array of current collided entities. |
 
 ### Installation
 
