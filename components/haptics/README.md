@@ -19,6 +19,12 @@ Extensions](https://w3c.github.io/gamepad/extensions.html#dom-gamepadhapticactua
 | events        | Array of events for controller entity to listen to to trigger a pulse (e.g., `triggerdown, triggerup`) | []            |
 | intensity     | Intensity of pulse (from 0 to 1)                                                                       | 1             |
 
+#### Methods
+
+| Name  | Description             |
+|-------|-------------------------|
+| pulse | Manually trigger pulse (with data-defined duration and intensity. |
+
 ### Installation
 
 #### Browser

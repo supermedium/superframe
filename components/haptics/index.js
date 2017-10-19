@@ -49,7 +49,7 @@ AFRAME.registerComponent('haptics', {
   pulse: function () {
     var actuator;
     var data = this.data;
-    if (!data.enabled) { return; }
+    if (!data.enabled || !this.gamepad) { return; }
     actuator = this.gamepad.hapticActuators[data.actuatorIndex];
     actuator.pulse(data.intensity, data.dur);
   },
