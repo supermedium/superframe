@@ -73,13 +73,19 @@
 
 	    this.pulse = this.pulse.bind(this);
 
-	    this.el.addEventListener('controllerconnected', function () {
-	      setTimeout(function () {
-	        self.gamepad = self.el.components['tracked-controls'].controller;
-	        if (!self.gamepad.hapticActuators.length) { return; }
-	        self.addEventListeners();
+	    if (this.el.components['tracked-controls'].controller) {
+	      this.gamepad = this.el.components['tracked-controls'].controller;
+	      if (!this.gamepad.hapticActuators.length) { return; }
+	      this.addEventListeners();
+	    } else {
+	      this.el.addEventListener('controllerconnected', function () {
+	        setTimeout(function () {
+	          self.gamepad = self.el.components['tracked-controls'].controller;
+	          if (!self.gamepad.hapticActuators.length) { return; }
+	          self.addEventListeners();
+	        });
 	      });
-	    });
+	    }
 	  },
 
 	  remove: function () {
