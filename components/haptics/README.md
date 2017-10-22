@@ -11,19 +11,20 @@ Extensions](https://w3c.github.io/gamepad/extensions.html#dom-gamepadhapticactua
 
 ### API
 
-| Property      | Description                                                                                            | Default Value |
-| --------      | -----------                                                                                            | ------------- |
-| actuatorIndex | Index of the actuator from the gamepad's array of actuators.                                           | 0             |
-| dur           | Duration of vibration pulse (milliseconds).                                                            | 100           |
-| enabled       | Whether the component should pulse on the event.                                                       | true          |
-| events        | Array of events for controller entity to listen to to trigger a pulse (e.g., `triggerdown, triggerup`) | []            |
-| intensity     | Intensity of pulse (from 0 to 1)                                                                       | 1             |
+| Property      | Description                                                                       | Default Value |
+| --------      | -----------                                                                       | ------------- |
+| actuatorIndex | Index of the actuator from the gamepad's array of actuators.                      | 0             |
+| dur           | Duration of vibration pulse (milliseconds).                                       | 100           |
+| enabled       | Whether the component should pulse on the event.                                  | true          |
+| events        | Array of events to listen for to trigger a pulse (e.g., `triggerdown, triggerup`) | []            |
+| eventsFrom    | Target entity to listen for `events` if other than the controller entity.         | `this.el`     |
+| force         | Intensity of pulse (from 0 to 1)                                                  | 1             |
 
 #### Methods
 
-| Name  | Description             |
-|-------|-------------------------|
-| pulse | Manually trigger pulse (with data-defined duration and intensity. |
+| Name  | Description                                                    |
+|-------|----------------------------------------------------------------|
+| pulse | Manually trigger pulse (with data-defined duration and force). |
 
 ### Installation
 
@@ -40,8 +41,8 @@ Install and use by directly including the [browser files](dist):
 
 <body>
   <a-scene>
-    <a-entity hand-controls="left"  haptics="events: triggerdown; dur: 1000; intensity: 0.5"></a-entity>
-    <a-entity hand-controls="right" haptics="events: triggerdown; dur: 500; intensity: 1"></a-entity>
+    <a-entity hand-controls="left"  haptics="events: triggerdown; dur: 1000; force: 0.5"></a-entity>
+    <a-entity hand-controls="right" haptics="events: triggerdown; dur: 500; force: 1.0"></a-entity>
   </a-scene>
 </body>
 ```

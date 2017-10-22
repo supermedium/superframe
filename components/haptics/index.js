@@ -15,7 +15,8 @@ AFRAME.registerComponent('haptics', {
     dur: {default: 100},
     enabled: {default: true},
     events: {type: 'array'},
-    intensity: {default: 1}
+    eventsFrom: {type: 'string'},
+    force: {default: 1}
   },
 
   multiple: true,
@@ -51,22 +52,28 @@ AFRAME.registerComponent('haptics', {
     var data = this.data;
     if (!data.enabled || !this.gamepad) { return; }
     actuator = this.gamepad.hapticActuators[data.actuatorIndex];
-    actuator.pulse(data.intensity, data.dur);
+    actuator.pulse(data.force, data.dur);
   },
 
   addEventListeners: function () {
     var data = this.data;
     var i;
+    var listenTarget;
+
+    listenTarget = data.eventsFrom ? document.querySelector(data.eventsFrom) : this.el;
     for (i = 0; i < data.events.length; i++) {
-      this.el.addEventListener(data.events[i], this.pulse);
+      listenTarget.addEventListener(data.events[i], this.pulse);
     }
   },
 
   removeEventListeners: function () {
     var data = this.data;
     var i;
+    var listenTarget;
+
+    listenTarget = data.eventsFrom ? document.querySelector(data.eventsFrom) : this.el;
     for (i = 0; i < data.events.length; i++) {
-      this.el.removeEventListener(data.events[i], this.pulse);
+      listenTarget.removeEventListener(data.events[i], this.pulse);
     }
   }
 });
