@@ -585,16 +585,18 @@ function dispatch(store, actionName, payload) {
   store.dispatch(Object.assign({
     type: actionName,
     toJSON: function toJSON() {
-      // toJSON just for redux-devtools-extension to serialize DOM elements.
+      var key;
       var serializedPayload = {};
-      Object.keys(payload).forEach(function serialize(key) {
+      // toJSON just for redux-devtools-extension to serialize DOM elements.
+      for (key in payload) {
         if (payload[key].tagName) {
           serializedPayload[key] = 'element#' + payload[key].id;
         } else {
           serializedPayload[key] = payload[key];
         }
-      });
-      return Object.assign({ type: actionName }, serializedPayload);
+      }
+      serializedPayload.type = actionName;
+      return serializedPayload;
     }
   }, payload));
 }
@@ -606,9 +608,10 @@ module.exports.dispatch = dispatch;
  * add event listeners.
  */
 function initEventProxies(el, store) {
+  var reducerName;
   var registeredActions = [];
 
-  Object.keys(Reducers).forEach(function (reducerName) {
+  for (reducerName in Reducers) {
     // Use reducer's declared handlers to know what events to listen to.
     Object.keys(Reducers[reducerName].handlers).forEach(function (actionName) {
       // Only need to register one handler for each event.
@@ -616,19 +619,11 @@ function initEventProxies(el, store) {
         return;
       }
       registeredActions.push(actionName);
-
       el.addEventListener(actionName, function dispatchActionFromEvent(evt) {
-        var payload = {};
-        Object.keys(evt.detail).forEach(function addDetailToPayload(key) {
-          if (key === 'target') {
-            return;
-          }
-          payload[key] = evt.detail[key];
-        });
-        dispatch(store, actionName, payload);
+        dispatch(store, actionName, evt.detail);
       });
     });
-  });
+  }
 }
 
 /**
@@ -766,10 +761,12 @@ AFRAME.registerComponent('bind', {
 
   init: function init() {
     this.unsubscribe = null;
+    this.onStateUpdate = this.onStateUpdate.bind(this);
 
     // Whether we are binding by namespace (e.g., bind__foo="prop1: true").
     this.isNamespacedBind = this.id && this.id in AFRAME.components && !AFRAME.components[this.id].isSingleProp;
 
+    this.lastData = {};
     this.updateObj = {};
   },
 
@@ -785,49 +782,66 @@ AFRAME.registerComponent('bind', {
 
     // Subscribe to store and register handler to do data-binding to components.
     store = el.sceneEl.systems.state.store;
-    this.unsubscribe = store.subscribe(handler);
-    handler();
+    this.unsubscribe = store.subscribe(this.onStateUpdate);
+    this.onStateUpdate();
+  },
 
-    function handler() {
-      // Update component with the state.
-      var propertyName;
-      var state = el.sceneEl.systems.state.state;
-      var stateSelector;
-      var value;
+  /**
+   * Handle state update.
+   */
+  onStateUpdate: function onStateUpdate() {
+    // Update component with the state.
+    var el = this.el;
+    var propertyName;
+    var state;
+    var stateSelector;
+    var value;
 
-      if (self.isNamespacedBind) {
-        clearObject(self.updateObj);
+    state = el.sceneEl.systems.state.state;
+
+    if (this.isNamespacedBind) {
+      clearObject(this.updateObj);
+    }
+
+    if (_typeof(this.data) !== 'object') {
+      value = select(state, this.data);
+      if (value === this.lastData) {
+        return;
+      }
+      AFRAME.utils.entity.setComponentProperty(el, this.id, value);
+      this.lastData = value;
+      return;
+    }
+
+    for (propertyName in this.data) {
+      // Pointer to a value in the state (e.g., `player.health`).
+      stateSelector = this.data[propertyName].trim();
+      value = select(state, stateSelector);
+
+      if (this.lastData[propertyName] === value) {
+        continue;
       }
 
-      if (_typeof(self.data) !== 'object') {
-        AFRAME.utils.entity.setComponentProperty(el, self.id, select(state, self.data));
+      // Remove component if value is `undefined`.
+      if (propertyName in AFRAME.components && value === undefined) {
+        el.removeAttribute(propertyName);
         return;
       }
 
-      for (propertyName in self.data) {
-        // Pointer to a value in the state (e.g., `player.health`).
-        stateSelector = self.data[propertyName].trim();
-        value = select(state, stateSelector);
-
-        // Remove component if value is `undefined`.
-        if (propertyName in AFRAME.components && value === undefined) {
-          el.removeAttribute(propertyName);
-          return;
-        }
-
-        // Set using dot-delimited property name.
-        if (self.isNamespacedBind) {
-          // Batch if doing namespaced bind.
-          self.updateObj[propertyName] = value;
-        } else {
-          AFRAME.utils.entity.setComponentProperty(el, propertyName, value);
-        }
+      // Set using dot-delimited property name.
+      if (this.isNamespacedBind) {
+        // Batch if doing namespaced bind.
+        this.updateObj[propertyName] = value;
+      } else {
+        AFRAME.utils.entity.setComponentProperty(el, propertyName, value);
       }
 
-      // Batch if doing namespaced bind.
-      if (self.isNamespacedBind) {
-        el.setAttribute(self.id, self.updateObj);
-      }
+      this.lastData[propertyName] = value;
+    }
+
+    // Batch if doing namespaced bind.
+    if (this.isNamespacedBind) {
+      el.setAttribute(this.id, this.updateObj);
     }
   },
 

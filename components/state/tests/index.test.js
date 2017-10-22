@@ -37,9 +37,7 @@ suite('state', function () {
         done();
         return;
       }
-      el.sceneEl.addEventListener('loaded', () => {
-        done();
-      });
+      el.sceneEl.addEventListener('loaded', () => { done(); });
     });
   });
 
@@ -158,6 +156,21 @@ suite('state', function () {
       setTimeout(() => {
         assert.equal(el.getAttribute('data-enabled'), 'true');
         done();
+      });
+    });
+
+    test('avoids calling setAttribute if data has not changed', function (done) {
+      var setAttributeSpy;
+      el.setAttribute('bind', 'data-counter: foo.counter; visible: foo.enabled');
+      el.emit('fooAdd', {number: 10});
+      setTimeout(() => {
+        setAttributeSpy = this.sinon.spy(el, 'setAttribute');
+        el.emit('fooAdd', {number: 15});
+        setTimeout(() => {
+          assert.equal(setAttributeSpy.getCalls().length, 1);
+          assert.equal(setAttributeSpy.getCalls()[0].args[0], 'data-counter');
+          done();
+        });
       });
     });
   });
