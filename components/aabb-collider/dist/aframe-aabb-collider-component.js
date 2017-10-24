@@ -76,12 +76,12 @@
 	  init: function () {
 	    this.centerDifferenceVec3 = new THREE.Vector3();
 	    this.clearedIntersectedEls = [];
+	    this.closestIntersectedEl = null;
 	    this.boundingBox = new THREE.Box3();
 	    this.boxCenter = new THREE.Vector3();
 	    this.boxHelper = new THREE.BoxHelper();
 	    this.boxMax = new THREE.Vector3();
 	    this.boxMin = new THREE.Vector3();
-	    this.closestIntersectedEl = null;
 	    this.hitClosestClearEventDetail = {};
 	    this.hitClosestEventDetail = {};
 	    this.intersectedEls = [];
@@ -209,22 +209,22 @@
 	    }
 
 	    // Emit events for the new closest entity and the old closest entity.
-	    if (!intersectedEls.length && this.closestEl) {
+	    if (!intersectedEls.length && this.closestIntersectedEl) {
 	      // No intersected entities, clear any closest entity.
-	      this.hitClosestClearEventDetail.el = this.closestEl;
-	      this.closestEl.emit('hitclosestclear');
-	      this.closestEl = null;
+	      this.hitClosestClearEventDetail.el = this.closestIntersectedEl;
+	      this.closestIntersectedEl.emit('hitclosestclear');
+	      this.closestIntersectedEl = null;
 	      el.emit('hitclosestclear', this.hitClosestClearEventDetail);
-	    } else if (newClosestEl !== this.closestEl) {
+	    } else if (newClosestEl !== this.closestIntersectedEl) {
 	      // Clear the previous closest entity.
-	      if (this.closestEl) {
-	        this.hitClosestClearEventDetail.el = this.closestEl;
-	        this.closestEl.emit('hitclosestclear', this.hitClosestClearEventDetail);
+	      if (this.closestIntersectedEl) {
+	        this.hitClosestClearEventDetail.el = this.closestIntersectedEl;
+	        this.closestIntersectedEl.emit('hitclosestclear', this.hitClosestClearEventDetail);
 	      }
 	      if (newClosestEl) {
 	        // Emit for the new closest entity.
 	        newClosestEl.emit('hitclosest');
-	        this.closestEl = newClosestEl;
+	        this.closestIntersectedEl = newClosestEl;
 	        this.hitClosestEventDetail.el = newClosestEl;
 	        el.emit('hitclosest', this.hitClosestEventDetail);
 	      }
@@ -236,9 +236,7 @@
 
 	    if (newIntersectedEls.length) {
 	      el.emit('hitstart', this.hitStartEventDetail);
-	    }
-	  },
-
+	    } },
 	  /**
 	   * AABB collision detection.
 	   * 3D version of https://www.youtube.com/watch?v=ghqD3e37R7E
