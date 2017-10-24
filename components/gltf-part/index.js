@@ -11,6 +11,7 @@ AFRAME.registerComponent('gltf-part', {
   init: function () {
     var el = this.el;
     this.getModel(function (modelPart) {
+      if (!modelPart) { return; }
       el.setObject3D('mesh', modelPart)
     });
   },
@@ -52,9 +53,21 @@ AFRAME.registerComponent('gltf-part', {
    * Search for the part name and look for a mesh.
    */
   selectFromModel: function (model) {
-    var mesh = model.getObjectByName(this.data.part).getObjectByProperty('type', 'Mesh')
-                    .clone(true);
-    if (this.data.buffer) { return mesh; }
+    var mesh;
+    var part;
+
+    part = model.getObjectByName(this.data.part);
+    if (!part) {
+      console.error('[gltf-part] `' + this.data.part + '` not found in model.');
+      return;
+    }
+
+    mesh = part.getObjectByProperty('type', 'Mesh').clone(true);
+
+    if (this.data.buffer) {
+      mesh.geometry = mesh.geometry.toNonIndexed();
+      return mesh;
+    }
     mesh.geometry = new THREE.Geometry().fromBufferGeometry(mesh.geometry);
     return mesh;
   }

@@ -1,6 +1,6 @@
 {
   "name": "aframe-gltf-part-component",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A component to extract parts from a GLTF model into their own A-Frame entities.",
   "main": "index.js",
   "unpkg": "dist/aframe-gltf-part-component.min.js",
