@@ -62,6 +62,22 @@ suite('state', function () {
       });
     });
 
+    test('binds system', done => {
+      AFRAME.registerSystem('test-system', {
+        schema: {
+          counter: {default: 100}
+        }
+      });
+      el.sceneEl.setAttribute('bind__test-system', 'counter: foo.counter');
+      assert.equal(el.sceneEl.getAttribute('test-system').counter, 5);
+      el.emit('fooAdd', {number: 10});
+      setTimeout(() => {
+        assert.equal(el.sceneEl.getAttribute('test-system').counter, 15);
+        delete AFRAME.systems['test-system'];
+        done();
+      });
+    });
+
     test('binds multi-property components', done => {
       // Components.
       AFRAME.registerComponent('bar', {schema: {barCounter: {default: 0}}});

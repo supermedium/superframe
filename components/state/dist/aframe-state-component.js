@@ -764,7 +764,7 @@ AFRAME.registerComponent('bind', {
     this.onStateUpdate = this.onStateUpdate.bind(this);
 
     // Whether we are binding by namespace (e.g., bind__foo="prop1: true").
-    this.isNamespacedBind = this.id && this.id in AFRAME.components && !AFRAME.components[this.id].isSingleProp;
+    this.isNamespacedBind = this.id && this.id in AFRAME.components && !AFRAME.components[this.id].isSingleProp || this.id in AFRAME.systems;
 
     this.lastData = {};
     this.updateObj = {};
