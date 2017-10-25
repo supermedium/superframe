@@ -6,7 +6,8 @@ var entityFactory = require('./helpers').entityFactory;
 AFRAME.registerReducer('foo', {
   initialState: {
     counter: 5,
-    enabled: false
+    enabled: false,
+    color: 'red'
   },
 
   handlers: {
@@ -22,6 +23,11 @@ AFRAME.registerReducer('foo', {
 
     fooSubtract: (newState, payload) => {
       newState.counter -= payload.number;
+      return newState;
+    },
+
+    fooColor: (newState, payload) => {
+      newState.color = payload.color;
       return newState;
     }
   }
@@ -187,6 +193,26 @@ suite('state', function () {
           assert.equal(setAttributeSpy.getCalls()[0].args[0], 'data-counter');
           done();
         });
+      });
+    });
+
+    test('avoids setAttribute if data has not changed for namespace', function (done) {
+      var setAttributeSpy;
+
+      AFRAME.registerComponent('test', {
+        schema: {
+          counter: {default: 0},
+          enabled: {default: false}
+        }
+      });
+
+      el.setAttribute('bind__test', 'counter: foo.counter; enabled: foo.enabled');
+
+      setAttributeSpy = this.sinon.spy(el, 'setAttribute');
+      el.emit('fooColor', {color: 'orange'});
+      setTimeout(() => {
+        assert.equal(setAttributeSpy.getCalls().length, 0);
+        done();
       });
     });
   });

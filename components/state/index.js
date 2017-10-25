@@ -227,6 +227,7 @@ AFRAME.registerComponent('bind', {
    */
   onStateUpdate: function () {
     // Update component with the state.
+    var hasKeys = false;
     var el = this.el;
     var propertyName;
     var state;
@@ -270,7 +271,10 @@ AFRAME.registerComponent('bind', {
     }
 
     // Batch if doing namespaced bind.
-    if (this.isNamespacedBind) {
+    for (hasKeys in this.updateObj) {
+      // See if object is empty.
+    }
+    if (this.isNamespacedBind && hasKeys) {
       el.setAttribute(this.id, this.updateObj);
     }
   },
