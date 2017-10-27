@@ -16,6 +16,8 @@ Useful if using vertex or face coloring as individual geometries' colors can
 still be manipulated individually since this component keeps a `faceIndex` and
 `vertexIndex`.
 
+Doesn't support buffer geometries *yet*.
+
 [Source code for interactive merged geometries](https://github.com/ngokevin/kframe/blob/master/components/geometry-merger/examples/basic/index.html#L10)
 
 ### API
