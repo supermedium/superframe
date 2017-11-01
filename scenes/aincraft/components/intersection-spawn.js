@@ -15,6 +15,13 @@ AFRAME.registerComponent('intersection-spawn', {
     const el = this.el;
 
     el.addEventListener(data.event, evt => {
+      if (!evt.detail.intersection) {
+        // The browser emits a click MouseEvent after the cursor component emits the mouseup event.
+        // We ignore it because it doesn't have detail.intersection.
+        // We are only interested by the click CustomEvent fired by the cursor component.
+        return;
+      }
+
       // Create element.
       const spawnEl = document.createElement('a-entity');
 
