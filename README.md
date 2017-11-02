@@ -17,6 +17,7 @@ See documentation for individual components:
 - [entity-generator](https://github.com/ngokevin/kframe/tree/master/components/entity-generator/) - Generate a number of entities in A-Frame given a mixin
 - [event-set](https://github.com/ngokevin/kframe/tree/master/components/event-set/) - Set properties in response to events in A-Frame
 - [firebase](https://github.com/ngokevin/kframe/tree/master/components/firebase/) - Multi-user in A-Frame using Firebase
+- [fps-counter](https://github.com/ngokevin/kframe/tree/master/components/fps-counter/) - A simple FPS counter component to measure performance in VR for A-Frame.
 - [geometry-merger](https://github.com/ngokevin/kframe/tree/master/components/geometry-merger/) - An A-Frame component to merge geometries to reduce draw calls.
 - [gltf-part](https://github.com/ngokevin/kframe/tree/master/components/gltf-part/) - A component to extract parts from a GLTF model into their own A-Frame entities.
 - [haptics](https://github.com/ngokevin/kframe/tree/master/components/haptics/) - A controller haptics (vibrations) component for A-Frame.
