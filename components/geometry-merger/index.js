@@ -8,9 +8,8 @@ AFRAME.registerComponent('geometry-merger', {
     var faceIndexStart;
     var self = this;
 
-    this.geometry = new THREE.Geometry();
-    this.mesh = new THREE.Mesh(this.geometry);
-    this.el.setObject3D('mesh', this.mesh);
+    this.mesh = this.el.getOrCreateObject3D('mesh', THREE.Mesh);
+    this.geometry = this.mesh.geometry = new THREE.Geometry();
 
     this.faceIndex = {};  // Keep index of original entity UUID to new face array.
     this.vertexIndex = {};  // Keep index of original entity UUID to vertex array.
