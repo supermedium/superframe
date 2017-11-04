@@ -12,6 +12,7 @@ See documentation for individual components:
 
 - [aabb-collider](https://github.com/ngokevin/kframe/tree/master/components/aabb-collider/) - An axis-aligned bounding box component for A-Frame.
 - [animation](https://github.com/ngokevin/kframe/tree/master/components/animation/) - Animations in A-Frame using anime.js
+- [atlas-uvs](https://github.com/ngokevin/kframe/tree/master/components/atlas-uvs/) - An A-Frame component to set UVs onto a plane geometry given a gridded texture atlas.
 - [audioanalyser](https://github.com/ngokevin/kframe/tree/master/components/audioanalyser/) - Audio visualizations in A-Frame using Web Audio (AnalyserNode)
 - [broadcast](https://github.com/ngokevin/kframe/tree/master/components/broadcast/) - Multi-user in A-Frame using raw websockets
 - [entity-generator](https://github.com/ngokevin/kframe/tree/master/components/entity-generator/) - Generate a number of entities in A-Frame given a mixin
