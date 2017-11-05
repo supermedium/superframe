@@ -96,7 +96,7 @@
 	  pulse: function () {
 	    var actuator;
 	    var data = this.data;
-	    if (!data.enabled || !this.gamepad) { return; }
+	    if (!data.enabled || !this.gamepad || !this.gamepad.hapticActuators) { return; }
 	    actuator = this.gamepad.hapticActuators[data.actuatorIndex];
 	    actuator.pulse(data.force, data.dur);
 	  },
