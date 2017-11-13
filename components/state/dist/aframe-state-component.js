@@ -681,6 +681,11 @@ AFRAME.registerReducer = function (name, definition) {
     // Call reducer.
     var newState = definition.handlers[type].call(NewReducer.prototype, state, payload);
 
+    // Call postAction.
+    if (definition.postAction) {
+      newState = definition.postAction.call(NewReducer.prototype, newState, payload);
+    }
+
     // Re-add metadata properties.
     payload.toJSON = toJSON;
     payload.type = type;
@@ -692,6 +697,7 @@ AFRAME.registerReducer = function (name, definition) {
     Reducer: NewReducer,
     initialState: NewReducer.prototype.initialState,
     handlers: NewReducer.prototype.handlers,
+    postAction: NewReducer.prototype.postAction,
     reducer: NewReducer.prototype.reducer
   };
   return NewReducer;

@@ -47,6 +47,20 @@ AFRAME.scenes[0].emit('increaseScore', {points: 50});
 
 And the binding components will automatically update the entities.
 
+To process the state after any event-triggered action, specify a `postAction`
+to update the state:
+
+```js
+AFRAME.registerReducer('app', {
+  // ...
+
+  postAction: function (newState, payload) {
+    newState.isRedOrBlue = newState.isRed || newState.isBlue;
+    return newState;
+  }
+});
+```
+
 ### Installation
 
 #### Browser

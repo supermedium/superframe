@@ -30,6 +30,11 @@ AFRAME.registerReducer('foo', {
       newState.color = payload.color;
       return newState;
     }
+  },
+
+  postAction: function (newState) {
+    newState.colorCounter = `${newState.color}${newState.counter}`;
+    return newState;
   }
 });
 
@@ -44,6 +49,19 @@ suite('state', function () {
         return;
       }
       el.sceneEl.addEventListener('loaded', () => { done(); });
+    });
+  });
+
+  suite('reducer', () => {
+    test('runs postAction', done => {
+      el.emit('fooColor', {color: 'red'});
+      setTimeout(() => {
+        el.emit('fooAdd', {number: 5});
+        setTimeout(() => {
+          assert.equal(el.sceneEl.systems.state.state.foo.colorCounter, 'red10');
+          done();
+        });
+      });
     });
   });
 
