@@ -7,7 +7,8 @@ AFRAME.registerReducer('foo', {
   initialState: {
     counter: 5,
     enabled: false,
-    color: 'red'
+    color: 'red',
+    position: {x: 0, y: 0, z: 0}
   },
 
   handlers: {
@@ -28,6 +29,13 @@ AFRAME.registerReducer('foo', {
 
     fooColor: (newState, payload) => {
       newState.color = payload.color;
+      return newState;
+    },
+
+    fooPosition: (newState, payload) => {
+      newState.position.x = payload.position.x;
+      newState.position.y = payload.position.y;
+      newState.position.z = payload.position.z;
       return newState;
     }
   },
@@ -230,6 +238,17 @@ suite('state', function () {
       el.emit('fooColor', {color: 'orange'});
       setTimeout(() => {
         assert.equal(setAttributeSpy.getCalls().length, 0);
+        done();
+      });
+    });
+
+    test('binds vector', done => {
+      el.setAttribute('bind__position', 'foo.position');
+      el.emit('fooPosition', {position: {x: 1, y: 2, z: 3}});
+      setTimeout(() => {
+        assert.equal(el.getAttribute('position').x, 1);
+        assert.equal(el.getAttribute('position').y, 2);
+        assert.equal(el.getAttribute('position').z, 3);
         done();
       });
     });

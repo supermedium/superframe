@@ -1,6 +1,6 @@
 {
   "name": "aframe-state-component",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "State management using declarative binding, pure function state transitions, and event-based action dispatchers, with Redux.",
   "main": "dist/aframe-state-component.js",
   "unpkg": "dist/aframe-state-component.min.js",
