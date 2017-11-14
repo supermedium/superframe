@@ -812,7 +812,7 @@ AFRAME.registerComponent('bind', {
 
     if (_typeof(this.data) !== 'object') {
       value = select(state, this.data);
-      if (value === this.lastData) {
+      if (value.constructor !== Object && value === this.lastData) {
         return;
       }
       AFRAME.utils.entity.setComponentProperty(el, this.id, value);
@@ -825,7 +825,7 @@ AFRAME.registerComponent('bind', {
       stateSelector = this.data[propertyName].trim();
       value = select(state, stateSelector);
 
-      if (this.lastData[propertyName] === value) {
+      if (value.constructor !== Object && this.lastData[propertyName] === value) {
         continue;
       }
 
