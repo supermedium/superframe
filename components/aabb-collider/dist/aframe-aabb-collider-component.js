@@ -251,7 +251,7 @@
 	      var boxMin;
 	      var boxMax;
 
-	      mesh = el.getObject3D('mesh');
+	      mesh = el.getObject3D('mesh') || el.getObject3D('text');
 	      if (!mesh) { return; }
 
 	      boundingBox.setFromObject(mesh);
