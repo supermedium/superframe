@@ -88,7 +88,7 @@ AFRAME.registerComponent('aabb-collider', {
     this.prevCheckTime = time;
 
     // No mesh, no collisions
-    mesh = el.getObject3D('mesh');
+    mesh = el.getObject3D('mesh') || el.getObject3D('text');
     if (!mesh) { return; }
 
     if (this.dirty) { this.refreshObjects(); }
