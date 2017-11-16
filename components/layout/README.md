@@ -40,15 +40,17 @@ We move then entire group around while maintaining the layout:
 
 ### Properties
 
-| Property | Description                                                                                        | Default Value |
-|----------|----------------------------------------------------------------------------------------------------|---------------|
-| type     | Type of layout. Can be one of `box`, `circle`, `cube`, `dodecahedron`, `line`, `pyramid`.          | `line`        |
-| columns  | Number of columns (for type `box`).                                                                | 1             |
-| margin   | Margin in meters (for type `box`, `line`).                                                         | 1             |
-| plane    | Which plane direction for 2D layout. Can be `xy`, `yz`, or `xz` (for type `box`, `circle`, `line`) | `xy`          |
-| radius   | Radius in meters (for type `circle`, `cube`, `dodecahedron`, `pyramid`.                            | 1             |
-| reverse  | Whether to reverse direction of layout.                                                            | false         |
-| angle    | For type `circle`, set this to position items `angle` degrees apart                                | false         |
+| Property     | Description                                                                                        | Default Value |
+|--------------|----------------------------------------------------------------------------------------------------|---------------|
+| type         | Type of layout. Can be one of `box`, `circle`, `cube`, `dodecahedron`, `line`, `pyramid`.          | `line`        |
+| columns      | Number of columns (for type `box`).                                                                | 1             |
+| margin       | Margin in meters (for type `box`, `line`).                                                         | 1             |
+| marginColumn | Margin in meters just for the columns (for type `box`). Defaults to `margin` value.                | 1             |
+| marginRow    | Margin in meters just for the rows (for type `box`). Defaults to `margin` value.                   | 1             |
+| plane        | Which plane direction for 2D layout. Can be `xy`, `yz`, or `xz` (for type `box`, `circle`, `line`) | `xy`          |
+| radius       | Radius in meters (for type `circle`, `cube`, `dodecahedron`, `pyramid`.                            | 1             |
+| reverse      | Whether to reverse direction of layout.                                                            | false         |
+| angle        | For type `circle`, set this to position items `angle` degrees apart                                | false         |
 
 ### Usage
 
