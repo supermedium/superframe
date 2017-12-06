@@ -15,6 +15,7 @@ module.exports = {
   output: {
     path: __dirname + '/dist',
     filename: process.env.NODE_ENV === 'production' ? 'aframe-state-component.min.js' : 'aframe-state-component.js',
+    libraryTarget: 'umd'
   },
   plugins: PLUGINS,
   module: {

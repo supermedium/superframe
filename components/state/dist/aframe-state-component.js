@@ -1,4 +1,14 @@
-/******/ (function(modules) { // webpackBootstrap
+(function webpackUniversalModuleDefinition(root, factory) {
+	if(typeof exports === 'object' && typeof module === 'object')
+		module.exports = factory();
+	else if(typeof define === 'function' && define.amd)
+		define([], factory);
+	else {
+		var a = factory();
+		for(var i in a) (typeof exports === 'object' ? exports : root)[i] = a[i];
+	}
+})(this, function() {
+return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
 /******/
@@ -85,41 +95,75 @@ AFRAME.registerState = function (definition) {
 
 AFRAME.registerSystem('state', {
   init: function init() {
+    var _this = this;
+
     this.diff = {};
     this.lastState = {};
     this.state = AFRAME.utils.clone(State.initialState);
     this.subscriptions = [];
     this.initEventHandlers();
+
+    this.el.addEventListener('loaded', function () {
+      var i;
+      // Initial dispatch.
+      for (i = 0; i < _this.subscriptions.length; i++) {
+        _this.subscriptions[i].onStateUpdate(_this.state, '@@INIT', {});
+      }
+    });
   },
 
+  /**
+   * Dispatch action.
+   */
   dispatch: function dispatch(actionName, payload) {
     var i;
+    var key;
     var subscription;
 
-    // Store last state.
-    AFRAME.utils.extendDeep(this.lastState, this.state);
-
-    // Calculate new state.
     State.handlers[actionName](this.state, payload);
 
     // Post-compute.
     State.computeState(this.state);
 
     // Get a diff to optimize bind updates.
-    AFRAME.utils.diff(this.lastState, this.state, this.diff);
+    for (key in this.diff) {
+      delete this.diff[key];
+    }
+    AFRAME.utils.diff(this.state, this.lastState, this.diff);
+
+    // Store last state.
+    AFRAME.utils.extendDeep(this.lastState, this.state);
+
+    // Calculate new state.
 
     // Notify subscriptions / binders.
     for (i = 0; i < this.subscriptions.length; i++) {
-      this.subscriptions[i](this.state, this.diff, actionName, payload);
+      if (!this.shouldUpdate(this.subscriptions[i].keysToWatch, this.diff)) {
+        continue;
+      }
+      this.subscriptions[i].onStateUpdate(this.state, actionName, payload);
     }
   },
 
-  subscribe: function subscribe(fn) {
-    this.subscriptions.push(fn);
+  subscribe: function subscribe(component) {
+    this.subscriptions.push(component);
   },
 
-  unsubscribe: function unsubscribe(fn) {
-    this.subscriptions.splice(this.subscriptions.indexOf(fn), 1);
+  unsubscribe: function unsubscribe(component) {
+    this.subscriptions.splice(this.subscriptions.indexOf(component), 1);
+  },
+
+  /**
+   * Check if state changes were relevant to this binding. If not, don't call.
+   */
+  shouldUpdate: function shouldUpdate(keysToWatch, diff) {
+    var stateKey;
+    for (stateKey in diff) {
+      if (keysToWatch.indexOf(stateKey)) {
+        return true;
+      }
+    }
+    return false;
   },
 
   /**
@@ -135,7 +179,6 @@ AFRAME.registerSystem('state', {
 
     // Use declared handlers to know what events to listen to.
     for (actionName in State.handlers) {
-      actionNameClosure = actionName;
       // Only need to register one handler for each event.
       if (registeredActions.indexOf(actionName) !== -1) {
         continue;
@@ -145,10 +188,10 @@ AFRAME.registerSystem('state', {
     }
 
     function registerListener(actionName) {
-      var _this = this;
+      var _this2 = this;
 
       this.el.addEventListener(actionName, function (evt) {
-        _this.dispatch(actionName, evt.detail);
+        _this2.dispatch(actionName, evt.detail);
       });
     }
   }
@@ -207,7 +250,7 @@ AFRAME.registerComponent('bind', {
     this.updateObj = {};
 
     // Subscribe to store and register handler to do data-binding to components.
-    this.system.subscribe(this.onStateUpdate);
+    this.system.subscribe(this);
   },
 
   update: function update() {
@@ -232,28 +275,13 @@ AFRAME.registerComponent('bind', {
   /**
    * Handle state update.
    */
-  onStateUpdate: function onStateUpdate(state, diff) {
+  onStateUpdate: function onStateUpdate(state) {
     // Update component with the state.
-    var hasChanges = false;
     var hasKeys = false;
     var el = this.el;
     var propertyName;
-    var stateKey;
     var stateSelector;
     var value;
-
-    // Check if state changes were relevant to this binding.
-    for (stateKey in diff) {
-      if (this.keysToWatch.indexOf(stateKey)) {
-        hasChanges = true;
-      }
-      if (hasChanges) {
-        break;
-      }
-    }
-    if (!hasChanges) {
-      return;
-    }
 
     if (this.isNamespacedBind) {
       clearObject(this.updateObj);
@@ -308,7 +336,7 @@ AFRAME.registerComponent('bind', {
   },
 
   remove: function remove() {
-    this.system.unsubscribe(this.onStateUpdate);
+    this.system.unsubscribe(this);
   }
 });
 
@@ -337,5 +365,53 @@ function clearObject(obj) {
   }
 }
 
+/**
+ * Helper to compose object of handlers, merging functions handling same action.
+ */
+function composeHandlers() {
+  var actionName;
+  var i;
+  var inputHandlers = arguments;
+  var outputHandlers;
+
+  outputHandlers = {};
+  for (i = 0; i < inputHandlers.length; i++) {
+    for (actionName in inputHandlers[i]) {
+      if (actionName in outputHandlers) {
+        // Initial compose/merge functions into arrays.
+        if (outputHandlers[actionName].constructor === Array) {
+          outputHandlers[actionName].push(inputHandlers[i][actionName]);
+        } else {
+          outputHandlers[actionName] = [outputHandlers[actionName], inputHandlers[i][actionName]];
+        }
+      } else {
+        outputHandlers[actionName] = inputHandlers[i][actionName];
+      }
+    }
+  }
+
+  // Compose functions specified via array.
+  for (actionName in outputHandlers) {
+    if (outputHandlers[actionName].constructor === Array) {
+      outputHandlers[actionName] = composeFunctions.apply(this, outputHandlers[actionName]);
+    }
+  }
+
+  return outputHandlers;
+}
+module.exports.composeHandlers = composeHandlers;
+
+function composeFunctions() {
+  var functions = arguments;
+  return function () {
+    var i;
+    for (i = 0; i < functions.length; i++) {
+      functions[i].apply(this, arguments);
+    }
+  };
+}
+module.exports.composeFunctions = composeFunctions;
+
 /***/ })
 /******/ ]);
+});

@@ -16,36 +16,64 @@ AFRAME.registerSystem('state', {
     this.state = AFRAME.utils.clone(State.initialState);
     this.subscriptions = [];
     this.initEventHandlers();
+
+    this.el.addEventListener('loaded', () => {
+      var i;
+      // Initial dispatch.
+      for (i = 0; i < this.subscriptions.length; i++) {
+        this.subscriptions[i].onStateUpdate(this.state, '@@INIT', {});
+      }
+    });
   },
 
+  /**
+   * Dispatch action.
+   */
   dispatch: function (actionName, payload) {
     var i;
+    var key;
     var subscription;
 
-    // Store last state.
-    AFRAME.utils.extendDeep(this.lastState, this.state);
-
-    // Calculate new state.
     State.handlers[actionName](this.state, payload);
 
     // Post-compute.
     State.computeState(this.state);
 
     // Get a diff to optimize bind updates.
-    AFRAME.utils.diff(this.lastState, this.state, this.diff);
+    for (key in this.diff) { delete this.diff[key]; }
+    AFRAME.utils.diff(this.state, this.lastState, this.diff);
+
+    // Store last state.
+    AFRAME.utils.extendDeep(this.lastState, this.state);
+
+    // Calculate new state.
 
     // Notify subscriptions / binders.
     for (i = 0; i < this.subscriptions.length; i++) {
-      this.subscriptions[i](this.state, this.diff, actionName, payload);
+      if (!this.shouldUpdate(this.subscriptions[i].keysToWatch, this.diff)) {
+        continue;
+      }
+      this.subscriptions[i].onStateUpdate(this.state, actionName, payload);
     }
   },
 
-  subscribe: function (fn) {
-    this.subscriptions.push(fn);
+  subscribe: function (component) {
+    this.subscriptions.push(component);
   },
 
-  unsubscribe: function (fn) {
-    this.subscriptions.splice(this.subscriptions.indexOf(fn), 1);
+  unsubscribe: function (component) {
+    this.subscriptions.splice(this.subscriptions.indexOf(component), 1);
+  },
+
+  /**
+   * Check if state changes were relevant to this binding. If not, don't call.
+   */
+  shouldUpdate: function (keysToWatch, diff) {
+    var stateKey;
+    for (stateKey in diff) {
+      if (keysToWatch.indexOf(stateKey)) { return true; }
+    }
+    return false;
   },
 
   /**
@@ -61,7 +89,6 @@ AFRAME.registerSystem('state', {
 
     // Use declared handlers to know what events to listen to.
     for (actionName in State.handlers) {
-      actionNameClosure = actionName;
       // Only need to register one handler for each event.
       if (registeredActions.indexOf(actionName) !== -1) { continue; }
       registeredActions.push(actionName);
@@ -128,7 +155,7 @@ AFRAME.registerComponent('bind', {
     this.updateObj = {};
 
     // Subscribe to store and register handler to do data-binding to components.
-    this.system.subscribe(this.onStateUpdate);
+    this.system.subscribe(this);
   },
 
   update: function () {
@@ -153,22 +180,13 @@ AFRAME.registerComponent('bind', {
   /**
    * Handle state update.
    */
-  onStateUpdate: function (state, diff) {
+  onStateUpdate: function (state) {
     // Update component with the state.
-    var hasChanges = false;
     var hasKeys = false;
     var el = this.el;
     var propertyName;
-    var stateKey;
     var stateSelector;
     var value;
-
-    // Check if state changes were relevant to this binding.
-    for (stateKey in diff) {
-      if (this.keysToWatch.indexOf(stateKey)) { hasChanges = true; }
-      if (hasChanges) { break; }
-    }
-    if (!hasChanges) { return; }
 
     if (this.isNamespacedBind) { clearObject(this.updateObj); }
 
@@ -221,7 +239,7 @@ AFRAME.registerComponent('bind', {
   },
 
   remove: function () {
-    this.system.unsubscribe(this.onStateUpdate);
+    this.system.unsubscribe(this);
   }
 });
 
@@ -247,3 +265,50 @@ function clearObject (obj) {
   var key;
   for (key in obj) { delete obj[key]; }
 }
+
+/**
+ * Helper to compose object of handlers, merging functions handling same action.
+ */
+function composeHandlers () {
+  var actionName;
+  var i;
+  var inputHandlers = arguments;
+  var outputHandlers;
+
+  outputHandlers = {};
+  for (i = 0; i < inputHandlers.length; i++) {
+    for (actionName in inputHandlers[i]) {
+      if (actionName in outputHandlers) {
+        // Initial compose/merge functions into arrays.
+        if (outputHandlers[actionName].constructor === Array) {
+          outputHandlers[actionName].push(inputHandlers[i][actionName]);
+        } else {
+          outputHandlers[actionName] = [outputHandlers[actionName], inputHandlers[i][actionName]];
+        }
+      } else {
+        outputHandlers[actionName] = inputHandlers[i][actionName];
+      }
+    }
+  }
+
+  // Compose functions specified via array.
+  for (actionName in outputHandlers) {
+    if (outputHandlers[actionName].constructor === Array) {
+      outputHandlers[actionName] = composeFunctions.apply(this, outputHandlers[actionName])
+    }
+  }
+
+  return outputHandlers;
+}
+module.exports.composeHandlers = composeHandlers;
+
+function composeFunctions () {
+  var functions = arguments;
+  return function () {
+    var i;
+    for (i = 0; i < functions.length; i++) {
+      functions[i].apply(this, arguments);
+    }
+  }
+}
+module.exports.composeFunctions = composeFunctions;
