@@ -58,6 +58,7 @@ AFRAME.registerComponent('layout', {
   update: function (oldData) {
     var children = this.children;
     var data = this.data;
+    var definedData;
     var el = this.el;
     var numChildren = children.length;
     var positionFn;
@@ -91,7 +92,13 @@ AFRAME.registerComponent('layout', {
       }
     }
 
-    positions = positionFn(data, numChildren, 'margin' in el.getDOMAttribute('layout'));
+    definedData = el.getDOMAttribute('layout');
+    positions = positionFn(
+      data, numChildren,
+      typeof definedData === 'string'
+      ? definedData.indexOf('margin') !== -1
+      : 'margin' in definedData
+    );
     if (data.reverse) { positions.reverse(); }
     setPositions(children, positions);
   },
