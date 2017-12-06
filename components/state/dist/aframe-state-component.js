@@ -152,8 +152,6 @@ AFRAME.registerSystem('state', {
    */
   copyState: function copyState(lastState, state) {
     var key;
-    console.log(lastState, state);
-
     for (key in state) {
       if (state[key] && _typeof(state[key].constructor) === Object) {
         this.copyState(lastState[key], state[key]);
