@@ -5,6 +5,8 @@ var State = {
   computeState: function () { /* no-op */ }
 };
 
+var duh;
+
 AFRAME.registerState = function (definition) {
   AFRAME.utils.extend(State, definition);
 }
@@ -12,10 +14,11 @@ AFRAME.registerState = function (definition) {
 AFRAME.registerSystem('state', {
   init: function () {
     this.diff = {};
-    this.lastState = {};
     this.state = AFRAME.utils.clone(State.initialState);
     this.subscriptions = [];
     this.initEventHandlers();
+
+    this.lastState = AFRAME.utils.clone(this.state);
 
     this.el.addEventListener('loaded', () => {
       var i;
@@ -34,6 +37,7 @@ AFRAME.registerSystem('state', {
     var key;
     var subscription;
 
+    // Modify state.
     State.handlers[actionName](this.state, payload);
 
     // Post-compute.
@@ -44,9 +48,7 @@ AFRAME.registerSystem('state', {
     AFRAME.utils.diff(this.state, this.lastState, this.diff);
 
     // Store last state.
-    AFRAME.utils.extendDeep(this.lastState, this.state);
-
-    // Calculate new state.
+    this.copyState(this.lastState, this.state);
 
     // Notify subscriptions / binders.
     for (i = 0; i < this.subscriptions.length; i++) {
@@ -54,6 +56,20 @@ AFRAME.registerSystem('state', {
         continue;
       }
       this.subscriptions[i].onStateUpdate(this.state, actionName, payload);
+    }
+  },
+
+  /**
+   * Store last state through a deep extend, but not for arrays.
+   */
+  copyState: function (lastState, state) {
+    var key;
+    for (key in state) {
+      if (state[key] && typeof state[key].constructor === Object) {
+        this.copyState(lastState[key], state[key]);
+      } else {
+        lastState[key] = state[key];
+      }
     }
   },
 
@@ -132,7 +148,7 @@ AFRAME.registerComponent('bind', {
       properties = value.split(';');
       for (i = 0; i < properties.length; i++) {
         pair = properties[i].trim().split(':');
-        data[pair[0]] = pair[1];
+        data[pair[0]] = pair[1].trim();
       }
       return data;
     }
@@ -160,20 +176,25 @@ AFRAME.registerComponent('bind', {
 
   update: function () {
     var data = this.data;
-    var dotIndex;
     var key;
     var property;
 
     this.keysToWatch.length = 0;
 
     // Index `keysToWatch` to only update state on relevant changes.
+    if (typeof data === 'string') {
+      this.keysToWatch.push(getKeyToWatch(data));
+      return;
+    }
     for (key in data) {
-      property = key;
-      dotIndex = data[key].indexOf('.');
-      if (dotIndex !== -1) {
-        property = data[key].substring(0, data[key].indexOf('.'));
-      }
-      this.keysToWatch.push(property);
+      this.keysToWatch.push(getKeyToWatch(data[key]));
+    }
+
+    function getKeyToWatch (str) {
+      var dotIndex;
+      dotIndex = str.indexOf('.');
+      if (dotIndex === -1) { return str.trim(); }
+      return str.substring(0, str.indexOf('.')).trim();
     }
   },
 
