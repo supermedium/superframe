@@ -1,4 +1,4 @@
-AFRAME.registerReducer('app', {
+AFRAME.registerState({
   initialState: {
     score: 0
   },
@@ -6,12 +6,10 @@ AFRAME.registerReducer('app', {
   handlers: {
     decreasescore: function (state, action) {
       state.score -= action.points;
-      return state;
     },
 
     increasescore: function (state, action) {
       state.score += action.points;
-      return state;
     }
   }
 });

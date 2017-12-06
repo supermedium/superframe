@@ -1,165 +1,78 @@
-var Redux = require('redux');
-
-var REDUCERS = {};  // Registered reducers.
-var Reducers = {};  // Reducer instances.
-
-function createStore () {
-  var reducers = {};  // Reducer functions.
-
-  // Instantiate registered reducers.
-  Object.keys(REDUCERS).forEach(function (reducerName) {
-    Reducers[reducerName] = new REDUCERS[reducerName].Reducer();
-    reducers[reducerName] = Reducers[reducerName].reducer;
-  });
-
-  // Create store
-  return Redux.createStore(
-    Redux.combineReducers(reducers),
-    window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
-  );
-}
-module.exports.createStore = createStore;
-
-/**
- * Dispatch action to store.
- *
- * @param {string} actionName
- * @param {object} payload
- */
-function dispatch (store, actionName, payload) {
-  store.dispatch(Object.assign({
-    type: actionName,
-    toJSON: function () {
-      var key;
-      var serializedPayload = {};
-      // toJSON just for redux-devtools-extension to serialize DOM elements.
-      for (key in payload) {
-        if (payload[key].tagName) {
-          serializedPayload[key] = 'element#' + payload[key].id;
-        } else {
-          serializedPayload[key] = payload[key];
-        }
-      }
-      serializedPayload.type = actionName;
-      return serializedPayload;
-    }
-  }, payload));
-}
-module.exports.dispatch = dispatch;
-
-/**
- * Proxy events to action dispatches so components can just bubble actions up as events.
- * Reducers register which actions they handle. Go through all of them and
- * add event listeners.
- */
-function initEventProxies (el, store) {
-  var reducerName;
-  var registeredActions = [];
-
-  for (reducerName in Reducers) {
-    // Use reducer's declared handlers to know what events to listen to.
-    Object.keys(Reducers[reducerName].handlers).forEach(function (actionName) {
-      // Only need to register one handler for each event.
-      if (registeredActions.indexOf(actionName) !== -1) { return; }
-      registeredActions.push(actionName);
-      el.addEventListener(actionName, function dispatchActionFromEvent (evt) {
-        dispatch(store, actionName, evt.detail);
-      });
-    });
-  }
-}
-
-/**
- * Base reducer prototype.
- */
-var Reducer = function () { /* no-op */ };
-Reducer.prototype = {
+// Singleton state definition.
+var State = {
   initialState: {},
-  handlers: {}
+  handlers: {},
+  computeState: function () { /* no-op */ }
 };
 
-/**
- * API for registering reducers.
- */
-AFRAME.registerReducer = function (name, definition) {
-  var NewReducer;
-  var proto;
+AFRAME.registerState = function (definition) {
+  AFRAME.utils.extend(State, definition);
+}
 
-  if (REDUCERS[name]) {
-    throw new Error('The reducer `' + name + '` has been already registered. ' +
-                    'Check that you are not loading two versions of the same reducer ' +
-                    'or two different reducers of the same name.');
-  }
-
-  // Format definition object to prototype object.
-  proto = {};
-  Object.keys(definition).forEach(function convertToPrototype (key) {
-    proto[key] = {
-      value: definition[key],
-      writable: true
-    };
-  });
-
-  // Extend base prototype.
-  NewReducer = function () { Reducer.call(this); };
-  NewReducer.prototype = Object.create(Reducer.prototype, proto);
-  NewReducer.prototype.name = name;
-  NewReducer.prototype.constructor = NewReducer;
-
-  // Wrap reducer to bind `this` to prototype. Redux would bind `window`.
-  // Combine all handlers into one reducer function.
-  NewReducer.prototype.reducer = function (state, payload) {
-    // Call reducer.
-    state = Object.assign({}, state || NewReducer.prototype.initialState);
-    if (!definition.handlers[payload.type]) { return state; }
-
-    // Remove metadata properties from payload, not relevant to reducer.
-    var toJSON = payload.toJSON;
-    var type = payload.type;
-    delete payload.toJSON;
-    delete payload.type;
-
-    // Call reducer.
-    var newState = definition.handlers[type].call(NewReducer.prototype, state, payload);
-
-    // Call postAction.
-    if (definition.postAction) {
-      newState = definition.postAction.call(NewReducer.prototype, newState, payload);
-    }
-
-    // Re-add metadata properties.
-    payload.toJSON = toJSON;
-    payload.type = type;
-
-    return newState;
-  };
-
-  REDUCERS[name] = {
-    Reducer: NewReducer,
-    initialState: NewReducer.prototype.initialState,
-    handlers: NewReducer.prototype.handlers,
-    postAction: NewReducer.prototype.postAction,
-    reducer: NewReducer.prototype.reducer
-  };
-  return NewReducer;
-};
-
-/**
- * State system using Redux.
- */
 AFRAME.registerSystem('state', {
   init: function () {
-    var store = this.store = createStore();
-    this.state = store.getState();
-    store.subscribe(() => {
-      this.state = store.getState();
-      this.el.emit('statechanged');
-    });
-    initEventProxies(this.el, this.store);
+    this.diff = {};
+    this.lastState = {};
+    this.state = AFRAME.utils.clone(State.initialState);
+    this.subscriptions = [];
+    this.initEventHandlers();
   },
 
-  getState: function () {
-    return this.state;
+  dispatch: function (actionName, payload) {
+    var i;
+    var subscription;
+
+    // Store last state.
+    AFRAME.utils.extendDeep(this.lastState, this.state);
+
+    // Calculate new state.
+    State.handlers[actionName](this.state, payload);
+
+    // Post-compute.
+    State.computeState(this.state);
+
+    // Get a diff to optimize bind updates.
+    AFRAME.utils.diff(this.lastState, this.state, this.diff);
+
+    // Notify subscriptions / binders.
+    for (i = 0; i < this.subscriptions.length; i++) {
+      this.subscriptions[i](this.state, this.diff, actionName, payload);
+    }
+  },
+
+  subscribe: function (fn) {
+    this.subscriptions.push(fn);
+  },
+
+  unsubscribe: function (fn) {
+    this.subscriptions.splice(this.subscriptions.indexOf(fn), 1);
+  },
+
+  /**
+   * Proxy events to action dispatches so components can just bubble actions up as events.
+   * Handlers define which actions they handle. Go through all and add event listeners.
+   */
+  initEventHandlers: function () {
+    var actionName;
+    var registeredActions = [];
+    var self = this;
+
+    registerListener = registerListener.bind(this);
+
+    // Use declared handlers to know what events to listen to.
+    for (actionName in State.handlers) {
+      actionNameClosure = actionName;
+      // Only need to register one handler for each event.
+      if (registeredActions.indexOf(actionName) !== -1) { continue; }
+      registeredActions.push(actionName);
+      registerListener(actionName);
+    }
+
+    function registerListener (actionName) {
+      this.el.addEventListener(actionName, evt => {
+        this.dispatch(actionName, evt.detail);
+      });
+    }
   }
 });
 
@@ -201,7 +114,8 @@ AFRAME.registerComponent('bind', {
   multiple: true,
 
   init: function () {
-    this.unsubscribe = null;
+    this.system = this.el.sceneEl.systems.state;
+    this.keysToWatch = [];
     this.onStateUpdate = this.onStateUpdate.bind(this);
 
     // Whether we are binding by namespace (e.g., bind__foo="prop1: true").
@@ -212,38 +126,53 @@ AFRAME.registerComponent('bind', {
 
     this.lastData = {};
     this.updateObj = {};
+
+    // Subscribe to store and register handler to do data-binding to components.
+    this.system.subscribe(this.onStateUpdate);
   },
 
   update: function () {
-    var el = this.el;
-    var self = this;
-    var store;
+    var data = this.data;
+    var dotIndex;
+    var key;
+    var property;
 
-    // Reset handler.
-    if (this.unsubscribe) { this.unsubscribe(); }
+    this.keysToWatch.length = 0;
 
-    // Subscribe to store and register handler to do data-binding to components.
-    store = el.sceneEl.systems.state.store;
-    this.unsubscribe = store.subscribe(this.onStateUpdate);
-    this.onStateUpdate();
+    // Index `keysToWatch` to only update state on relevant changes.
+    for (key in data) {
+      property = key;
+      dotIndex = data[key].indexOf('.');
+      if (dotIndex !== -1) {
+        property = data[key].substring(0, data[key].indexOf('.'));
+      }
+      this.keysToWatch.push(property);
+    }
   },
 
   /**
    * Handle state update.
    */
-  onStateUpdate: function () {
+  onStateUpdate: function (state, diff) {
     // Update component with the state.
+    var hasChanges = false;
     var hasKeys = false;
     var el = this.el;
     var propertyName;
-    var state;
+    var stateKey;
     var stateSelector;
     var value;
 
-    state = el.sceneEl.systems.state.state;
+    // Check if state changes were relevant to this binding.
+    for (stateKey in diff) {
+      if (this.keysToWatch.indexOf(stateKey)) { hasChanges = true; }
+      if (hasChanges) { break; }
+    }
+    if (!hasChanges) { return; }
 
     if (this.isNamespacedBind) { clearObject(this.updateObj); }
 
+    // Single-property bind.
     if (typeof this.data !== 'object') {
       value = select(state, this.data);
 
@@ -292,7 +221,7 @@ AFRAME.registerComponent('bind', {
   },
 
   remove: function () {
-    if (this.unsubscribe) { this.unsubscribe(); }
+    this.system.unsubscribe(this.onStateUpdate);
   }
 });
 

@@ -1,17 +1,21 @@
 ## aframe-state-component
 
-[A-Frame](https://aframe.io) state management using declarative binding, pure
-function state transitions, and event-based action dispatchers, currently based
-on Redux.
+State management for [A-Frame](https://aframe.io) using single global state
+modified through actions. Features declarative bindings to easily bind state to
+application. By separating state from components and being able to bind state
+to component properties, components can be decoupled from the application, not
+needing to know about its state.
+
+No dependencies and tailored for A-Frame. Bindings will only update their
+entities if relevant pieces of the global state are modified.
 
 ### Usage
 
-Reducers are functions that take the current state and an action (a JavaScript
-object), and returns the new state. To register reducers, use
-`AFRAME.registerReducer`:
+The application state is a singleton defining an initial state and handler
+functions that modify the state.
 
 ```js
-AFRAME.registerReducer('app', {
+AFRAME.registerState({
   initialState: {
     score: 0
   },
@@ -19,18 +23,17 @@ AFRAME.registerReducer('app', {
   handlers: {
     decreaseScore: function (state, action) {
       state.score -= action.points;
-      return state;
     },
 
     increaseScore: function (state, action) {
       state.score += action.points;
-      return state;
     }
   }
 });
 ```
 
-Then we can declarative bind pieces of the state into the A-Frame application with the `bind` component:
+Then we can declarative bind pieces of the state into the A-Frame application
+with the `bind` component:
 
 ```html
 <a-scene>
@@ -45,18 +48,24 @@ To update the state, we can dispatch an action using an event:
 AFRAME.scenes[0].emit('increaseScore', {points: 50});
 ```
 
-And the binding components will automatically update the entities.
-
-To process the state after any event-triggered action, specify a `postAction`
-to update the state:
+Or manually dispatched:
 
 ```js
-AFRAME.registerReducer('app', {
+AFRAME.scenes[0].systems.state.dispatch('increaseScore', {points: 50});
+```
+
+The binding components will automatically and selectively update the entities
+in response to state changes.
+
+To post-process the state after any event-triggered action, specify a
+`computeState` function to update the state:
+
+```js
+AFRAME.registerState({
   // ...
 
-  postAction: function (newState, payload) {
+  computeState: function (newState, payload) {
     newState.isRedOrBlue = newState.isRed || newState.isBlue;
-    return newState;
   }
 });
 ```
@@ -70,17 +79,17 @@ Install and use by directly including the [browser files](dist):
 ```html
 <head>
   <title>My A-Frame Scene</title>
-  <script src="https://aframe.io/releases/0.6.1/aframe.min.js"></script>
+  <script src="https://aframe.io/releases/0.8.0/aframe.min.js"></script>
   <script src="https://unpkg.com/aframe-state-component/dist/aframe-state-component.min.js"></script>
   <script>
-    AFRAME.registerReducer('foo', {
+    AFRAME.registerState({
       initialState: {
         enemyPosition: {x: 0, y: 1, z: 2}
       },
+
       handlers: {
         enemyMoved: function (state, action) {
           state.enemyPosition = action.newPosition;
-          return state;
         }
       },
     });

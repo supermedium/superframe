@@ -1,7 +1,7 @@
 {
   "name": "aframe-state-component",
-  "version": "1.8.0",
-  "description": "State management using declarative binding, pure function state transitions, and event-based action dispatchers, with Redux.",
+  "version": "2.0.0",
+  "description": "State management for A-Frame using single global state modified through actions. State flows down to application via declarative binding.",
   "main": "dist/aframe-state-component.js",
   "unpkg": "dist/aframe-state-component.min.js",
   "scripts": {
@@ -30,9 +30,6 @@
     "url": "https://github.com/ngokevin/kframe/issues"
   },
   "homepage": "https://github.com/ngokevin/kframe/tree/components/state#readme",
-  "dependencies": {
-    "redux": "^3.5.2"
-  },
   "devDependencies": {
     "aframe": "*",
     "babel-core": "^6.26.0",
