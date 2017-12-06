@@ -5,8 +5,6 @@ var State = {
   computeState: function () { /* no-op */ }
 };
 
-var duh;
-
 AFRAME.registerState = function (definition) {
   AFRAME.utils.extend(State, definition);
 }

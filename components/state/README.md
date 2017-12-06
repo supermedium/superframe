@@ -57,7 +57,7 @@ AFRAME.scenes[0].systems.state.dispatch('increaseScore', {points: 50});
 The binding components will automatically and selectively update the entities
 in response to state changes.
 
-To post-process the state after any event-triggered action, specify a
+To attach additional computed state after the action is processed, specify a
 `computeState` function to update the state:
 
 ```js
