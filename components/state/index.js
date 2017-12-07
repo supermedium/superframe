@@ -50,9 +50,7 @@ AFRAME.registerSystem('state', {
 
     // Notify subscriptions / binders.
     for (i = 0; i < this.subscriptions.length; i++) {
-      if (!this.shouldUpdate(this.subscriptions[i].keysToWatch, this.diff)) {
-        continue;
-      }
+      if (!this.shouldUpdate(this.subscriptions[i].keysToWatch, this.diff)) { continue; }
       this.subscriptions[i].onStateUpdate(this.state, actionName, payload);
     }
   },
@@ -85,7 +83,9 @@ AFRAME.registerSystem('state', {
   shouldUpdate: function (keysToWatch, diff) {
     var stateKey;
     for (stateKey in diff) {
-      if (keysToWatch.indexOf(stateKey)) { return true; }
+      if (keysToWatch.indexOf(stateKey) !== -1) {
+        return true;
+      }
     }
     return false;
   },
@@ -199,7 +199,7 @@ AFRAME.registerComponent('bind', {
   /**
    * Handle state update.
    */
-  onStateUpdate: function (state) {
+  onStateUpdate: function (state, actionName) {
     // Update component with the state.
     var hasKeys = false;
     var el = this.el;

@@ -89,8 +89,6 @@ var State = {
   computeState: function computeState() {/* no-op */}
 };
 
-var duh;
-
 AFRAME.registerState = function (definition) {
   AFRAME.utils.extend(State, definition);
 };
@@ -175,7 +173,7 @@ AFRAME.registerSystem('state', {
   shouldUpdate: function shouldUpdate(keysToWatch, diff) {
     var stateKey;
     for (stateKey in diff) {
-      if (keysToWatch.indexOf(stateKey)) {
+      if (keysToWatch.indexOf(stateKey) !== -1) {
         return true;
       }
     }
@@ -298,7 +296,7 @@ AFRAME.registerComponent('bind', {
   /**
    * Handle state update.
    */
-  onStateUpdate: function onStateUpdate(state) {
+  onStateUpdate: function onStateUpdate(state, actionName) {
     // Update component with the state.
     var hasKeys = false;
     var el = this.el;
