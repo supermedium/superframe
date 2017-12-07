@@ -11,6 +11,8 @@ entities if relevant pieces of the global state are modified.
 
 ### Usage
 
+#### Defining State
+
 The application state is a singleton defining an initial state and handler
 functions that modify the state.
 
@@ -32,15 +34,19 @@ AFRAME.registerState({
 });
 ```
 
+#### Binding State
+
 Then we can declarative bind pieces of the state into the A-Frame application
 with the `bind` component:
 
 ```html
 <a-scene>
   <a-entity bind__text="value: app.score"></a-entity>
-  <!-- Or <a-entity bind="text.value: app.score"> -->
+  <!-- Or <a-entity bind="text.value: score"> -->
 </a-scene>
 ```
+
+#### Modifying State
 
 To update the state, we can dispatch an action using an event:
 
@@ -56,6 +62,8 @@ AFRAME.scenes[0].systems.state.dispatch('increaseScore', {points: 50});
 
 The binding components will automatically and selectively update the entities
 in response to state changes.
+
+#### Computed State
 
 To attach additional computed state after the action is processed, specify a
 `computeState` function to update the state:
@@ -97,7 +105,7 @@ Install and use by directly including the [browser files](dist):
 </head>
 <body>
   <a-scene>
-    <a-entity bind__position="foo.enemyPosition"></a-entity>
+    <a-entity bind__position="enemyPosition"></a-entity>
   </a-scene>
 </body>
 ```
