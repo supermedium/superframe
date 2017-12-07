@@ -37,7 +37,8 @@ AFRAME.registerState({
 #### Binding State
 
 Then we can declarative bind pieces of the state into the A-Frame application
-with the `bind` component:
+with the `bind` component. The components will be automatically updated when
+the state changes.
 
 ```html
 <a-scene>
@@ -52,16 +53,16 @@ To update the state, we can dispatch an action using an event:
 
 ```js
 AFRAME.scenes[0].emit('increaseScore', {points: 50});
-```
 
-Or manually dispatched:
-
-```js
-AFRAME.scenes[0].systems.state.dispatch('increaseScore', {points: 50});
+// Or manually dispatched:
+// AFRAME.scenes[0].systems.state.dispatch('increaseScore', {points: 50});
 ```
 
 The binding components will automatically and selectively update the entities
 in response to state changes.
+
+A `stateupdate` event will be fired, but we probably don't need to use it. The
+event might later be useful if we develop a debugging front-end for the state.
 
 #### Computed State
 
