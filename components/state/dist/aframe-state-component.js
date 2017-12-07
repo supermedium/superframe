@@ -104,6 +104,11 @@ AFRAME.registerSystem('state', {
 
     this.lastState = AFRAME.utils.clone(this.state);
 
+    this.eventDetail = {
+      lastState: this.lastState,
+      state: this.state
+    };
+
     this.el.addEventListener('loaded', function () {
       var i;
       // Initial dispatch.
@@ -131,7 +136,7 @@ AFRAME.registerSystem('state', {
     for (key in this.diff) {
       delete this.diff[key];
     }
-    AFRAME.utils.diff(this.state, this.lastState, this.diff);
+    AFRAME.utils.diff(this.lastState, this.state, this.diff);
 
     // Store last state.
     this.copyState(this.lastState, this.state);
@@ -143,6 +148,11 @@ AFRAME.registerSystem('state', {
       }
       this.subscriptions[i].onStateUpdate(this.state, actionName, payload);
     }
+
+    // Emit.
+    this.eventDetail.action = actionName;
+    this.eventDetail.payload = payload;
+    this.el.emit('stateupdate', this.eventDetail);
   },
 
   /**
@@ -150,12 +160,22 @@ AFRAME.registerSystem('state', {
    */
   copyState: function copyState(lastState, state) {
     var key;
+
     for (key in state) {
-      if (state[key] && _typeof(state[key].constructor) === Object) {
+      // Nested state.
+      if (state[key] && state[key].constructor === Object) {
+        if (!(key in lastState)) {
+          // Clone object if destination does not exist.
+          lastState[key] = AFRAME.utils.clone(state[key]);
+          return;
+        }
+        // Recursively copy state.
         this.copyState(lastState[key], state[key]);
-      } else {
-        lastState[key] = state[key];
+        return;
       }
+
+      // Copy by value.
+      lastState[key] = state[key];
     }
   },
 

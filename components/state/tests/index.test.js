@@ -3,20 +3,26 @@ require('aframe');
 require('../index.js');
 var entityFactory = require('./helpers').entityFactory;
 
-AFRAME.registerState({
-  initialState: {
-    color: 'red',
-    counter: 5,
+var initialState = {
+  color: 'red',
+  counter: 5,
+  enabled: false,
+  nested: {
     enabled: false,
-    nested: {
-      enabled: false,
-    },
-    position: {x: 0, y: 0, z: 0}
   },
+  position: {x: 0, y: 0, z: 0}
+};
+
+AFRAME.registerState({
+  initialState: initialState,
 
   handlers: {
     fooAdd: (state, payload) => {
       state.counter += payload.number;
+    },
+
+    fooAddPropertyToNested: (state, payload) => {
+      state.nested.item = payload.item;
     },
 
     fooEnable: (state, payload) => {
@@ -49,27 +55,59 @@ AFRAME.registerState({
 
 suite('state', function () {
   var el;
+  var system;
 
   setup(function (done) {
     el = entityFactory();
     setTimeout(() => {
       if (el.sceneEl.hasLoaded) {
+        system = el.sceneEl.systems.state;
         done();
         return;
       }
-      el.sceneEl.addEventListener('loaded', () => { done(); });
+      el.sceneEl.addEventListener('loaded', () => {
+        system = el.sceneEl.systems.state;
+        done();
+      });
     });
   });
 
-  suite('reducer', () => {
-    test('runs postAction', done => {
-      el.emit('fooColor', {color: 'red'});
+  suite('last state', () => {
+    test('initializes last state to initial state', () => {
+      assert.shallowDeepEqual(system.lastState, initialState);
+      assert.notOk(system.lastState === system.state);
+    });
+
+    test('updates last state', () => {
+      el.emit('fooEnable');
+      assert.ok(system.lastState.enabled);
+      assert.notOk(system.lastState === system.state);
+    });
+
+    test('copies nested object values by value not reference', () => {
+      el.emit('fooEnableNested');
+      assert.notOk(system.lastState.nested === system.state.nested);
+      assert.shallowDeepEqual(system.lastState.nested, system.state.nested);
+    });
+
+    test('clones object to last state if does not exist', done => {
+      var obj = {foo: 'bar'};
+      el.emit('fooAddPropertyToNested', {item: obj});
       setTimeout(() => {
-        el.emit('fooAdd', {number: 5});
-        setTimeout(() => {
-          assert.equal(el.sceneEl.systems.state.state.colorCounter, 'red10');
-          done();
-        });
+        assert.equal(system.lastState.nested.item.foo, 'bar');
+        assert.ok(system.lastState.nested.item !== system.state.nested.item);
+        done();
+      });
+    });
+  });
+
+  test('runs computeState', done => {
+    el.emit('fooColor', {color: 'red'});
+    setTimeout(() => {
+      el.emit('fooAdd', {number: 5});
+      setTimeout(() => {
+        assert.equal(el.sceneEl.systems.state.state.colorCounter, 'red10');
+        done();
       });
     });
   });
