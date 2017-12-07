@@ -3,46 +3,47 @@ require('aframe');
 require('../index.js');
 var entityFactory = require('./helpers').entityFactory;
 
-AFRAME.registerReducer('foo', {
+AFRAME.registerState({
   initialState: {
+    color: 'red',
     counter: 5,
     enabled: false,
-    color: 'red',
+    nested: {
+      enabled: false,
+    },
     position: {x: 0, y: 0, z: 0}
   },
 
   handlers: {
-    fooAdd: (newState, payload) => {
-      newState.counter += payload.number;
-      return newState;
+    fooAdd: (state, payload) => {
+      state.counter += payload.number;
     },
 
-    fooEnable: (newState, payload) => {
-      newState.enabled = true;
-      return newState;
+    fooEnable: (state, payload) => {
+      state.enabled = true;
     },
 
-    fooSubtract: (newState, payload) => {
-      newState.counter -= payload.number;
-      return newState;
+    fooEnableNested: (state, payload) => {
+      state.nested.enabled = true;
     },
 
-    fooColor: (newState, payload) => {
-      newState.color = payload.color;
-      return newState;
+    fooSubtract: (state, payload) => {
+      state.counter -= payload.number;
     },
 
-    fooPosition: (newState, payload) => {
-      newState.position.x = payload.position.x;
-      newState.position.y = payload.position.y;
-      newState.position.z = payload.position.z;
-      return newState;
+    fooColor: (state, payload) => {
+      state.color = payload.color;
+    },
+
+    fooPosition: (state, payload) => {
+      state.position.x = payload.position.x;
+      state.position.y = payload.position.y;
+      state.position.z = payload.position.z;
     }
   },
 
-  postAction: function (newState) {
-    newState.colorCounter = `${newState.color}${newState.counter}`;
-    return newState;
+  computeState: function (state) {
+    state.colorCounter = `${state.color}${state.counter}`;
   }
 });
 
@@ -66,7 +67,7 @@ suite('state', function () {
       setTimeout(() => {
         el.emit('fooAdd', {number: 5});
         setTimeout(() => {
-          assert.equal(el.sceneEl.systems.state.state.foo.colorCounter, 'red10');
+          assert.equal(el.sceneEl.systems.state.state.colorCounter, 'red10');
           done();
         });
       });
@@ -75,7 +76,7 @@ suite('state', function () {
 
   suite('bind', () => {
     test('binds single-property component', done => {
-      el.setAttribute('bind', 'visible: foo.enabled');
+      el.setAttribute('bind', 'visible: enabled');
       assert.notOk(el.getAttribute('visible'));
       el.emit('fooEnable');
       setTimeout(() => {
@@ -85,9 +86,19 @@ suite('state', function () {
     });
 
     test('binds single-property component with namespace', done => {
-      el.setAttribute('bind__visible', 'foo.enabled');
+      el.setAttribute('bind__visible', 'enabled');
       assert.notOk(el.getAttribute('visible'));
       el.emit('fooEnable');
+      setTimeout(() => {
+        assert.ok(el.getAttribute('visible'));
+        done();
+      });
+    });
+
+    test('binds single-property component with namespace and nested state', done => {
+      el.setAttribute('bind__visible', 'nested.enabled');
+      assert.notOk(el.getAttribute('visible'));
+      el.emit('fooEnableNested');
       setTimeout(() => {
         assert.ok(el.getAttribute('visible'));
         done();
@@ -100,7 +111,7 @@ suite('state', function () {
           counter: {default: 100}
         }
       });
-      el.sceneEl.setAttribute('bind__test-system', 'counter: foo.counter');
+      el.sceneEl.setAttribute('bind__test-system', 'counter: counter');
       assert.equal(el.sceneEl.getAttribute('test-system').counter, 5);
       el.emit('fooAdd', {number: 10});
       setTimeout(() => {
@@ -120,7 +131,7 @@ suite('state', function () {
       assert.equal(el.getAttribute('bar').barCounter, 0);
 
       // Bind.
-      el.setAttribute('bind', {'bar.barCounter': 'foo.counter', 'baz.bazCounter': 'foo.counter'});
+      el.setAttribute('bind', {'bar.barCounter': 'counter', 'baz.bazCounter': 'counter'});
 
       // Assert initial state bind values.
       assert.equal(el.getAttribute('bar').barCounter, 5);
@@ -148,7 +159,7 @@ suite('state', function () {
       });
 
       // Bind.
-      el.setAttribute('bind__bar', {'barCounter': 'foo.counter', 'barEnabled': 'foo.enabled'});
+      el.setAttribute('bind__bar', {'barCounter': 'counter', 'barEnabled': 'enabled'});
 
       // Assert initial state bind values.
       assert.equal(el.getAttribute('bar').barCounter, 5);
@@ -178,7 +189,7 @@ suite('state', function () {
       });
 
       // Bind.
-      el.setAttribute('bind__bar', {'barCounter': 'foo.counter', 'barEnabled': 'foo.enabled'});
+      el.setAttribute('bind__bar', {'barCounter': 'counter', 'barEnabled': 'enabled'});
 
 
       assert.equal(spy.getCalls().length, 2);
@@ -188,7 +199,7 @@ suite('state', function () {
     });
 
     test('binds non-component attribute', done => {
-      el.setAttribute('bind', 'data-enabled: foo.enabled');
+      el.setAttribute('bind', 'data-enabled: enabled');
       assert.equal(el.getAttribute('data-enabled'), 'false');
       el.emit('fooEnable');
       setTimeout(() => {
@@ -198,7 +209,7 @@ suite('state', function () {
     });
 
     test('binds non-component attribute with namespace', done => {
-      el.setAttribute('bind__data-enabled', 'foo.enabled');
+      el.setAttribute('bind__data-enabled', 'enabled');
       assert.equal(el.getAttribute('data-enabled'), 'false');
       el.emit('fooEnable');
       setTimeout(() => {
@@ -209,7 +220,7 @@ suite('state', function () {
 
     test('avoids calling setAttribute if data has not changed', function (done) {
       var setAttributeSpy;
-      el.setAttribute('bind', 'data-counter: foo.counter; visible: foo.enabled');
+      el.setAttribute('bind', 'data-counter: counter; visible: enabled');
       el.emit('fooAdd', {number: 10});
       setTimeout(() => {
         setAttributeSpy = this.sinon.spy(el, 'setAttribute');
@@ -232,7 +243,7 @@ suite('state', function () {
         }
       });
 
-      el.setAttribute('bind__test', 'counter: foo.counter; enabled: foo.enabled');
+      el.setAttribute('bind__test', 'counter: counter; enabled: enabled');
 
       setAttributeSpy = this.sinon.spy(el, 'setAttribute');
       el.emit('fooColor', {color: 'orange'});
@@ -243,7 +254,7 @@ suite('state', function () {
     });
 
     test('binds vector', done => {
-      el.setAttribute('bind__position', 'foo.position');
+      el.setAttribute('bind__position', 'position');
       el.emit('fooPosition', {position: {x: 1, y: 2, z: 3}});
       setTimeout(() => {
         assert.equal(el.getAttribute('position').x, 1);

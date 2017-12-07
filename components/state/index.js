@@ -170,6 +170,8 @@ AFRAME.registerComponent('bind', {
 
     // Subscribe to store and register handler to do data-binding to components.
     this.system.subscribe(this);
+
+    this.onStateUpdate(this.system.state);
   },
 
   update: function () {

@@ -7,7 +7,7 @@
 		var a = factory();
 		for(var i in a) (typeof exports === 'object' ? exports : root)[i] = a[i];
 	}
-})(this, function() {
+})(typeof self !== 'undefined' ? self : this, function() {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -265,6 +265,8 @@ AFRAME.registerComponent('bind', {
 
     // Subscribe to store and register handler to do data-binding to components.
     this.system.subscribe(this);
+
+    this.onStateUpdate(this.system.state);
   },
 
   update: function update() {
