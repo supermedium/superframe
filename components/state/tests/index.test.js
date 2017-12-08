@@ -9,6 +9,7 @@ var initialState = {
   enabled: false,
   nested: {
     enabled: false,
+    enabled2: false
   },
   position: {x: 0, y: 0, z: 0}
 };
@@ -31,6 +32,10 @@ AFRAME.registerState({
 
     fooEnableNested: (state, payload) => {
       state.nested.enabled = true;
+    },
+
+    fooEnableNested2: (state, payload) => {
+      state.nested.enabled2 = true;
     },
 
     fooSubtract: (state, payload) => {
@@ -137,6 +142,16 @@ suite('state', function () {
       el.setAttribute('bind__visible', 'nested.enabled');
       assert.notOk(el.getAttribute('visible'));
       el.emit('fooEnableNested');
+      setTimeout(() => {
+        assert.ok(el.getAttribute('visible'));
+        done();
+      });
+    });
+
+    test('binds single-property component with namespace and nested state 2', done => {
+      el.setAttribute('bind__visible', 'nested.enabled2');
+      assert.notOk(el.getAttribute('visible'));
+      el.emit('fooEnableNested2');
       setTimeout(() => {
         assert.ok(el.getAttribute('visible'));
         done();

@@ -167,11 +167,11 @@ AFRAME.registerSystem('state', {
         if (!(key in lastState)) {
           // Clone object if destination does not exist.
           lastState[key] = AFRAME.utils.clone(state[key]);
-          return;
+          continue;
         }
         // Recursively copy state.
         this.copyState(lastState[key], state[key]);
-        return;
+        continue;
       }
 
       // Copy by value.
