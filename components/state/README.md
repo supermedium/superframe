@@ -81,6 +81,47 @@ AFRAME.registerState({
 });
 ```
 
+#### Utils
+
+The component exports utilities to help organize the state definition by
+helping to split up handlers and compute state functions into separate
+modules.
+
+`composeHandlers (handlers1, handlers2, ...)`
+
+Combines together objects containing handlers. If two objects have a handler
+function for the same action name, those two handler functions will be composed
+together.
+
+```js
+var composeHandlers = require('aframe-state-component').composeHandlers;
+AFRAME.registerState({
+  computeHandlers: composeHandlers(
+    {
+      quxAction: state => { state.counter++; }
+      qazAction: state => { state.counter--; }
+    },
+    require('./fooState').handlers,
+    require('./barState').handlers
+  )
+});
+```
+
+`composeFunctions (fn1, fn2, ...)`
+
+Combines functions together. Useful for combining multiple `computeState`
+functions together.
+
+```js
+var composeFunctions = require('aframe-state-component').composeFunctions;
+AFRAME.registerState({
+  computeState: composeFunctions(
+    require('./fooState').composeState,
+    require('./barState').composeState
+  )
+});
+```
+
 ### Installation
 
 #### Browser
