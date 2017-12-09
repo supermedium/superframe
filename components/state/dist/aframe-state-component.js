@@ -332,7 +332,11 @@ AFRAME.registerComponent('bind', {
 
     // Single-property bind.
     if (_typeof(this.data) !== 'object') {
-      value = select(state, this.data);
+      try {
+        value = select(state, this.data);
+      } catch (e) {
+        throw new Error('[aframe-state-component] Key \'' + this.data + '\' not found in state.' + (' #' + this.el.getAttribute('id') + '[' + this.attrName + ']'));
+      }
 
       if (typeof value !== 'object ' && _typeof(this.lastData) !== 'object' && this.lastData === value) {
         return;
@@ -346,7 +350,11 @@ AFRAME.registerComponent('bind', {
     for (propertyName in this.data) {
       // Pointer to a value in the state (e.g., `player.health`).
       stateSelector = this.data[propertyName].trim();
-      value = select(state, stateSelector);
+      try {
+        value = select(state, stateSelector);
+      } catch (e) {
+        throw new Error('[aframe-state-component] Key \'' + propertyName + '\' not found in state.' + (' #' + this.el.getAttribute('id') + '[' + this.attrName + ']'));
+      }
 
       if ((typeof value === 'undefined' ? 'undefined' : _typeof(value)) !== 'object' && _typeof(this.lastData[propertyName]) !== 'object' && this.lastData[propertyName] === value) {
         continue;
