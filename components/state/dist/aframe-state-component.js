@@ -353,7 +353,7 @@ AFRAME.registerComponent('bind', {
       try {
         value = select(state, stateSelector);
       } catch (e) {
-        throw new Error('[aframe-state-component] Key \'' + propertyName + '\' not found in state.' + (' #' + this.el.getAttribute('id') + '[' + this.attrName + ']'));
+        throw new Error('[aframe-state-component] Key \'' + stateSelector + '\' not found in state.' + (' #' + this.el.getAttribute('id') + '[' + this.attrName + ']'));
       }
 
       if ((typeof value === 'undefined' ? 'undefined' : _typeof(value)) !== 'object' && _typeof(this.lastData[propertyName]) !== 'object' && this.lastData[propertyName] === value) {

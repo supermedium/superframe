@@ -255,7 +255,7 @@ AFRAME.registerComponent('bind', {
       try {
         value = select(state, stateSelector);
       } catch (e) {
-        throw new Error(`[aframe-state-component] Key '${propertyName}' not found in state.` +
+        throw new Error(`[aframe-state-component] Key '${stateSelector}' not found in state.` +
                         ` #${this.el.getAttribute('id')}[${this.attrName}]`);
       }
 
