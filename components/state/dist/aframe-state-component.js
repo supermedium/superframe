@@ -298,20 +298,11 @@ AFRAME.registerComponent('bind', {
 
     // Index `keysToWatch` to only update state on relevant changes.
     if (typeof data === 'string') {
-      this.keysToWatch.push(getKeyToWatch(data));
+      this.keysToWatch.push(parseKeyToWatch(data));
       return;
     }
     for (key in data) {
-      this.keysToWatch.push(getKeyToWatch(data[key]));
-    }
-
-    function getKeyToWatch(str) {
-      var dotIndex;
-      dotIndex = str.indexOf('.');
-      if (dotIndex === -1) {
-        return str.trim();
-      }
-      return str.substring(0, str.indexOf('.')).trim();
+      this.keysToWatch.push(parseKeyToWatch(data[key]));
     }
   },
 
@@ -392,6 +383,56 @@ AFRAME.registerComponent('bind', {
 });
 
 /**
+ * Toggle component attach and detach based on boolean value.
+ *
+ * bind__raycastable="isRaycastable""
+ */
+AFRAME.registerComponent('bind-toggle', {
+  schema: { type: 'string' },
+
+  multiple: true,
+
+  init: function init() {
+    this.system = this.el.sceneEl.systems.state;
+    this.keysToWatch = [];
+    this.onStateUpdate = this.onStateUpdate.bind(this);
+
+    // Subscribe to store and register handler to do data-binding to components.
+    this.system.subscribe(this);
+
+    this.onStateUpdate(this.system.state);
+  },
+
+  update: function update() {
+    this.keysToWatch[0] = parseKeyToWatch(this.data);
+  },
+
+  /**
+   * Handle state update.
+   */
+  onStateUpdate: function onStateUpdate(state, actionName) {
+    var el = this.el;
+    var value;
+
+    try {
+      value = select(state, this.data);
+    } catch (e) {
+      throw new Error('[aframe-state-component] Key \'' + this.data + '\' not found in state.' + (' #' + this.el.getAttribute('id') + '[' + this.attrName + ']'));
+    }
+
+    if (value) {
+      el.setAttribute(this.id, '');
+    } else {
+      el.removeAttribute(this.id);
+    }
+  },
+
+  remove: function remove() {
+    this.system.unsubscribe(this);
+  }
+});
+
+/**
  * Select value from store.
  *
  * @param {object} state - State object.
@@ -462,6 +503,15 @@ function composeFunctions() {
   };
 }
 module.exports.composeFunctions = composeFunctions;
+
+function parseKeyToWatch(str) {
+  var dotIndex;
+  dotIndex = str.indexOf('.');
+  if (dotIndex === -1) {
+    return str.trim();
+  }
+  return str.substring(0, str.indexOf('.')).trim();
+}
 
 /***/ })
 /******/ ]);

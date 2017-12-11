@@ -26,6 +26,10 @@ AFRAME.registerState({
       state.nested.item = payload.item;
     },
 
+    fooDisable: (state, payload) => {
+      state.enabled = false;
+    },
+
     fooEnable: (state, payload) => {
       state.enabled = true;
     },
@@ -57,6 +61,8 @@ AFRAME.registerState({
     state.colorCounter = `${state.color}${state.counter}`;
   }
 });
+
+AFRAME.registerComponent('raycastable', {});
 
 suite('state', function () {
   var el;
@@ -313,6 +319,32 @@ suite('state', function () {
         assert.equal(el.getAttribute('position').x, 1);
         assert.equal(el.getAttribute('position').y, 2);
         assert.equal(el.getAttribute('position').z, 3);
+        done();
+      });
+    });
+  });
+
+  suite.only('bind-toggle', () => {
+    test('toggles component', done => {
+      el.setAttribute('bind-toggle__raycastable', 'enabled');
+      assert.notOk('raycastable' in el.components);
+      el.emit('fooEnable');
+      setTimeout(() => {
+        assert.ok('raycastable' in el.components);
+        el.emit('fooDisable');
+        setTimeout(() => {
+          assert.notOk('raycastable' in el.components);
+          done();
+        });
+      });
+    });
+
+    test('toggles component via nested state', done => {
+      el.setAttribute('bind-toggle__raycastable', 'nested.enabled');
+      assert.notOk('raycastable' in el.components);
+      el.emit('fooEnableNested');
+      setTimeout(() => {
+        assert.ok('raycastable' in el.components);
         done();
       });
     });

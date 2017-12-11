@@ -49,6 +49,13 @@ the state changes.
 </a-scene>
 ```
 
+There's also a `bind-toggle` component which will attach and detach a component
+entirely based on a boolean value.
+
+```js
+<a-entity bind__raycastable="isRaycastable"></a-entity>
+```
+
 #### Modifying State
 
 To update the state, we can dispatch an action using an event:
