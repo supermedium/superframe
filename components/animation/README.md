@@ -1,5 +1,7 @@
 ## aframe-animation-component
 
+> Recommended to use master branch of A-Frame (0.8.0 milestone) for v4.x.
+
 An animation component for [A-Frame](https://aframe.io) using
 [anime.js](https://github.com/juliangarnier/anime).
 
