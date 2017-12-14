@@ -446,11 +446,11 @@ function select(state, selector) {
   for (i = 0; i < split.length; i++) {
     value = value[split[i]];
   }
-  if (selector[0] === '!') {
-    return !value;
-  }
   if (selector[0] === '!' && selector[1] === '!') {
     return !!value;
+  }
+  if (selector[0] === '!') {
+    return !value;
   }
   return value;
 }

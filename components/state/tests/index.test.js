@@ -180,6 +180,26 @@ suite('state', function () {
       });
     });
 
+    test('binds single-property component with namespace/nested/!', done => {
+      el.setAttribute('bind__visible', '!nested.enabled');
+      assert.ok(el.getAttribute('visible'));
+      el.emit('fooEnableNested');
+      setTimeout(() => {
+        assert.notOk(el.getAttribute('visible'));
+        done();
+      });
+    });
+
+    test('binds single-property component with namespace/nested/!!', done => {
+      el.setAttribute('bind__visible', '!!nested.enabled');
+      assert.notOk(el.getAttribute('visible'));
+      el.emit('fooEnableNested');
+      setTimeout(() => {
+        assert.ok(el.getAttribute('visible'));
+        done();
+      });
+    });
+
     test('binds single-property component with namespace and nested state 2', done => {
       el.setAttribute('bind__visible', 'nested.enabled2');
       assert.notOk(el.getAttribute('visible'));
