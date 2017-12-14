@@ -1,4 +1,4 @@
-/* global AFRAME */
+/* global AFRAME, THREE */
 
 var anime = require('animejs');
 
@@ -9,15 +9,14 @@ if (typeof AFRAME === 'undefined') {
 var utils = AFRAME.utils;
 var getComponentProperty = utils.entity.getComponentProperty;
 var setComponentProperty = utils.entity.setComponentProperty;
-var styleParser = utils.styleParser.parse;
 
 /**
  * Animation component for A-Frame.
  *
- * startEvents -> beginAnimation -> Set animationIsPlaying. FROM SCRATCH.
+ * startEvents -> beginAnimation -> Build animation from scratch and set animationIsPlaying.
  * pauseEvents -> pauseAnimation -> Unset animationIsPlaying.
- * resumeEvents ->
- * restartEvents ->
+ * resumeEvents -> resumeAnimation -> Set animationIsPlaying.
+ * restartEvents -> restartAnimation -> Call animation.restart().
  *
  * @member {object} animation - anime.js instance.
  * @member {boolean} animationIsPlaying - Control if animation is playing.
@@ -63,20 +62,17 @@ AFRAME.registerComponent('animation', {
     this.resumeAnimation = this.resumeAnimation.bind(this);
 
     this.config = {
-      complete: function () {i
+      complete: function () {
         self.el.emit('animationcomplete', self.eventDetail);
       }
     };
   },
 
   update: function () {
-    var attrName = this.attrName;
     var config = this.config;
     var data = this.data;
     var el = this.el;
     var propType;
-    var self = this;
-    var updateConfig;
 
     this.animationIsPlaying = false;
 
@@ -90,19 +86,11 @@ AFRAME.registerComponent('animation', {
     config.elasticity = data.elasticity;
     config.loop = data.loop;
 
-    // Check if vector config.
-    propType = getPropertyType(el, data.property);
-    if (propType === 'vec2' || propType === 'vec3' || propType === 'vec4') {
-      this.updateConfigForVector();
-    } else {
-      this.updateConfigForDefault();
-    }
-
     // Stop previous animation.
     this.pauseAnimation();
 
     // Start new animation.
-    this.startAnimation();
+    this.createAndStartAnimation();
   },
 
   tick: function (t, dt) {
@@ -150,7 +138,7 @@ AFRAME.registerComponent('animation', {
     config.aframeProperty = data.to;
     config.update = function (anim) {
       setComponentProperty(el, data.property, anim.animatables[0].target.aframeProperty);
-    }
+    };
   },
 
   /**
@@ -166,8 +154,9 @@ AFRAME.registerComponent('animation', {
     var to;
 
     // Parse coordinates.
-    from = getComponentProperty(el, data.property);
-    if (data.from) { from = AFRAME.utils.coordinates.parse(data.from); }
+    from = data.from
+      ? AFRAME.utils.coordinates.parse(data.from)  // If data.from defined, use that.
+      : getComponentProperty(el, data.property);  // If data.from not defined, get on the fly.
     to = AFRAME.utils.coordinates.parse(data.to);
 
     // Animate rotation through radians.
@@ -186,22 +175,32 @@ AFRAME.registerComponent('animation', {
       // If animating object3D transformation, run more optimized updater.
       config.update = function (anim) {
         el.object3D[data.property].copy(anim.animatables[0].target);
-      }
+      };
     } else {
       // Animating some vector.
       config.update = function (anim) {
-        setComponentProperty(el, property, anim.animations[0].target);
-      }
+        setComponentProperty(el, data.property, anim.animations[0].target);
+      };
     }
   },
 
   /**
    * Start animation from scratch.
+   *
+   * @param {boolean} isRestarting - If set, don't need to wait on delay or event.
    */
-  startAnimation: function () {
+  createAndStartAnimation: function (isRestarting) {
     var data = this.data;
     var el = this.el;
-    var self = this;
+    var propType;
+
+    // Update the config before each run. Check if vector config.
+    propType = getPropertyType(el, data.property);
+    if (propType === 'vec2' || propType === 'vec3' || propType === 'vec4') {
+      this.updateConfigForVector();
+    } else {
+      this.updateConfigForDefault();
+    }
 
     this.animationIsPlaying = false;
     this.animation = anime(this.config);
@@ -210,13 +209,13 @@ AFRAME.registerComponent('animation', {
     this.addEventListeners();
 
     // Delay animation.
-    if (data.delay) {
+    if (!isRestarting && data.delay) {
       setTimeout(this.beginAnimation, data.delay);
       return;
     }
 
     // Wait for start events for animation.
-    if (data.startEvents && data.startEvents.length) { return; }
+    if (!isRestarting && data.startEvents && data.startEvents.length) { return; }
 
     // Play animation.
     this.beginAnimation();
@@ -232,7 +231,7 @@ AFRAME.registerComponent('animation', {
   },
 
   restartAnimation: function () {
-    this.animation.restart();
+    this.createAndStartAnimation(this.animationIsPlaying);
   },
 
   resumeAnimation: function () {
