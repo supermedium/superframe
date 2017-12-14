@@ -442,11 +442,16 @@ function select(state, selector) {
   var i;
   var split;
   var value = state;
-  split = selector.split('.');
+  split = stripNot(selector).split('.');
   for (i = 0; i < split.length; i++) {
     value = value[split[i]];
   }
-  split.length = 0;
+  if (selector[0] === '!') {
+    return !value;
+  }
+  if (selector[0] === '!' && selector[1] === '!') {
+    return !!value;
+  }
   return value;
 }
 
@@ -506,11 +511,21 @@ module.exports.composeFunctions = composeFunctions;
 
 function parseKeyToWatch(str) {
   var dotIndex;
+  str = stripNot(str.trim());
   dotIndex = str.indexOf('.');
   if (dotIndex === -1) {
-    return str.trim();
+    return str;
   }
-  return str.substring(0, str.indexOf('.')).trim();
+  return str.substring(0, str.indexOf('.'));
+}
+
+function stripNot(str) {
+  if (str.indexOf('!!') === 0) {
+    return str.replace('!!', '');
+  } else if (str.indexOf('!') === 0) {
+    return str.replace('!', '');
+  }
+  return str;
 }
 
 /***/ })

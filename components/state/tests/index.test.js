@@ -134,12 +134,38 @@ suite('state', function () {
       });
     });
 
+    test('binds single-property component with !(not) operator', done => {
+      el.setAttribute('bind', 'visible: !enabled');
+      assert.ok(el.getAttribute('visible'));
+      el.emit('fooEnable');
+      setTimeout(() => {
+        assert.notOk(el.getAttribute('visible'));
+        done();
+      });
+    });
+
+    test('binds single-property component with !!(bool) operator', () => {
+      el.setAttribute('visible', false);
+      el.setAttribute('bind', 'visible: !!enabled');
+      assert.ok(el.getAttribute('visible'));
+    });
+
     test('binds single-property component with namespace', done => {
       el.setAttribute('bind__visible', 'enabled');
       assert.notOk(el.getAttribute('visible'));
       el.emit('fooEnable');
       setTimeout(() => {
         assert.ok(el.getAttribute('visible'));
+        done();
+      });
+    });
+
+    test('binds single-property component with namespae with !(not)', done => {
+      el.setAttribute('bind__visible', '!enabled');
+      assert.ok(el.getAttribute('visible'));
+      el.emit('fooEnable');
+      setTimeout(() => {
+        assert.notOk(el.getAttribute('visible'));
         done();
       });
     });
@@ -324,7 +350,7 @@ suite('state', function () {
     });
   });
 
-  suite.only('bind-toggle', () => {
+  suite('bind-toggle', () => {
     test('toggles component', done => {
       el.setAttribute('bind-toggle__raycastable', 'enabled');
       assert.notOk('raycastable' in el.components);
