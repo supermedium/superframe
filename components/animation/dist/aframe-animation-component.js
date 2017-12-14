@@ -286,6 +286,11 @@
 	    this.animationIsPlaying = true;
 	  },
 
+	  /**
+	   * Make sure two animations on the same property don't fight each other.
+	   * e.g., animation__mouseenter="property: material.opacity"
+	   *       animation__mouseleave="property: material.opacity"
+	   */
 	  stopRelatedAnimations: function () {
 	    var component;
 	    var componentName;
