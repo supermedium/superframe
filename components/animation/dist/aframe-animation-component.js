@@ -48,6 +48,8 @@
 
 	var anime = __webpack_require__(1);
 
+	AFRAME.anime = anime;
+
 	if (typeof AFRAME === 'undefined') {
 	  throw new Error('Component attempted to register before AFRAME was available.');
 	}

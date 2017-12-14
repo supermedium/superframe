@@ -2,6 +2,8 @@
 
 var anime = require('animejs');
 
+AFRAME.anime = anime;
+
 if (typeof AFRAME === 'undefined') {
   throw new Error('Component attempted to register before AFRAME was available.');
 }
