@@ -35,3 +35,4 @@ node_modules
 
 *.sw[ponml]
 yarn.lock
+package-lock.json

@@ -45,21 +45,30 @@ AFRAME.registerComponent('animation', {
   multiple: true,
 
   init: function () {
+    var self = this;
+
+    this.eventDetail = {name: this.attrName};
+
     this.animation = null;
     this.animationIsPlaying = false;
-    this.config = null;
     this.pauseAnimationBound = this.pauseAnimation.bind(this);
     this.beginAnimationBound = this.beginAnimation.bind(this);
     this.restartAnimationBound = this.restartAnimation.bind(this);
     this.resumeAnimationBound = this.resumeAnimation.bind(this);
+
+    this.config = {
+      complete: function () {i
+        self.el.emit('animationcomplete', self.eventDetail);
+      }
+    };
   },
 
   update: function () {
     var attrName = this.attrName;
-    var config;
+    var config = this.config;
     var data = this.data;
     var el = this.el;
-    var propType = getPropertyType(el, data.property);
+    var propType;
     var self = this;
     var updateConfig;
 
@@ -68,27 +77,20 @@ AFRAME.registerComponent('animation', {
     if (!data.property) { return; }
 
     // Base config.
-    config = {
-      autoplay: false,
-      complete: function () {
-        el.emit('animationcomplete', config);
-        el.emit(attrName + '-complete', config);
-      },
-      direction: data.dir,
-      duration: data.dur,
-      easing: data.easing,
-      elasticity: data.elasticity,
-      loop: data.loop
-    };
+    config.autoplay = false;
+    config.direction = data.dir;
+    config.duration = data.dur;
+    config.easing = data.easing;
+    config.elasticity = data.elasticity;
+    config.loop = data.loop;
 
-    // Customize config based on property type.
-    updateConfig = configDefault;
+    // Check if vector config.
+    propType = getPropertyType(el, data.property);
     if (propType === 'vec2' || propType === 'vec3' || propType === 'vec4') {
-      updateConfig = configVector;
+      this.updateConfigForVector();
+    } else {
+      this.updateConfigForDefault();
     }
-
-    // Create config.
-    this.config = updateConfig(el, data, config);
 
     // Stop previous animation.
     this.pauseAnimation();
@@ -102,17 +104,11 @@ AFRAME.registerComponent('animation', {
     this.animation.tick(t);
   },
 
-  /**
-   * `remove` handler.
-   */
   remove: function () {
     this.pauseAnimation();
     this.removeEventListeners();
   },
 
-  /**
-   * `pause` handler.
-   */
   pause: function () {
     this.paused = true;
     this.pausedWasPlaying = true;
@@ -130,6 +126,65 @@ AFRAME.registerComponent('animation', {
     if (this.pausedWasPlaying) {
       this.resumeAnimation();
       this.pausedWasPlaying = false;
+    }
+  },
+
+  /**
+   * Stuff property into generic `property` key.
+   */
+  updateConfigForDefault: function () {
+    var config = this.config;
+    var data = this.data;
+    var el = this.el;
+    var from;
+
+    from = data.from || getComponentProperty(el, data.property);
+    config.targets = {aframeProperty: from};
+    config.aframeProperty = data.to;
+    config.update = function (anim) {
+      setComponentProperty(el, data.property, anim.animatables[0].target.aframeProperty);
+    }
+  },
+
+  /**
+   * Extend x/y/z/w onto the config.
+   * Update vector by modifying object3D.
+   */
+  updateConfigForVector: function () {
+    var config = this.config;
+    var data = this.data;
+    var el = this.el;
+    var key;
+    var from;
+    var to;
+
+    // Parse coordinates.
+    from = getComponentProperty(el, data.property);
+    if (data.from) { from = AFRAME.utils.coordinates.parse(data.from); }
+    to = AFRAME.utils.coordinates.parse(data.to);
+
+    // Animate rotation through radians.
+    if (data.property === 'rotation') {
+      toRadians(from);
+      toRadians(to);
+    }
+
+    // Set to and from.
+    config.targets = [from];
+    for (key in to) { config[key] = to[key]; }
+
+    // Set update function.
+    if (data.property === 'position' || data.property === 'rotation' ||
+        data.property === 'scale') {
+      // If animating object3D transformation, run more optimized updater.
+      config.update = function (anim) {
+        el.object3D[data.property].copy(anim.animatables[0].target);
+      }
+    } else {
+      // Animating some vector.
+      config.update = function (anim) {
+        setComponentProperty(el, property, anim.animations[0].target);
+      }
     }
   },
 
@@ -165,10 +220,8 @@ AFRAME.registerComponent('animation', {
   },
 
   beginAnimation: function () {
-    var el = this.el;
     this.animationIsPlaying = true;
-    el.emit('animationbegin');
-    el.emit(this.attrName + '-begin');
+    this.el.emit('animationbegin', this.eventDetail);
   },
 
   restartAnimation: function () {
@@ -182,74 +235,36 @@ AFRAME.registerComponent('animation', {
   addEventListeners: function () {
     var data = this.data;
     var el = this.el;
-    var self = this;
-    data.startEvents.map(function (eventName) {
-      el.addEventListener(eventName, self.beginAnimationBound);
-    });
-    data.pauseEvents.map(function (eventName) {
-      el.addEventListener(eventName, self.pauseAnimationBound);
-    });
-    data.resumeEvents.map(function (eventName) {
-      el.addEventListener(eventName, self.resumeAnimationBound);
-    });
-    data.restartEvents.map(function (eventName) {
-      el.addEventListener(eventName, self.restartAnimationBound);
-    });
+    addEventListeners(el, data.startEvents, this.beginAnimationBound);
+    addEventListeners(el, data.pauseEvents, this.pauseAnimationBound);
+    addEventListeners(el, data.resumeEvents, this.resumeAnimationBound);
+    addEventListeners(el, data.restartEvents, this.restartAnimationBound);
   },
 
   removeEventListeners: function () {
     var data = this.data;
     var el = this.el;
-    var self = this;
-    data.startEvents.map(function (eventName) {
-      el.removeEventListener(eventName, self.beginAnimationBound);
-    });
-    data.pauseEvents.map(function (eventName) {
-      el.removeEventListener(eventName, self.pauseAnimationBound);
-    });
-    data.resumeEvents.map(function (eventName) {
-      el.removeEventListener(eventName, self.resumeAnimationBound);
-    });
-    data.restartEvents.map(function (eventName) {
-      el.removeEventListener(eventName, self.restartAnimationBound);
-    });
+    removeEventListeners(el, data.startEvents, this.beginAnimationBound);
+    removeEventListeners(el, data.pauseEvents, this.pauseAnimationBound);
+    removeEventListeners(el, data.resumeEvents, this.resumeAnimationBound);
+    removeEventListeners(el, data.restartEvents, this.restartAnimationBound);
   }
 });
 
 /**
- * Stuff property into generic `property` key.
+ * Given property name, check schema to see what type we are animating.
+ * We just care whether the property is a vector.
  */
-function configDefault (el, data, config) {
-  var from = data.from || getComponentProperty(el, data.property);
-  return AFRAME.utils.extend({}, config, {
-    targets: {aframeProperty: from},
-    aframeProperty: data.to,
-    update: function (anim) {
-      setComponentProperty(el, data.property, anim.animatables[0].target.aframeProperty);
-    }
-  });
-}
-
-/**
- * Extend x/y/z/w onto the config.
- */
-function configVector (el, data, config) {
-  var from = getComponentProperty(el, data.property);
-  if (data.from) { from = AFRAME.utils.coordinates.parse(data.from); }
-  var to = AFRAME.utils.coordinates.parse(data.to);
-  return AFRAME.utils.extend({}, config, {
-    targets: [from],
-    update: function (anim) {
-      setComponentProperty(el, data.property, anim.animatables[0].target);
-    }
-  }, to);
-}
-
 function getPropertyType (el, property) {
-  var split = property.split('.');
-  var componentName = split[0];
-  var propertyName = split[1];
-  var component = el.components[componentName] || AFRAME.components[componentName];
+  var component;
+  var componentName;
+  var split;
+  var propertyName;
+
+  split = property.split('.');
+  componentName = split[0];
+  propertyName = split[1];
+  component = el.components[componentName] || AFRAME.components[componentName];
 
   // Primitives.
   if (!component) { return null; }
@@ -259,6 +274,30 @@ function getPropertyType (el, property) {
 
   // Multi-prop.
   if (propertyName) { return component.schema[propertyName].type; }
+
   // Single-prop.
   return component.schema.type;
+}
+
+/**
+ * Convert object to radians.
+ */
+function toRadians (obj) {
+  obj.x = THREE.Math.degToRad(obj.x);
+  obj.y = THREE.Math.degToRad(obj.y);
+  obj.z = THREE.Math.degToRad(obj.z);
+}
+
+function addEventListeners (el, eventNames, handler) {
+  var i;
+  for (i = 0; i < eventNames.length; i++) {
+    el.addEventListener(eventNames[i], handler);
+  }
+}
+
+function removeEventListeners (el, eventNames, handler) {
+  var i;
+  for (i = 0; i < eventNames.length; i++) {
+    el.removeEventListener(eventNames[i], handler);
+  }
 }

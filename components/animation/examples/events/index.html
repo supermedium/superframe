@@ -4,7 +4,7 @@
     <meta name="description" content="Triggering and ending animations on events"></meta>
     <meta property="og:image" content="https://raw.githubusercontent.com/ngokevin/kframe/master/components/animation/examples/events/preview.gif"></meta>
     <script src="../build.js"></script>
-    <script src="https://aframe.io/releases/0.5.0/aframe.min.js"></script>
+    <script src="https://rawgit.com/aframevr/aframe/6019885/dist/aframe-master.min.js"></script>
     <script src="../../dist/aframe-animation-component.min.js"></script>
     <script src="components/event-proxy.js"></script>
     <script src="https://unpkg.com/aframe-event-set-component@3.0.x/dist/aframe-event-set-component.min.js"></script>
@@ -12,7 +12,9 @@
   </head>
   <body>
     <a-scene>
-      <a-entity id="container" position="0 0 -2">
+      <a-entity id="mouseCursor" cursor="rayOrigin: mouse"></a-entity>
+
+      <a-entity id="container" position="0 0 -4">
         <a-box
           id="testContainer" color="#F55" height="3"
           animation__scale="property: scale; dir: alternate; dur: 200;
@@ -30,6 +32,7 @@
           position="0 1 -2">
         </a-box>
 
+        <!-- Buttons. -->
         <a-mixin id="option"
                  geometry="primitive: box; width: 2; depth: 0.01"
                  material="color: #333"
@@ -57,10 +60,6 @@
 
       <!-- Sky. -->
       <a-sky color="#DDD"></a-sky>
-
-      <a-entity position="0 0 3">
-        <a-camera><a-cursor color="#FFF"></a-cursor></a-camera>
-      </a-entity>
     </a-scene>
 
     <!--githubcorner-->

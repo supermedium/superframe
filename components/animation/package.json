@@ -9,6 +9,7 @@
     "dist": "webpack index.js dist/aframe-animation-component.js && webpack -p index.js dist/aframe-animation-component.min.js",
     "lint": "semistandard -v | snazzy",
     "prepublish": "npm run dist",
+    "start": "npm run dev",
     "test": "karma start ./tests/karma.conf.js",
     "test:firefox": "karma start ./tests/karma.conf.js --browsers Firefox",
     "test:chrome": "karma start ./tests/karma.conf.js --browsers Chrome"
@@ -32,7 +33,7 @@
   },
   "homepage": "https://github.com/ngokevin/kframe/tree/components/animation#readme",
   "dependencies": {
-    "animejs": "2.0.2"
+    "animejs": "^2.2.0"
   },
   "devDependencies": {
     "aframe": "^0.5.0",
