@@ -16,7 +16,6 @@ var setComponentProperty = utils.entity.setComponentProperty;
  * startEvents -> beginAnimation -> Build animation from scratch and set animationIsPlaying.
  * pauseEvents -> pauseAnimation -> Unset animationIsPlaying.
  * resumeEvents -> resumeAnimation -> Set animationIsPlaying.
- * restartEvents -> restartAnimation -> Call animation.restart().
  *
  * @member {object} animation - anime.js instance.
  * @member {boolean} animationIsPlaying - Control if animation is playing.
@@ -42,7 +41,6 @@ AFRAME.registerComponent('animation', {
     startEvents: {type: 'array'},
     pauseEvents: {type: 'array'},
     resumeEvents: {type: 'array'},
-    restartEvents: {type: 'array'},
     to: {default: ''}
   },
 
@@ -58,7 +56,6 @@ AFRAME.registerComponent('animation', {
     this.animationIsPlaying = false;
     this.pauseAnimation = this.pauseAnimation.bind(this);
     this.beginAnimation = this.beginAnimation.bind(this);
-    this.restartAnimation = this.restartAnimation.bind(this);
     this.resumeAnimation = this.resumeAnimation.bind(this);
 
     this.config = {
@@ -71,8 +68,6 @@ AFRAME.registerComponent('animation', {
   update: function () {
     var config = this.config;
     var data = this.data;
-    var el = this.el;
-    var propType;
 
     this.animationIsPlaying = false;
 
@@ -85,9 +80,6 @@ AFRAME.registerComponent('animation', {
     config.easing = data.easing;
     config.elasticity = data.elasticity;
     config.loop = data.loop;
-
-    // Stop previous animation.
-    this.pauseAnimation();
 
     // Start new animation.
     this.createAndStartAnimation();
@@ -132,7 +124,6 @@ AFRAME.registerComponent('animation', {
     var data = this.data;
     var el = this.el;
     var from;
-
     from = data.from || getComponentProperty(el, data.property);
     config.targets = {aframeProperty: from};
     config.aframeProperty = data.to;
@@ -188,24 +179,27 @@ AFRAME.registerComponent('animation', {
     }
   },
 
-  /**
-   * Start animation from scratch.
-   *
-   * @param {boolean} isRestarting - If set, don't need to wait on delay or event.
-   */
-  createAndStartAnimation: function (isRestarting) {
-    var data = this.data;
-    var el = this.el;
+  updateConfig: function () {
     var propType;
 
     // Update the config before each run. Check if vector config.
-    propType = getPropertyType(el, data.property);
+    propType = getPropertyType(this.el, this.data.property);
     if (propType === 'vec2' || propType === 'vec3' || propType === 'vec4') {
       this.updateConfigForVector();
     } else {
       this.updateConfigForDefault();
     }
+  },
 
+  /**
+   * Start animation from scratch.
+   */
+  createAndStartAnimation: function () {
+    var data = this.data;
+    var el = this.el;
+    var propType;
+
+    this.updateConfig();
     this.animationIsPlaying = false;
     this.animation = anime(this.config);
 
@@ -213,13 +207,13 @@ AFRAME.registerComponent('animation', {
     this.addEventListeners();
 
     // Delay animation.
-    if (!isRestarting && data.delay) {
+    if (data.delay) {
       setTimeout(this.beginAnimation, data.delay);
       return;
     }
 
     // Wait for start events for animation.
-    if (!isRestarting && data.startEvents && data.startEvents.length) { return; }
+    if (data.startEvents && data.startEvents.length) { return; }
 
     // Play animation.
     this.beginAnimation();
@@ -229,17 +223,38 @@ AFRAME.registerComponent('animation', {
     this.animationIsPlaying = false;
   },
 
+  /**
+   * This is before animation start (including from startEvents).
+   * Set to initial state (config.from, time = 0, seekTime = 0).
+   */
   beginAnimation: function () {
+    this.updateConfig();
+    this.time = 0;
+    this.animation.seek(0);
     this.animationIsPlaying = true;
+    this.stopRelatedAnimations();
     this.el.emit('animationbegin', this.eventDetail);
-  },
-
-  restartAnimation: function () {
-    this.createAndStartAnimation(this.animationIsPlaying);
   },
 
   resumeAnimation: function () {
     this.animationIsPlaying = true;
+  },
+
+  /**
+   * Make sure two animations on the same property don't fight each other.
+   * e.g., animation__mouseenter="property: material.opacity"
+   *       animation__mouseleave="property: material.opacity"
+   */
+  stopRelatedAnimations: function () {
+    var component;
+    var componentName;
+    for (componentName in this.el.components) {
+      component = this.el.components[componentName];
+      if (componentName === this.attrName) { continue; }
+      if (component.name !== 'animation') { continue; }
+      if (component.data.property !== this.data.property) { continue; }
+      component.animationIsPlaying = false;
+    }
   },
 
   addEventListeners: function () {
@@ -248,7 +263,6 @@ AFRAME.registerComponent('animation', {
     addEventListeners(el, data.startEvents, this.beginAnimation);
     addEventListeners(el, data.pauseEvents, this.pauseAnimation);
     addEventListeners(el, data.resumeEvents, this.resumeAnimation);
-    addEventListeners(el, data.restartEvents, this.restartAnimation);
   },
 
   removeEventListeners: function () {
@@ -257,7 +271,6 @@ AFRAME.registerComponent('animation', {
     removeEventListeners(el, data.startEvents, this.beginAnimation);
     removeEventListeners(el, data.pauseEvents, this.pauseAnimation);
     removeEventListeners(el, data.resumeEvents, this.resumeAnimation);
-    removeEventListeners(el, data.restartEvents, this.restartAnimation);
   }
 });
 

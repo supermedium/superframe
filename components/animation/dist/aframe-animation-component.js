@@ -62,7 +62,6 @@
 	 * startEvents -> beginAnimation -> Build animation from scratch and set animationIsPlaying.
 	 * pauseEvents -> pauseAnimation -> Unset animationIsPlaying.
 	 * resumeEvents -> resumeAnimation -> Set animationIsPlaying.
-	 * restartEvents -> restartAnimation -> Call animation.restart().
 	 *
 	 * @member {object} animation - anime.js instance.
 	 * @member {boolean} animationIsPlaying - Control if animation is playing.
@@ -88,7 +87,6 @@
 	    startEvents: {type: 'array'},
 	    pauseEvents: {type: 'array'},
 	    resumeEvents: {type: 'array'},
-	    restartEvents: {type: 'array'},
 	    to: {default: ''}
 	  },
 
@@ -104,7 +102,6 @@
 	    this.animationIsPlaying = false;
 	    this.pauseAnimation = this.pauseAnimation.bind(this);
 	    this.beginAnimation = this.beginAnimation.bind(this);
-	    this.restartAnimation = this.restartAnimation.bind(this);
 	    this.resumeAnimation = this.resumeAnimation.bind(this);
 
 	    this.config = {
@@ -117,8 +114,6 @@
 	  update: function () {
 	    var config = this.config;
 	    var data = this.data;
-	    var el = this.el;
-	    var propType;
 
 	    this.animationIsPlaying = false;
 
@@ -131,9 +126,6 @@
 	    config.easing = data.easing;
 	    config.elasticity = data.elasticity;
 	    config.loop = data.loop;
-
-	    // Stop previous animation.
-	    this.pauseAnimation();
 
 	    // Start new animation.
 	    this.createAndStartAnimation();
@@ -178,7 +170,6 @@
 	    var data = this.data;
 	    var el = this.el;
 	    var from;
-
 	    from = data.from || getComponentProperty(el, data.property);
 	    config.targets = {aframeProperty: from};
 	    config.aframeProperty = data.to;
@@ -220,7 +211,11 @@
 	        data.property === 'scale') {
 	      // If animating object3D transformation, run more optimized updater.
 	      config.update = function (anim) {
-	        el.object3D[data.property].copy(anim.animatables[0].target);
+	        el.object3D[data.property].set(
+	          anim.animatables[0].target.x,
+	          anim.animatables[0].target.y,
+	          anim.animatables[0].target.z
+	        );
 	      };
 	    } else {
 	      // Animating some vector.
@@ -230,24 +225,27 @@
 	    }
 	  },
 
-	  /**
-	   * Start animation from scratch.
-	   *
-	   * @param {boolean} isRestarting - If set, don't need to wait on delay or event.
-	   */
-	  createAndStartAnimation: function (isRestarting) {
-	    var data = this.data;
-	    var el = this.el;
+	  updateConfig: function () {
 	    var propType;
 
 	    // Update the config before each run. Check if vector config.
-	    propType = getPropertyType(el, data.property);
+	    propType = getPropertyType(this.el, this.data.property);
 	    if (propType === 'vec2' || propType === 'vec3' || propType === 'vec4') {
 	      this.updateConfigForVector();
 	    } else {
 	      this.updateConfigForDefault();
 	    }
+	  },
 
+	  /**
+	   * Start animation from scratch.
+	   */
+	  createAndStartAnimation: function () {
+	    var data = this.data;
+	    var el = this.el;
+	    var propType;
+
+	    this.updateConfig();
 	    this.animationIsPlaying = false;
 	    this.animation = anime(this.config);
 
@@ -255,13 +253,13 @@
 	    this.addEventListeners();
 
 	    // Delay animation.
-	    if (!isRestarting && data.delay) {
+	    if (data.delay) {
 	      setTimeout(this.beginAnimation, data.delay);
 	      return;
 	    }
 
 	    // Wait for start events for animation.
-	    if (!isRestarting && data.startEvents && data.startEvents.length) { return; }
+	    if (data.startEvents && data.startEvents.length) { return; }
 
 	    // Play animation.
 	    this.beginAnimation();
@@ -271,17 +269,33 @@
 	    this.animationIsPlaying = false;
 	  },
 
+	  /**
+	   * This is before animation start (including from startEvents).
+	   * Set to initial state (config.from, time = 0, seekTime = 0).
+	   */
 	  beginAnimation: function () {
+	    this.updateConfig();
+	    this.time = 0;
+	    this.animation.seek(0);
 	    this.animationIsPlaying = true;
+	    this.stopRelatedAnimations();
 	    this.el.emit('animationbegin', this.eventDetail);
-	  },
-
-	  restartAnimation: function () {
-	    this.createAndStartAnimation(this.animationIsPlaying);
 	  },
 
 	  resumeAnimation: function () {
 	    this.animationIsPlaying = true;
+	  },
+
+	  stopRelatedAnimations: function () {
+	    var component;
+	    var componentName;
+	    for (componentName in this.el.components) {
+	      component = this.el.components[componentName];
+	      if (componentName === this.attrName) { continue; }
+	      if (component.name !== 'animation') { continue; }
+	      if (component.data.property !== this.data.property) { continue; }
+	      component.animationIsPlaying = false;
+	    }
 	  },
 
 	  addEventListeners: function () {
@@ -290,7 +304,6 @@
 	    addEventListeners(el, data.startEvents, this.beginAnimation);
 	    addEventListeners(el, data.pauseEvents, this.pauseAnimation);
 	    addEventListeners(el, data.resumeEvents, this.resumeAnimation);
-	    addEventListeners(el, data.restartEvents, this.restartAnimation);
 	  },
 
 	  removeEventListeners: function () {
@@ -299,7 +312,6 @@
 	    removeEventListeners(el, data.startEvents, this.beginAnimation);
 	    removeEventListeners(el, data.pauseEvents, this.pauseAnimation);
 	    removeEventListeners(el, data.resumeEvents, this.resumeAnimation);
-	    removeEventListeners(el, data.restartEvents, this.restartAnimation);
 	  }
 	});
 

@@ -3,7 +3,7 @@
     <title>Basic</title>
     <meta name="description" content="Animating various properties of various objects"></meta>
     <meta property="og:image" content="https://raw.githubusercontent.com/ngokevin/kframe/master/components/animation/examples/basic/preview.gif"></meta>
-    <script src="https://aframe.io/releases/0.5.0/aframe.min.js"></script>
+    <script src="https://rawgit.com/aframevr/aframe/6019885/dist/aframe-master.min.js"></script>
     <script src="../../dist/aframe-animation-component.min.js"></script>
     <script src="https://unpkg.com/aframe-template-component@3.2.1/dist/aframe-template-component.min.js"></script>
   </head>
@@ -35,7 +35,9 @@
                                      easing: easeInSine; loop: true; to: 0 2 0">
         </a-cylinder>
 
-        <a-box id="bottom-plate" height="0.2" position="0 -0.5 0"></a-box>
+        <a-box id="bottom-plate" height="0.2" position="0 -0.5 0"
+               animation__opacity="property: material.opacity; dir: alternate; dur: 1000;
+                                   loop: true; from: 1; to: 0"></a-box>
 
         <!-- Orbiters. -->
         <a-entity class="ball" template="src: #orbiter" data-orbitradius="1" data-easing="linear"
