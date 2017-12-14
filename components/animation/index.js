@@ -254,8 +254,11 @@ function getPropertyType (el, property) {
   // Primitives.
   if (!component) { return null; }
 
-  if (propertyName) {
-    return component.schema[propertyName].type;
-  }
+  // Dynamic schema. We only care about vectors anyways.
+  if (propertyName && !component.schema[propertyName]) { return null; }
+
+  // Multi-prop.
+  if (propertyName) { return component.schema[propertyName].type; }
+  // Single-prop.
   return component.schema.type;
 }

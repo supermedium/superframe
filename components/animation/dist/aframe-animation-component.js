@@ -42,7 +42,7 @@
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	/* global AFRAME */
 
@@ -117,7 +117,6 @@
 	    config = {
 	      autoplay: false,
 	      complete: function () {
-	        console.log("HO");
 	        el.emit('animationcomplete', config);
 	        el.emit(attrName + '-complete', config);
 	      },
@@ -301,16 +300,20 @@
 	  // Primitives.
 	  if (!component) { return null; }
 
-	  if (propertyName) {
-	    return component.schema[propertyName].type;
-	  }
+	  // Dynamic schema. We only care about vectors anyways.
+	  if (propertyName && !component.schema[propertyName]) { return null; }
+
+	  // Multi-prop.
+	  console.log("WHAT");
+	  if (propertyName) { return component.schema[propertyName].type; }
+	  // Single-prop.
 	  return component.schema.type;
 	}
 
 
-/***/ },
+/***/ }),
 /* 1 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*
 	 2017 Julian Garnier
@@ -340,5 +343,5 @@
 	n.speed=1;n.running=q;n.remove=function(a){a=M(a);for(var b=q.length;b--;)for(var d=q[b],c=d.animations,e=c.length;e--;)F(a,c[e].animatable.target)&&(c.splice(e,1),c.length||d.pause())};n.getValue=J;n.path=function(a,b){var d=g.str(a)?v(a)[0]:a,c=b||100;return function(a){return{el:d,property:a,totalLength:d.getTotalLength()*(c/100)}}};n.setDashoffset=function(a){var b=a.getTotalLength();a.setAttribute("stroke-dasharray",b);return b};n.bezier=y;n.easings=N;n.timeline=function(a){var b=n(a);b.pause();
 	b.duration=0;b.add=function(a){b.children.forEach(function(a){a.began=!0;a.completed=!0});w(a).forEach(function(a){var c=b.duration,d=a.offset;a.autoplay=!1;a.offset=g.und(d)?c:K(d,c);b.seek(a.offset);a=n(a);a.duration>c&&(b.duration=a.duration);a.began=!0;b.children.push(a)});b.reset();b.seek(0);b.autoplay&&b.restart();return b};return b};n.random=function(a,b){return Math.floor(Math.random()*(b-a+1))+a};return n});
 
-/***/ }
+/***/ })
 /******/ ]);
