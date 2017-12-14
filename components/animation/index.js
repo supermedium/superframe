@@ -174,7 +174,11 @@ AFRAME.registerComponent('animation', {
         data.property === 'scale') {
       // If animating object3D transformation, run more optimized updater.
       config.update = function (anim) {
-        el.object3D[data.property].copy(anim.animatables[0].target);
+        el.object3D[data.property].set(
+          anim.animatables[0].target.x,
+          anim.animatables[0].target.y,
+          anim.animatables[0].target.z
+        );
       };
     } else {
       // Animating some vector.
