@@ -14,6 +14,11 @@ var styleParser = utils.styleParser.parse;
 /**
  * Animation component for A-Frame.
  *
+ * startEvents -> beginAnimation -> Set animationIsPlaying. FROM SCRATCH.
+ * pauseEvents -> pauseAnimation -> Unset animationIsPlaying.
+ * resumeEvents ->
+ * restartEvents ->
+ *
  * @member {object} animation - anime.js instance.
  * @member {boolean} animationIsPlaying - Control if animation is playing.
  */
@@ -48,13 +53,14 @@ AFRAME.registerComponent('animation', {
     var self = this;
 
     this.eventDetail = {name: this.attrName};
+    this.time = 0;
 
     this.animation = null;
     this.animationIsPlaying = false;
-    this.pauseAnimationBound = this.pauseAnimation.bind(this);
-    this.beginAnimationBound = this.beginAnimation.bind(this);
-    this.restartAnimationBound = this.restartAnimation.bind(this);
-    this.resumeAnimationBound = this.resumeAnimation.bind(this);
+    this.pauseAnimation = this.pauseAnimation.bind(this);
+    this.beginAnimation = this.beginAnimation.bind(this);
+    this.restartAnimation = this.restartAnimation.bind(this);
+    this.resumeAnimation = this.resumeAnimation.bind(this);
 
     this.config = {
       complete: function () {i
@@ -99,9 +105,10 @@ AFRAME.registerComponent('animation', {
     this.startAnimation();
   },
 
-  tick: function (t) {
+  tick: function (t, dt) {
     if (!this.animationIsPlaying) { return; }
-    this.animation.tick(t);
+    this.time += dt;
+    this.animation.tick(this.time);
   },
 
   remove: function () {
@@ -204,7 +211,7 @@ AFRAME.registerComponent('animation', {
 
     // Delay animation.
     if (data.delay) {
-      setTimeout(this.beginAnimationBound, data.delay);
+      setTimeout(this.beginAnimation, data.delay);
       return;
     }
 
@@ -235,19 +242,19 @@ AFRAME.registerComponent('animation', {
   addEventListeners: function () {
     var data = this.data;
     var el = this.el;
-    addEventListeners(el, data.startEvents, this.beginAnimationBound);
-    addEventListeners(el, data.pauseEvents, this.pauseAnimationBound);
-    addEventListeners(el, data.resumeEvents, this.resumeAnimationBound);
-    addEventListeners(el, data.restartEvents, this.restartAnimationBound);
+    addEventListeners(el, data.startEvents, this.beginAnimation);
+    addEventListeners(el, data.pauseEvents, this.pauseAnimation);
+    addEventListeners(el, data.resumeEvents, this.resumeAnimation);
+    addEventListeners(el, data.restartEvents, this.restartAnimation);
   },
 
   removeEventListeners: function () {
     var data = this.data;
     var el = this.el;
-    removeEventListeners(el, data.startEvents, this.beginAnimationBound);
-    removeEventListeners(el, data.pauseEvents, this.pauseAnimationBound);
-    removeEventListeners(el, data.resumeEvents, this.resumeAnimationBound);
-    removeEventListeners(el, data.restartEvents, this.restartAnimationBound);
+    removeEventListeners(el, data.startEvents, this.beginAnimation);
+    removeEventListeners(el, data.pauseEvents, this.pauseAnimation);
+    removeEventListeners(el, data.resumeEvents, this.resumeAnimation);
+    removeEventListeners(el, data.restartEvents, this.restartAnimation);
   }
 });
 
