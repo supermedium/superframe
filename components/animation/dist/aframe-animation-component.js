@@ -244,11 +244,26 @@
 	    var data = this.data;
 	    var el = this.el;
 	    var from;
+	    var isBoolean;
+	    var to;
+
 	    from = data.from || getComponentProperty(el, data.property);
+	    to = data.to;
+
+	    // Convert booleans to integer to allow boolean flipping.
+	    isBoolean = to.toString() === 'true' || to.toString() === 'false';
+	    if (isBoolean) {
+	      from = data.from ? 1 : 0;
+	      to = data.to ? 1 : 0;
+	    }
+
 	    config.targets = {aframeProperty: from.toString()};
-	    config.aframeProperty = data.to.toString();
+	    config.aframeProperty = to.toString();
 	    config.update = function (anim) {
-	      setComponentProperty(el, data.property, anim.animatables[0].target.aframeProperty);
+	      var value;
+	      value = anim.animatables[0].target.aframeProperty;
+	      if (isBoolean) { value = value >= 1 ? true : false; }
+	      setComponentProperty(el, data.property, value);
 	    };
 	  },
 
