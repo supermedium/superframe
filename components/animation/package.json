@@ -1,6 +1,6 @@
 {
   "name": "aframe-animation-component",
-  "version": "4.0.0-beta3",
+  "version": "4.0.0-beta4",
   "description": "Animations in A-Frame using anime.js",
   "main": "index.js",
   "cdn": "dist/aframe-animation-component.min.js",
@@ -33,7 +33,7 @@
   },
   "homepage": "https://github.com/ngokevin/kframe/tree/components/animation#readme",
   "dependencies": {
-    "animejs": "^2.2.0"
+    "animejs": "2.2.0"
   },
   "devDependencies": {
     "aframe": "^0.5.0",

@@ -51,11 +51,6 @@ suite('animation', function () {
       el.setAttribute('animation', {property: 'position', to: '2 2 2'});
     });
 
-    test('emits prefixed animationbegin event', function (done) {
-      el.addEventListener('animation__position-begin', evt => { done(); });
-      el.setAttribute('animation__position', {property: 'position', to: '2 2 2'});
-    });
-
     test('emits animationcomplete event', function (done) {
       el.addEventListener('animationbegin', evt => {
         el.addEventListener('animationcomplete', evt => { done(); });
@@ -63,18 +58,6 @@ suite('animation', function () {
         component.tick(99999);
       });
       el.setAttribute('animation', {property: 'position', to: '2 2 2'});
-    });
-
-    test('emits prefixed animationcomplete event', function (done) {
-      el.addEventListener('animation__position-begin', evt => {
-        setTimeout(() => {
-          var component = el.components['animation__position'];
-          el.addEventListener('animation__position-complete', evt => { done(); });
-          component.tick(1);
-          component.tick(99999);
-        });
-      });
-      el.setAttribute('animation__position', {property: 'position', to: '2 2 2'});
     });
   });
 });

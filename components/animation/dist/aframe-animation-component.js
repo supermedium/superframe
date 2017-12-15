@@ -59,11 +59,22 @@
 	var setComponentProperty = utils.entity.setComponentProperty;
 
 	/**
-	 * Animation component for A-Frame.
+	 * Animation component for A-Frame using anime.js.
 	 *
-	 * startEvents -> beginAnimation -> Build animation from scratch and set animationIsPlaying.
-	 * pauseEvents -> pauseAnimation -> Unset animationIsPlaying.
-	 * resumeEvents -> resumeAnimation -> Set animationIsPlaying.
+	 * The component manually controls the tick by setting `autoplay: false` on anime.js and
+	 * manually * calling `animation.tick()` in the tick handler. To pause or resume, we toggle a
+	 * boolean * flag * `isAnimationPlaying`.
+	 *
+	 * anime.js animation config for tweenining Javascript objects and values works as:
+	 *
+	 *  config = {
+	 *    targets: {foo: 0.0, bar: '#000'},
+	 *    foo: 1.0,
+	 *    bar: '#FFF'
+	 *  }
+	 *
+	 * The above will tween each property in `targets`. The `to` values are set in the root of
+	 * the config.
 	 *
 	 * @member {object} animation - anime.js instance.
 	 * @member {boolean} animationIsPlaying - Control if animation is playing.
@@ -102,12 +113,14 @@
 
 	    this.animation = null;
 	    this.animationIsPlaying = false;
-	    this.pauseAnimation = this.pauseAnimation.bind(this);
+	    this.onStartEvent = this.onStartEvent.bind(this);
 	    this.beginAnimation = this.beginAnimation.bind(this);
+	    this.pauseAnimation = this.pauseAnimation.bind(this);
 	    this.resumeAnimation = this.resumeAnimation.bind(this);
 
 	    this.config = {
 	      complete: function () {
+	        self.animationIsPlaying = false;
 	        self.el.emit('animationcomplete', self.eventDetail);
 	      }
 	    };
@@ -165,6 +178,65 @@
 	  },
 
 	  /**
+	   * Start animation from scratch.
+	   */
+	  createAndStartAnimation: function () {
+	    var data = this.data;
+
+	    this.updateConfig();
+	    this.animationIsPlaying = false;
+	    this.animation = anime(this.config);
+
+	    this.removeEventListeners();
+	    this.addEventListeners();
+
+	    // Wait for start events for animation.
+	    if (data.startEvents && data.startEvents.length) { return; }
+
+	    // Delay animation.
+	    if (data.delay) {
+	      setTimeout(this.beginAnimation, data.delay);
+	      return;
+	    }
+
+	    // Play animation.
+	    this.beginAnimation();
+	  },
+
+	  /**
+	   * This is before animation start (including from startEvents).
+	   * Set to initial state (config.from, time = 0, seekTime = 0).
+	   */
+	  beginAnimation: function () {
+	    this.updateConfig();
+	    this.time = 0;
+	    this.animation.seek(0);
+	    this.animationIsPlaying = true;
+	    this.stopRelatedAnimations();
+	    this.el.emit('animationbegin', this.eventDetail);
+	  },
+
+	  pauseAnimation: function () {
+	    this.animationIsPlaying = false;
+	  },
+
+	  resumeAnimation: function () {
+	    this.animationIsPlaying = true;
+	  },
+
+	  /**
+	   * startEvents callback.
+	   */
+	  onStartEvent: function () {
+	    // Include the delay before each start event.
+	    if (this.data.delay) {
+	      setTimeout(this.beginAnimation, this.data.delay);
+	      return;
+	    }
+	    this.beginAnimation();
+	  },
+
+	  /**
 	   * Stuff property into generic `property` key.
 	   */
 	  updateConfigForDefault: function () {
@@ -173,8 +245,8 @@
 	    var el = this.el;
 	    var from;
 	    from = data.from || getComponentProperty(el, data.property);
-	    config.targets = {aframeProperty: from};
-	    config.aframeProperty = data.to;
+	    config.targets = {aframeProperty: from.toString()};
+	    config.aframeProperty = data.to.toString();
 	    config.update = function (anim) {
 	      setComponentProperty(el, data.property, anim.animatables[0].target.aframeProperty);
 	    };
@@ -240,55 +312,6 @@
 	  },
 
 	  /**
-	   * Start animation from scratch.
-	   */
-	  createAndStartAnimation: function () {
-	    var data = this.data;
-	    var el = this.el;
-	    var propType;
-
-	    this.updateConfig();
-	    this.animationIsPlaying = false;
-	    this.animation = anime(this.config);
-
-	    this.removeEventListeners();
-	    this.addEventListeners();
-
-	    // Delay animation.
-	    if (data.delay) {
-	      setTimeout(this.beginAnimation, data.delay);
-	      return;
-	    }
-
-	    // Wait for start events for animation.
-	    if (data.startEvents && data.startEvents.length) { return; }
-
-	    // Play animation.
-	    this.beginAnimation();
-	  },
-
-	  pauseAnimation: function () {
-	    this.animationIsPlaying = false;
-	  },
-
-	  /**
-	   * This is before animation start (including from startEvents).
-	   * Set to initial state (config.from, time = 0, seekTime = 0).
-	   */
-	  beginAnimation: function () {
-	    this.updateConfig();
-	    this.time = 0;
-	    this.animation.seek(0);
-	    this.animationIsPlaying = true;
-	    this.stopRelatedAnimations();
-	    this.el.emit('animationbegin', this.eventDetail);
-	  },
-
-	  resumeAnimation: function () {
-	    this.animationIsPlaying = true;
-	  },
-
-	  /**
 	   * Make sure two animations on the same property don't fight each other.
 	   * e.g., animation__mouseenter="property: material.opacity"
 	   *       animation__mouseleave="property: material.opacity"
@@ -308,7 +331,7 @@
 	  addEventListeners: function () {
 	    var data = this.data;
 	    var el = this.el;
-	    addEventListeners(el, data.startEvents, this.beginAnimation);
+	    addEventListeners(el, data.startEvents, this.onStartEvent);
 	    addEventListeners(el, data.pauseEvents, this.pauseAnimation);
 	    addEventListeners(el, data.resumeEvents, this.resumeAnimation);
 	  },
@@ -316,7 +339,7 @@
 	  removeEventListeners: function () {
 	    var data = this.data;
 	    var el = this.el;
-	    removeEventListeners(el, data.startEvents, this.beginAnimation);
+	    removeEventListeners(el, data.startEvents, this.onStartEvent);
 	    removeEventListeners(el, data.pauseEvents, this.pauseAnimation);
 	    removeEventListeners(el, data.resumeEvents, this.resumeAnimation);
 	  }
