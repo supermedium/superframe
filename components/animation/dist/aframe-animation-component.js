@@ -245,6 +245,7 @@
 	    var el = this.el;
 	    var from;
 	    var isBoolean;
+	    var lastValue;
 	    var to;
 
 	    from = data.from || getComponentProperty(el, data.property);
@@ -257,12 +258,20 @@
 	      to = data.to ? 1 : 0;
 	    }
 
+	    lastValue = from.toString();
 	    config.targets = {aframeProperty: from.toString()};
 	    config.aframeProperty = to.toString();
 	    config.update = function (anim) {
 	      var value;
 	      value = anim.animatables[0].target.aframeProperty;
+
+	      // Need to do a last value check for animation timeline since all the tweening
+	      // begins simultaenously even if the value has not changed. Also better for perf anyways.
+	      if (value === lastValue) { return; }
+	      lastValue = value;
+
 	      if (isBoolean) { value = value >= 1 ? true : false; }
+	      if (self.id === 'fadein') { console.log(value); }
 	      setComponentProperty(el, data.property, value);
 	    };
 	  },
@@ -275,6 +284,7 @@
 	    var config = this.config;
 	    var data = this.data;
 	    var el = this.el;
+	    var lastValue = {};
 	    var key;
 	    var from;
 	    var to;
@@ -295,23 +305,39 @@
 	    config.targets = [from];
 	    for (key in to) { config[key] = to[key]; }
 
-	    // Set update function.
+	    lastValue.x = from.x;
+	    lastValue.y = from.y;
+	    lastValue.z = from.z;
+
+	    // If animating object3D transformation, run more optimized updater.
 	    if (data.property === 'position' || data.property === 'rotation' ||
 	        data.property === 'scale') {
-	      // If animating object3D transformation, run more optimized updater.
 	      config.update = function (anim) {
-	        el.object3D[data.property].set(
-	          anim.animatables[0].target.x,
-	          anim.animatables[0].target.y,
-	          anim.animatables[0].target.z
-	        );
+	        var value = anim.animations[0].target;
+	        // For animation timeline.
+	        if (value.x === lastValue.x &&
+	            value.y === lastValue.y &&
+	            value.z === lastValue.z) { return; }
+	        lastValue.x = value.x;
+	        lastValue.y = value.y;
+	        lastValue.z = value.z;
+	        el.object3D[data.property].set(value.x, value.y, value.z);
 	      };
-	    } else {
-	      // Animating some vector.
-	      config.update = function (anim) {
-	        setComponentProperty(el, data.property, anim.animations[0].target);
-	      };
+	      return;
 	    }
+
+	    // Animating some vector.
+	    config.update = function (anim) {
+	      var value = anim.animations[0].target;
+	      // For animation timeline.
+	      if (value.x === lastValue.x &&
+	          value.y === lastValue.y &&
+	          value.z === lastValue.z) { return; }
+	      lastValue.x = value.x;
+	      lastValue.y = value.y;
+	      lastValue.z = value.z;
+	      setComponentProperty(el, data.property, value);
+	    };
 	  },
 
 	  updateConfig: function () {
