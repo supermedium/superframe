@@ -169,6 +169,13 @@ entity.
 | loop        | Number of times to loop. Set `true` to loop infinitely.                                                                         | 0             |
 | startEvents | Comma-separated list of events to wait that will trigger the timeline animation. If not specified, the animation will autoplay. | ''            |
 
+#### Events
+
+| Event                     | Description                                                                                                                  |
+|---------------------------|------------------------------------------------------------------------------------------------------------------------------|
+| animationtimelinecomplete | Emitted when animation timeline is complete. Event detail contains animation `name` (`__<ID>`). Not emitted if `loop: true`. |
+
+
 ### Installation
 
 #### Browser

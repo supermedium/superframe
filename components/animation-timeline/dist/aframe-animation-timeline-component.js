@@ -72,6 +72,7 @@
 
 	    this.animationIsPlaying = false;
 	    this.beginAnimation = this.beginAnimation.bind(this);
+	    this.eventDetail = {name: this.id}
 	    this.time = 0;
 	    this.timeline = null;
 
@@ -106,6 +107,7 @@
 	    var offset;
 	    var timelineEl;
 	    var timelineGroupEl;
+	    var self = this;
 
 	    timelineEl = document.querySelector(this.data.timeline);
 	    if (timelineEl.tagName !== 'A-TIMELINE') {
@@ -117,6 +119,9 @@
 	    this.time = 0;
 	    this.timeline = AFRAME.anime.timeline({
 	      autoplay: false,
+	      complete: function () {
+	        self.el.emit('animationtimelinecomplete', self.eventDetail);
+	      },
 	      direction: this.data.direction,
 	      loop: this.data.loop
 	    });
