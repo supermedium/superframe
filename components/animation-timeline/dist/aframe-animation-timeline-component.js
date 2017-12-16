@@ -158,16 +158,28 @@
 	    var config;
 	    var els;
 	    var i;
+	    var select;
 
 	    animationName = 'animation__' + animationEl.getAttribute('name');
-	    els = this.el.sceneEl.querySelectorAll(animationEl.getAttribute('select'));
+	    select = animationEl.getAttribute('select');
+	    els = this.el.sceneEl.querySelectorAll(select);
+
+	    if (!els.length) {
+	      console.warn('[animation-timeline] No entities found for select="' +
+	                    select + '"');
+	      return 0;
+	    }
 
 	    for (i = 0; i < els.length; i++) {
 	      component = els[i].components[animationName];
+	      if (!component) {
+	        throw new Error('Could not find animation `' + animationName + '` for `' +
+	                        animationEl.getAttribute('select') + '`.');
+	      }
 	      component.updateConfig();
 	      config = cloneConfig(component.config);
 	      config.offset = offset;
-	      this.timeline.add(cloneConfig(config));
+	      this.timeline.add(config);
 	    }
 
 	    return (config.duration || 0) + (config.delay || 0);
