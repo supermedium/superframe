@@ -13,6 +13,8 @@ component][animation] for declaratively defining and orchestrating timelines of
 animations. The animation timeline component depends on the animation
 component. Make sure to include that.
 
+[View Demo](https://ngokevin.github.io/aframe-animation-timeline-component/)
+
 ![GIF](https://user-images.githubusercontent.com/674727/34067163-d0b3af9c-e1d2-11e7-9b3a-c9c207001e6c.gif)
 
 ### Example
