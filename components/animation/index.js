@@ -12,6 +12,8 @@ var utils = AFRAME.utils;
 var getComponentProperty = utils.entity.getComponentProperty;
 var setComponentProperty = utils.entity.setComponentProperty;
 
+var colorHelper = new THREE.Color();
+
 /**
  * Animation component for A-Frame using anime.js.
  *
@@ -35,6 +37,7 @@ var setComponentProperty = utils.entity.setComponentProperty;
  */
 AFRAME.registerComponent('animation', {
   schema: {
+    autoplay: {default: false},
     delay: {default: 0},
     dir: {default: ''},
     dur: {default: 1000},
@@ -145,7 +148,7 @@ AFRAME.registerComponent('animation', {
     this.addEventListeners();
 
     // Wait for start events for animation.
-    if (data.startEvents && data.startEvents.length) { return; }
+    if (!data.autoplay || data.startEvents && data.startEvents.length) { return; }
 
     // Delay animation.
     if (data.delay) {
@@ -199,7 +202,6 @@ AFRAME.registerComponent('animation', {
     var el = this.el;
     var from;
     var isBoolean;
-    var lastValue;
     var to;
 
     from = data.from || getComponentProperty(el, data.property);
@@ -212,22 +214,25 @@ AFRAME.registerComponent('animation', {
       to = data.to ? 1 : 0;
     }
 
-    lastValue = from.toString();
     config.targets = {aframeProperty: from.toString()};
     config.aframeProperty = to.toString();
-    config.update = function (anim) {
-      var value;
-      value = anim.animatables[0].target.aframeProperty;
+    config.update = (function () {
+      var lastValue = from.toString();
+      return function (anim) {
+        var value;
+        value = anim.animatables[0].target.aframeProperty;
 
-      // Need to do a last value check for animation timeline since all the tweening
-      // begins simultaenously even if the value has not changed. Also better for perf anyways.
-      if (value === lastValue) { return; }
-      lastValue = value;
+        // Need to do a last value check for animation timeline since all the tweening
+        // begins simultaenously even if the value has not changed. Also better for perf
+        // anyways.
+        if (value === lastValue) { return; }
+        lastValue = value;
 
-      if (isBoolean) { value = value >= 1 ? true : false; }
-      if (self.id === 'fadein') { console.log(value); }
-      setComponentProperty(el, data.property, value);
-    };
+        if (isBoolean) { value = value >= 1 ? true : false; }
+
+        setComponentProperty(el, data.property, value);
+      };
+    })();
   },
 
   /**
@@ -238,7 +243,6 @@ AFRAME.registerComponent('animation', {
     var config = this.config;
     var data = this.data;
     var el = this.el;
-    var lastValue = {};
     var key;
     var from;
     var to;
@@ -259,14 +263,38 @@ AFRAME.registerComponent('animation', {
     config.targets = [from];
     for (key in to) { config[key] = to[key]; }
 
-    lastValue.x = from.x;
-    lastValue.y = from.y;
-    lastValue.z = from.z;
-
     // If animating object3D transformation, run more optimized updater.
     if (data.property === 'position' || data.property === 'rotation' ||
         data.property === 'scale') {
-      config.update = function (anim) {
+      config.update = (function () {
+        var lastValue = {};
+        lastValue.x = from.x;
+        lastValue.y = from.y;
+        lastValue.z = from.z;
+
+        return function (anim) {
+          var value = anim.animatables[0].target;
+          // For animation timeline.
+          if (value.x === lastValue.x &&
+              value.y === lastValue.y &&
+              value.z === lastValue.z) { return; }
+          lastValue.x = value.x;
+          lastValue.y = value.y;
+          lastValue.z = value.z;
+          el.object3D[data.property].set(value.x, value.y, value.z);
+        };
+      })();
+      return;
+    }
+
+    // Animating some vector.
+    config.update = (function () {
+      var lastValue = {};
+      lastValue.x = from.x;
+      lastValue.y = from.y;
+      lastValue.z = from.z;
+
+      return function (anim) {
         var value = anim.animations[0].target;
         // For animation timeline.
         if (value.x === lastValue.x &&
@@ -275,23 +303,9 @@ AFRAME.registerComponent('animation', {
         lastValue.x = value.x;
         lastValue.y = value.y;
         lastValue.z = value.z;
-        el.object3D[data.property].set(value.x, value.y, value.z);
-      };
-      return;
-    }
-
-    // Animating some vector.
-    config.update = function (anim) {
-      var value = anim.animations[0].target;
-      // For animation timeline.
-      if (value.x === lastValue.x &&
-          value.y === lastValue.y &&
-          value.z === lastValue.z) { return; }
-      lastValue.x = value.x;
-      lastValue.y = value.y;
-      lastValue.z = value.z;
-      setComponentProperty(el, data.property, value);
-    };
+        setComponentProperty(el, data.property, value);
+      }
+    })();
   },
 
   updateConfig: function () {
