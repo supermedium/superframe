@@ -83,7 +83,7 @@
 	 */
 	AFRAME.registerComponent('animation', {
 	  schema: {
-	    autoplay: {default: false},
+	    autoplay: {default: true},
 	    delay: {default: 0},
 	    dir: {default: ''},
 	    dur: {default: 1000},
