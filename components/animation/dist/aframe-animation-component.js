@@ -250,20 +250,20 @@
 	    var isBoolean;
 	    var to;
 
-	    from = data.from || getComponentProperty(el, data.property);
-	    to = data.to;
+	    from = (data.from || getComponentProperty(el, data.property)).toString();
+	    to = data.to.toString();
 
 	    // Convert booleans to integer to allow boolean flipping.
-	    isBoolean = to.toString() === 'true' || to.toString() === 'false';
+	    isBoolean = to === 'true' || to === 'false';
 	    if (isBoolean) {
-	      from = data.from ? 1 : 0;
-	      to = data.to ? 1 : 0;
+	      from = data.from === 'true' ? 1 : 0;
+	      to = data.to === 'true' ? 1 : 0;
 	    }
 
-	    config.targets = {aframeProperty: from.toString()};
-	    config.aframeProperty = to.toString();
+	    config.targets = {aframeProperty: from};
+	    config.aframeProperty = to;
 	    config.update = (function () {
-	      var lastValue = from.toString();
+	      var lastValue = from;
 	      return function (anim) {
 	        var value;
 	        value = anim.animatables[0].target.aframeProperty;
@@ -274,7 +274,9 @@
 	        if (value === lastValue) { return; }
 	        lastValue = value;
 
-	        if (isBoolean) { value = value >= 1 ? true : false; }
+	        if (isBoolean) {
+	          value = value >= 1 ? true : false;
+	        }
 
 	        setComponentProperty(el, data.property, value);
 	      };
