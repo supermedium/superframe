@@ -98,6 +98,7 @@
 	   * Begin the animation.
 	   */
 	  beginAnimation: function () {
+	    var additionalOffset;
 	    var i;
 	    var j;
 	    var duration;
@@ -132,16 +133,12 @@
 	          if (duration > longestDuration) { longestDuration = duration; }
 	        }
 	        offset += longestDuration;
-	        // Add additional offset if specified.
-	        offset += parseFloat(timelineGroupEl.getAttribute('offset') || 0, 10)
 	        continue;
 	      }
 
 	      // Add single animation.
 	      if (timelineEl.children[i].tagName === 'A-TIMELINE-ANIMATION') {
 	        offset += this.addAnimationToTimeline(timelineEl.children[i], offset);
-	        // Add additional offset if specified.
-	        offset += parseFloat(timelineEl.children[i].getAttribute('offset') || 0, 10)
 	      }
 	    }
 	  },
@@ -153,6 +150,7 @@
 	   * @returns {number} Duration.
 	   */
 	  addAnimationToTimeline: function (animationEl, offset) {
+	    var additionalOffset;
 	    var animationName;
 	    var component;
 	    var config;
@@ -170,6 +168,8 @@
 	      return 0;
 	    }
 
+	    additionalOffset = parseFloat(animationEl.getAttribute('offset') || 0, 10)
+
 	    for (i = 0; i < els.length; i++) {
 	      component = els[i].components[animationName];
 	      if (!component) {
@@ -178,11 +178,11 @@
 	      }
 	      component.updateConfig();
 	      config = cloneConfig(component.config);
-	      config.offset = offset;
+	      config.offset = offset + additionalOffset;
 	      this.timeline.add(config);
 	    }
 
-	    return (config.duration || 0) + (config.delay || 0);
+	    return (config.duration || 0) + (config.delay || 0) + additionalOffset;
 	  }
 	});
 
