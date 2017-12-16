@@ -1,13 +1,19 @@
 ## aframe-animation-timeline-component
 
+> Required to use master branch of A-Frame (0.8.0 milestone) for v4.x.
+> Try https://rawgit.com/ngokevin/aframe/animationbugless/dist/aframe-master.min.js
+
 [![Version](http://img.shields.io/npm/v/aframe-animation-timeline-component.svg?style=flat-square)](https://npmjs.org/package/aframe-animation-timeline-component)
 [![License](http://img.shields.io/npm/l/aframe-animation-timeline-component.svg?style=flat-square)](https://npmjs.org/package/aframe-animation-timeline-component)
 
 [animation]: https://github.com/ngokevin/kframe/tree/master/components/animation
 
-A timeline component to use with the [animation component][animation] for
-declaratively defining and orchestrating timelines of animations. For
-[A-Frame](https://aframe.io).
+A timeline component for A-Frame to use with the [animation
+component][animation] for declaratively defining and orchestrating timelines of
+animations. The animation timeline component depends on the animation
+component. Make sure to include that.
+
+![GIF]https://user-images.githubusercontent.com/674727/34067163-d0b3af9c-e1d2-11e7-9b3a-c9c207001e6c.gif)
 
 ### Example
 
@@ -170,7 +176,8 @@ Install and use by directly including the [browser files](dist):
 ```html
 <head>
   <title>My A-Frame Scene</title>
-  <script src="https://aframe.io/releases/0.7.1/aframe.min.js"></script>
+  <script src="https://rawgit.com/ngokevin/aframe/animationbugless/dist/aframe-master.min.js"></script>
+  <script src="https://unpkg.com/aframe-animation-component@4.0.0-beta8/dist/aframe-animation-timeline-component.min.js"></script>
   <script src="https://unpkg.com/aframe-animation-timeline-component/dist/aframe-animation-timeline-component.min.js"></script>
 </head>
 
@@ -213,6 +220,7 @@ Install and use by directly including the [browser files](dist):
 Install via npm:
 
 ```bash
+npm install aframe-animation-component
 npm install aframe-animation-timeline-component
 ```
 
@@ -220,5 +228,6 @@ Then require and use.
 
 ```js
 require('aframe');
+require('aframe-animation-component');
 require('aframe-animation-timeline-component');
 ```
