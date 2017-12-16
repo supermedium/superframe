@@ -2,8 +2,13 @@
 
 > Recommended to use master branch of A-Frame (0.8.0 milestone) for v4.x.
 
+[animationtimeline]: https://github.com/ngokevin/kframe/tree/master/components/animation-timeline
+
 An animation component for [A-Frame](https://aframe.io) using
 [anime.js](https://github.com/juliangarnier/anime).
+
+Also check out the [animation-timeline component][animationtimeline] for
+defining and orchestrating timelines of animations.
 
 ![animation](https://cloud.githubusercontent.com/assets/674727/23724348/3991d594-0401-11e7-9b90-31ef43ee7e54.gif)
 
@@ -14,7 +19,7 @@ An animation component for [A-Frame](https://aframe.io) using
 | Property     | Description                                                                                                                                             | Default Value | Values                  |
 | --------     | -----------                                                                                                                                             | ------------- | ------                  |
 | property     | Property to animate. Can be a component name, a dot-delimited property of a component (e.g., `material.color`), or a plain attribute.                   |               |                         |
-| from         | Initial value at start of animation. If not specified, the current property value of the entity will be used (will be sampled on each animation start). | null          |                         |
+| from         | Initial value at start of animation. If not specified, the current property value of the entity will be used (will be sampled on each animation start). It is best to specify a `from` value when possible for stability. | null          |                         |
 | to           | Target value at end of animation.                                                                                                                       | null          |                         |
 | delay        | How long (milliseconds) to wait before starting.                                                                                                        | 0             |                         |
 | dir          | Which dir to go from `from` to `to`.                                                                                                                    | normal        | alternate, reverse      |
@@ -26,6 +31,7 @@ An animation component for [A-Frame](https://aframe.io) using
 | startEvents  | Comma-separated list of events to listen to trigger play/restart. Animation will not autoplay if specified.                                             | null          |                         |
 | pauseEvents  | Comma-separated list of events to listen to trigger pause. Can be resumed with `resumeEvents`.                                                          | null          |                         |
 | resumeEvents | Comma-separated list of events to listen to trigger resume after pausing.                                                                               | null          |                         |
+| autoplay | Whether or not the animation should `autoplay`. Should be specified if the animation is defined for the [`animation-timeline` component][animationtimeline]. | null          |                         |
 
 #### Multiple Animations
 

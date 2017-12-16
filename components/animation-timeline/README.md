@@ -72,6 +72,10 @@ parameters. Animations are defined using the `animation` component on the
 entity or entities. `<a-timeline-animation>` merely points to them and adds
 their animation configurations to the timeline object.
 
+Make sure **`autoplay: false`** is set on all timelined animations, and I recommend
+specifying `from` on each on of those animations. The timeline will not attempt
+to grab from values dynamically.
+
 | Attribute | Description                                                                                                                                                                                           |
 |-----------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | select    | Selector to entity or entities to animate (e.g., `.boxes` or `#sphere`).                                                                                                                              |

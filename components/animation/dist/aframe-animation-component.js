@@ -250,8 +250,10 @@
 	    var isBoolean;
 	    var to;
 
-	    from = (data.from || getComponentProperty(el, data.property)).toString();
-	    to = data.to.toString();
+	    from = data.from || getComponentProperty(el, data.property);
+	    to = data.to;
+	    from = from ? from.toString() : from;
+	    to = to ? to.toString() : to;
 
 	    // Convert booleans to integer to allow boolean flipping.
 	    isBoolean = to === 'true' || to === 'false';
