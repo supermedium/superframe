@@ -147,7 +147,7 @@ suite('state', function () {
     test('binds single-property component with !!(bool) operator', () => {
       el.setAttribute('visible', false);
       el.setAttribute('bind', 'visible: !!enabled');
-      assert.ok(el.getAttribute('visible'));
+      assert.notOk(el.getAttribute('visible'));
     });
 
     test('binds single-property component with namespace', done => {
@@ -354,6 +354,7 @@ suite('state', function () {
       el.emit('fooColor', {color: 'orange'});
       setTimeout(() => {
         assert.equal(setAttributeSpy.getCalls().length, 0);
+        delete AFRAME.components.test;
         done();
       });
     });
@@ -365,6 +366,27 @@ suite('state', function () {
         assert.equal(el.getAttribute('position').x, 1);
         assert.equal(el.getAttribute('position').y, 2);
         assert.equal(el.getAttribute('position').z, 3);
+        done();
+      });
+    });
+
+    test('can be binded via mixin', done => {
+      var mixin;
+      AFRAME.registerComponent('test', {
+        schema: {counter: {default: 0}}
+      });
+
+      mixin = document.createElement('a-mixin');
+      mixin.setAttribute('id', 'bindMixin');
+      mixin.setAttribute('bind__test', 'counter: counter');
+      el.sceneEl.appendChild(mixin);
+
+      setTimeout(() => {
+        el.setAttribute('mixin', 'bindMixin');
+        assert.equal(el.getAttribute('test').counter, 5);
+        el.emit('fooAdd', {number: 10});
+        assert.equal(el.getAttribute('test').counter, 15);
+        delete AFRAME.components.test;
         done();
       });
     });
