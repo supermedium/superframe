@@ -134,7 +134,9 @@ AFRAME.registerSystem('state', {
         this.dispatch(actionName, evt.detail);
       });
     }
-  }
+  },
+
+  select: select  // For testing.
 });
 
 /**
@@ -345,6 +347,27 @@ AFRAME.registerComponent('bind-toggle', {
  * @param {string} selector - Dot-delimited store keys (e.g., game.player.health).
  */
 function select (state, selector) {
+  var i;
+  var runningBool;
+  var tokens;
+
+  // If just single selector, then grab value.
+  tokens = selector.split(/\s+/);
+  if (tokens.length === 1) { return selectProperty(state, selector); }
+
+  // If has boolean expression, evaluate.
+  runningBool = selectProperty(state, tokens[0]);
+  for (i = 1; i < tokens.length; i += 2) {
+    if (tokens[i] === '||') {
+      runningBool = runningBool || selectProperty(state, tokens[i + 1]);
+    } else if (tokens[i] === '&&') {
+      runningBool = runningBool && selectProperty(state, tokens[i + 1]);
+    }
+  }
+  return runningBool;
+}
+
+function selectProperty (state, selector) {
   var i;
   var split;
   var value = state;

@@ -417,4 +417,39 @@ suite('state', function () {
       });
     });
   });
+
+  suite('select', () => {
+    test('grabs value', () => {
+      assert.equal(system.select({foo: 5}, 'foo'), 5);
+      assert.equal(system.select({foo: {bar: 'red'}}, 'foo.bar'), 'red');
+    });
+
+    test('handles not', () => {
+      assert.equal(system.select({foo: false}, 'foo'), false);
+      assert.equal(system.select({foo: false}, '!foo'), true);
+      assert.equal(system.select({foo: false}, '!!foo'), false);
+      assert.equal(system.select({foo: 'red'}, '!foo'), false);
+      assert.equal(system.select({foo: 'red'}, '!!foo'), true);
+    });
+
+    test('handles or', () => {
+      assert.equal(system.select({foo: false, bar: false}, 'foo || bar'), false);
+      assert.equal(system.select({foo: false, bar: true}, 'foo || bar'), true);
+      assert.equal(system.select({foo: false, bar: true}, 'bar || foo'), true);
+      assert.equal(system.select({foo: true, bar: false}, 'bar || foo'), true);
+      assert.equal(system.select({foo: true, bar: false, qux: false}, 'qux || bar || foo'), true);
+      assert.equal(system.select({foo: false, bar: {qux: true}}, 'bar.qux || foo'), true);
+    });
+
+    test('handles and', () => {
+      assert.equal(system.select({foo: false, bar: false}, 'foo && bar'), false);
+      assert.equal(system.select({foo: false, bar: true}, 'foo && bar'), false);
+      assert.equal(system.select({foo: false, bar: true}, 'bar && foo'), false);
+      assert.equal(system.select({foo: true, bar: true}, 'bar && foo'), true);
+      assert.equal(system.select({foo: true, bar: true}, 'foo && bar'), true);
+      assert.equal(system.select({foo: true, bar: {qux: true}}, 'bar.qux && foo'), true);
+      assert.equal(system.select({foo: true, bar: true, qux: true}, 'qux && bar && foo'), true);
+      assert.equal(system.select({foo: true, bar: {qux: false}}, 'bar.qux && foo'), false);
+    });
+  });
 });

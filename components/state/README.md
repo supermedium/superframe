@@ -49,19 +49,29 @@ the state changes.
 </a-scene>
 ```
 
-The `bind` component offers boolean expressions with `!` and `!!` operators
-(and only boolean expressions to stay simple):
+There's a `bind-toggle` component which will attach and detach a component
+entirely based on a boolean value.
+
+```html
+<a-entity bind__raycastable="isRaycastable"></a-entity>
+```
+
+#### Expressions
+
+Boolean expressions are supported in binding.
+
+NOT (`!`) and BOOL (`!!`):
 
 ```html
 <a-entity bind="visible: !enabled"></a-entity>
 <a-entity bind__visible="!!enabled"></a-entity>
 ```
 
-There's also a `bind-toggle` component which will attach and detach a component
-entirely based on a boolean value.
+OR (`||`) and AND (`&&`):
 
 ```html
-<a-entity bind__raycastable="isRaycastable"></a-entity>
+<a-entity bind__menu="active: menuOpened && controllerEnabled"></a-entity>
+<a-entity bind__gun="enabled: gunGrabbed && !!bullets || isRobot"></a-entity>
 ```
 
 #### Modifying State
