@@ -205,11 +205,11 @@ AFRAME.registerComponent('bind', {
 
     // Index `keysToWatch` to only update state on relevant changes.
     if (typeof data === 'string') {
-      this.keysToWatch.push(parseKeyToWatch(data));
+      parseKeysToWatch(this.keysToWatch, data);
       return;
     }
     for (key in data) {
-      this.keysToWatch.push(parseKeyToWatch(data[key]));
+      parseKeysToWatch(this.keysToWatch, data[key]);
     }
   },
 
@@ -311,7 +311,8 @@ AFRAME.registerComponent('bind-toggle', {
   },
 
   update: function () {
-    this.keysToWatch[0] = parseKeyToWatch(this.data);
+    this.keysToWatch.length = 0;
+    parseKeysToWatch(this.keysToWatch, this.data);
   },
 
   /**
@@ -431,6 +432,17 @@ function composeFunctions () {
   }
 }
 module.exports.composeFunctions = composeFunctions;
+
+function parseKeysToWatch (keys, str) {
+  var i;
+  var tokens;
+  tokens = str.split(/\s+/);
+  for (i = 0; i < tokens.length; i++) {
+    if (tokens[i] !== '||' && tokens[i] !== '&&') {
+      keys.push(parseKeyToWatch(tokens[i]));
+    }
+  }
+}
 
 function parseKeyToWatch (str) {
   var dotIndex;
