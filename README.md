@@ -27,6 +27,7 @@ See documentation for individual components:
 - [log](https://github.com/ngokevin/kframe/tree/master/components/log/) - In-VR console logs for A-Frame.
 - [look-at](https://github.com/ngokevin/kframe/tree/master/components/look-at/) - Rotate an entity to face towards another entity in A-Frame
 - [mountain](https://github.com/ngokevin/kframe/tree/master/components/mountain/) - Mountain terrain in A-Frame using randomly-generated height maps
+- [proxy-event](https://github.com/ngokevin/kframe/tree/master/components/proxy-event/) - A component to declaratively proxy events for A-Frame.
 - [randomizer](https://github.com/ngokevin/kframe/tree/master/components/randomizer/) - Randomize color, position, rotation, and scale in A-Frame
 - [state](https://github.com/ngokevin/kframe/tree/master/components/state/) - State management for A-Frame using single global state modified through actions. State flows down to application via declarative binding.
 - [sun-sky](https://github.com/ngokevin/kframe/tree/master/components/sun-sky/) - Gradient sky with adjustable sun in A-Frame
