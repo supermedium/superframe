@@ -85,6 +85,7 @@ AFRAME.registerComponent('proxy-event', {
     var data = this.data;
     var el = this.el;
     var to;
+    var self = this;
 
     if (data.to === 'CHILDREN') {
       to = el.querySelectorAll('*');
@@ -95,8 +96,8 @@ AFRAME.registerComponent('proxy-event', {
     }
 
     el.addEventListener(data.event, function (evt) {
+      var data = self.data;
       var i;
-      var data = this.data;
       if (!data.captureBubbles && evt.target !== el) { return; }
       for (i = 0; i < to.length; i++) {
         to[i].emit(data.as || data.event, null, data.bubbles);
