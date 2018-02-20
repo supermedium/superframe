@@ -72,6 +72,7 @@
  */
 AFRAME.registerComponent('proxy-event', {
   schema: {
+    captureBubbles: {default: false},
     event: {type: 'string'},
     to: {type: 'string'},
     as: {type: 'string'},
@@ -95,7 +96,8 @@ AFRAME.registerComponent('proxy-event', {
 
     el.addEventListener(data.event, function (evt) {
       var i;
-      if (evt.target !== el) { return; }
+      var data = this.data;
+      if (!data.captureBubbles && evt.target !== el) { return; }
       for (i = 0; i < to.length; i++) {
         to[i].emit(data.as || data.event, null, data.bubbles);
       }

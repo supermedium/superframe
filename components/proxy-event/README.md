@@ -9,12 +9,13 @@ For [A-Frame](https://aframe.io).
 
 ### API
 
-| Property | Description                                                                                                          | Default Value |
-| -------- | -----------                                                                                                          | ------------- |
-| event    | Event name to proxy.                                                                                                 | ''            |
-| to       | Selector of entities to proxy event to. If set to `CHILDREN`, then the event is recursively proxied to all children. | ''            |
-| as       | Optional. Rename the event as the event is proxied to its target(s).                                                 | ''            |
-| bubbles  | Whether to bubble the proxied event.                                                                                 | false         |
+| Property       | Description                                                                                                          | Default Value |
+| --------       | -----------                                                                                                          | ------------- |
+| captureBubbles | Whether to capture children's bubble events.                                                                         | false         |
+| event          | Event name to proxy.                                                                                                 | ''            |
+| to             | Selector of entities to proxy event to. If set to `CHILDREN`, then the event is recursively proxied to all children. | ''            |
+| as             | Optional. Rename the event as the event is proxied to its target(s).                                                 | ''            |
+| bubbles        | Whether to bubble the proxied event.                                                                                 | false         |
 
 ### Installation
 
