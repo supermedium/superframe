@@ -14,8 +14,8 @@
     <meta property="og:title" content="Pokemon in MagicaVoxel and A-Frame"/>
     <meta property="og:image" content="https://ngokevin.github.io/aframe-magicavoxel-projects/pokemon/preview.png"/>
 
-    <script src="../lib/aframe.min.js"></script>
-    <script src="../lib/aframe-extras.loaders.min.js"></script>
+    <script src="https://aframe.io/releases/0.7.1/aframe.min.js"></script>
+    <script src="https://rawgit.com/donmccurdy/aframe-extras/b78b47821aab2d89924d9008db2df52a04381c6f/dist/aframe-extras.loaders.min.js"></script>
     <script src="https://npmcdn.com/aframe-animation-component@3.0.1"></script>
     <script src="https://npmcdn.com/aframe-particle-system-component@1.0.1/dist/aframe-particle-system-component.min.js"></script>
     <script src="https://npmcdn.com/aframe-look-at-component@1.0.2"></script>
@@ -59,13 +59,18 @@
       <!-- Lights. -->
       <a-light type="ambient" color="#777"></a-light>
       <a-entity animation="property: rotation; to: 0 360 0; easing: linear; loop: true;
-                           duration: 2000">
+                           dur: 2000">
         <a-light type="point" color="#FFF" position="-10 10 -15" intensity="0.3"></a-light>
         <a-light type="point" color="#FFF" position="10 10 -15" intensity="0.3"></a-light>
       </a-entity>
 
+      <a-entity position="0 0 4">
+        <a-camera></a-camera>
+        <a-entity hand-controls="left"></a-entity>
+        <a-entity hand-controls="right"></a-entity>
+      </a-entity>
+
       <a-sky color="#111"></a-sky>
-      <a-camera position="0 1.8 4"></a-camera>
     </a-scene>
   </body>
 </html>
