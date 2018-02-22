@@ -30,6 +30,10 @@
         <audio id="song" autoplay loop src="audio/pokemon-gym-battle.mp3"></audio>
       </a-assets>
 
+      <script>
+        document.getElementById('song').volume = 0.6;
+      </script>
+
       <!-- Model. -->
       <a-entity ply-model="src: #stadium-ply"
                 position="0 -11 -27" scale=".8 .8 .8" rotation="-90 0 0"></a-entity>
