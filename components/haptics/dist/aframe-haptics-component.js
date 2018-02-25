@@ -72,7 +72,7 @@
 	    var i;
 	    var self = this;
 
-	    this.pulse = this.pulse.bind(this);
+	    this.callPulse = function () { self.pulse(); };
 
 	    if (this.el.components['tracked-controls'].controller) {
 	      this.gamepad = this.el.components['tracked-controls'].controller;
@@ -93,12 +93,12 @@
 	    this.removeEventListeners();
 	  },
 
-	  pulse: function () {
+	  pulse: function (force, dur) {
 	    var actuator;
 	    var data = this.data;
 	    if (!data.enabled || !this.gamepad || !this.gamepad.hapticActuators) { return; }
 	    actuator = this.gamepad.hapticActuators[data.actuatorIndex];
-	    actuator.pulse(data.force, data.dur);
+	    actuator.pulse(force || data.force, dur || data.dur);
 	  },
 
 	  addEventListeners: function () {
@@ -108,7 +108,7 @@
 
 	    listenTarget = data.eventsFrom ? document.querySelector(data.eventsFrom) : this.el;
 	    for (i = 0; i < data.events.length; i++) {
-	      listenTarget.addEventListener(data.events[i], this.pulse);
+	      listenTarget.addEventListener(data.events[i], this.callPulse);
 	    }
 	  },
 
@@ -119,7 +119,7 @@
 
 	    listenTarget = data.eventsFrom ? document.querySelector(data.eventsFrom) : this.el;
 	    for (i = 0; i < data.events.length; i++) {
-	      listenTarget.removeEventListener(data.events[i], this.pulse);
+	      listenTarget.removeEventListener(data.events[i], this.callPulse);
 	    }
 	  }
 	});

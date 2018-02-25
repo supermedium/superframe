@@ -22,9 +22,16 @@ Extensions](https://w3c.github.io/gamepad/extensions.html#dom-gamepadhapticactua
 
 #### Methods
 
-| Name  | Description                                                    |
-|-------|----------------------------------------------------------------|
-| pulse | Manually trigger pulse (with data-defined duration and force). |
+| Name  | Description                                                                                                         |
+|-------|---------------------------------------------------------------------------------------------------------------------|
+| pulse | Manually trigger pulse (can pass in `force` and `duration` as arguments, defaults data-defined duration and force). |
+
+```js
+this.el.components.haptics.pulse();
+
+// function pulse (force, duration)
+this.el.components.haptics.pulse(0.5, 200);
+```
 
 ### Installation
 
