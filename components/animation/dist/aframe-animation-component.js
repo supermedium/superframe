@@ -250,16 +250,24 @@
 	    var el = this.el;
 	    var from;
 	    var isBoolean;
+	    var isNumber;
 	    var to;
 
 	    from = data.from || (
-	      this.data.isRawProperty
+	      data.isRawProperty
 	        ? getRawProperty(el, data.property)
 	        : getComponentProperty(el, data.property)
 	    );
 	    to = data.to;
-	    from = from ? from.toString() : from;
-	    to = to ? to.toString() : to;
+
+	    isNumber = !isNaN(from || to);
+	    if (isNumber) {
+	      from = parseFloat(from);
+	      to = parseFloat(to);
+	    } else {
+	      from = from ? from.toString() : from;
+	      to = to ? to.toString() : to;
+	    }
 
 	    // Convert booleans to integer to allow boolean flipping.
 	    isBoolean = to === 'true' || to === 'false';
