@@ -206,9 +206,11 @@ AFRAME.registerComponent('animation', {
     var isBoolean;
     var to;
 
-    from = data.from || this.data.isRawProperty
-      ? getRawProperty(el, data.property)
-      : getComponentProperty(el, data.property);
+    from = data.from || (
+      this.data.isRawProperty
+        ? getRawProperty(el, data.property)
+        : getComponentProperty(el, data.property)
+    );
     to = data.to;
     from = from ? from.toString() : from;
     to = to ? to.toString() : to;
