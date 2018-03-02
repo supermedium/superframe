@@ -1,6 +1,6 @@
 {
   "name": "aframe-animation-component",
-  "version": "4.0.0-beta9",
+  "version": "4.0.0-beta10",
   "description": "Animations in A-Frame using anime.js",
   "main": "index.js",
   "cdn": "dist/aframe-animation-component.min.js",
