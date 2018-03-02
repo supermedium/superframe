@@ -57,6 +57,7 @@
 	var utils = AFRAME.utils;
 	var getComponentProperty = utils.entity.getComponentProperty;
 	var setComponentProperty = utils.entity.setComponentProperty;
+	var splitCache = {};
 
 	var colorHelper = new THREE.Color();
 
@@ -103,7 +104,8 @@
 	    startEvents: {type: 'array'},
 	    pauseEvents: {type: 'array'},
 	    resumeEvents: {type: 'array'},
-	    to: {default: ''}
+	    to: {default: ''},
+	    isRawProperty: {default: false}
 	  },
 
 	  multiple: true,
@@ -250,7 +252,9 @@
 	    var isBoolean;
 	    var to;
 
-	    from = data.from || getComponentProperty(el, data.property);
+	    from = data.from || this.data.isRawProperty
+	      ? getRawProperty(el, data.property)
+	      : getComponentProperty(el, data.property);
 	    to = data.to;
 	    from = from ? from.toString() : from;
 	    to = to ? to.toString() : to;
@@ -280,7 +284,11 @@
 	          value = value >= 1 ? true : false;
 	        }
 
-	        setComponentProperty(el, data.property, value);
+	        if (data.isRawProperty) {
+	          setRawProperty(el, data.property, value);
+	        } else {
+	          setComponentProperty(el, data.property, value);
+	        }
 	      };
 	    })();
 	  },
@@ -358,10 +366,12 @@
 	    })();
 	  },
 
+	  /**
+	   * Update the config before each run.
+	   */
 	  updateConfig: function () {
 	    var propType;
-
-	    // Update the config before each run. Check if vector config.
+	    // Check if vector config.
 	    propType = getPropertyType(this.el, this.data.property);
 	    if (propType === 'vec2' || propType === 'vec3' || propType === 'vec4') {
 	      this.updateConfigForVector();
@@ -453,6 +463,32 @@
 	  for (i = 0; i < eventNames.length; i++) {
 	    el.removeEventListener(eventNames[i], handler);
 	  }
+	}
+
+	function getRawProperty (el, path) {
+	  var i;
+	  var split;
+	  var value;
+	  split = splitDot(path);
+	  value = el;
+	  for (i = 0; i < split.length; i++) { value = value[split[i]]; }
+	  return value;
+	}
+
+	function setRawProperty (el, path, value) {
+	  var currentValue;
+	  var i;
+	  var split;
+	  split = splitDot(path);
+	  currentValue = el;
+	  for (i = 0; i < split.length - 1; i++) { currentValue = currentValue[split[i]]; }
+	  currentValue[split[split.length - 1]] = value;
+	}
+
+	function splitDot (path) {
+	  if (path in splitCache) { return splitCache[path]; }
+	  splitCache[path] = path.split('.');
+	  return splitCache[path];
 	}
 
 
