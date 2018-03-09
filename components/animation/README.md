@@ -1,8 +1,5 @@
 ## aframe-animation-component
 
-> Required to use master branch of A-Frame (0.8.0 milestone) for v4.x.
-> Try https://rawgit.com/ngokevin/aframe/animationbugless/dist/aframe-master.min.js
-
 [animationtimeline]: https://github.com/ngokevin/kframe/tree/master/components/animation-timeline
 
 An animation component for [A-Frame](https://aframe.io) using
@@ -12,6 +9,8 @@ Also check out the [animation-timeline component][animationtimeline] for
 defining and orchestrating timelines of animations.
 
 ![animation](https://cloud.githubusercontent.com/assets/674727/23724348/3991d594-0401-11e7-9b90-31ef43ee7e54.gif)
+
+Latest version requires A-Frame v0.8.0.
 
 ### API
 
@@ -94,8 +93,8 @@ Install and use by directly including the [browser files](dist):
 ```html
 <head>
   <title>My A-Frame Scene</title>
-  <script src="https://rawgit.com/ngokevin/aframe/animationbugless/dist/aframe-master.min.js"></script>
-  <script src="https://unpkg.com/aframe-animation-component@4.0.0-beta8/dist/aframe-animation-component.min.js"></script>
+  <script src="https://aframe.io/releases/0.8.0/aframe.min.js"></script>
+  <script src="https://unpkg.com/aframe-animation-component@4.0.0/dist/aframe-animation-component.min.js"></script>
 </head>
 
 <body>
