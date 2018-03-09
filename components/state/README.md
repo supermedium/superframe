@@ -1,7 +1,5 @@
 ## aframe-state-component
 
-> v2 requires A-Frame master branch (0.8.0 milestone).
-
 State management for [A-Frame](https://aframe.io) using single global state
 modified through actions. Features declarative bindings to easily bind state to
 application. By separating state from components and being able to bind state
@@ -10,6 +8,8 @@ needing to know about its state.
 
 No dependencies and tailored for A-Frame. Bindings will only update their
 entities if relevant pieces of the global state are modified.
+
+v2 requires A-Frame v0.8.0.
 
 ### Usage
 

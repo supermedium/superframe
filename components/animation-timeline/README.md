@@ -1,8 +1,5 @@
 ## aframe-animation-timeline-component
 
-> Required to use master branch of A-Frame (0.8.0 milestone) for v4.x.
-> Try https://rawgit.com/ngokevin/aframe/animationbugless/dist/aframe-master.min.js
-
 [![Version](http://img.shields.io/npm/v/aframe-animation-timeline-component.svg?style=flat-square)](https://npmjs.org/package/aframe-animation-timeline-component)
 [![License](http://img.shields.io/npm/l/aframe-animation-timeline-component.svg?style=flat-square)](https://npmjs.org/package/aframe-animation-timeline-component)
 
@@ -16,6 +13,8 @@ component. Make sure to include that.
 [View Demo](https://ngokevin.github.io/kframe/components/animation-timeline/)
 
 ![GIF](https://user-images.githubusercontent.com/674727/34067163-d0b3af9c-e1d2-11e7-9b3a-c9c207001e6c.gif)
+
+Latest version requires A-Frame v0.8.0.
 
 ### Example
 
@@ -185,7 +184,7 @@ Install and use by directly including the [browser files](dist):
 ```html
 <head>
   <title>My A-Frame Scene</title>
-  <script src="https://rawgit.com/ngokevin/aframe/animationbugless/dist/aframe-master.min.js"></script>
+  <script src="https://aframe.io/releases/0.8.0/aframe.min.js"></script>
   <script src="https://unpkg.com/aframe-animation-component@4.0.0-beta8/dist/aframe-animation-timeline-component.min.js"></script>
   <script src="https://unpkg.com/aframe-animation-timeline-component/dist/aframe-animation-timeline-component.min.js"></script>
 </head>
