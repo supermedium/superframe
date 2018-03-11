@@ -8,12 +8,18 @@ if (typeof AFRAME === 'undefined') {
   throw new Error('Component attempted to register before AFRAME was available.');
 }
 
+var colorHelperFrom = new THREE.Color();
+var colorHelperTo = new THREE.Color();
+
 var utils = AFRAME.utils;
 var getComponentProperty = utils.entity.getComponentProperty;
 var setComponentProperty = utils.entity.setComponentProperty;
 var splitCache = {};
 
-var colorHelper = new THREE.Color();
+var TYPE_COLOR = 'color';
+var PROP_POSITION = 'position';
+var PROP_ROTATION = 'rotation';
+var PROP_SCALE = 'scale';
 
 /**
  * Animation component for A-Frame using anime.js.
@@ -59,6 +65,7 @@ AFRAME.registerComponent('animation', {
     pauseEvents: {type: 'array'},
     resumeEvents: {type: 'array'},
     to: {default: ''},
+    type: {default: ''},
     isRawProperty: {default: false}
   },
 
@@ -76,6 +83,11 @@ AFRAME.registerComponent('animation', {
     this.beginAnimation = this.beginAnimation.bind(this);
     this.pauseAnimation = this.pauseAnimation.bind(this);
     this.resumeAnimation = this.resumeAnimation.bind(this);
+
+    this.fromColor = {};
+    this.toColor = {};
+    this.targets = {};
+    this.targetsArray = [];
 
     this.config = {
       complete: function () {
@@ -196,6 +208,50 @@ AFRAME.registerComponent('animation', {
   },
 
   /**
+   * rawProperty: true and type: color;
+   */
+  updateConfigForRawColor: function () {
+    var config = this.config;
+    var data = this.data;
+    var el = this.el;
+    var from;
+    var key;
+    var to;
+
+    from = data.from || getRawProperty(el, data.property);
+    to = data.to;
+
+    // Use r/g/b vector for color type.
+    this.setColorConfig(from, to);
+    from = this.fromColor;
+    to = this.toColor;
+
+    this.targetsArray.length = 0;
+    this.targetsArray.push(from);
+    config.targets = this.targetsArray;
+    for (key in to) { config[key] = to[key]; }
+
+    config.update = (function () {
+      var lastValue = {};
+      lastValue.r = from.r;
+      lastValue.g = from.g;
+      lastValue.b = from.b;
+
+      return function (anim) {
+        var value;
+        value = anim.animatables[0].target;
+
+        // For animation timeline.
+          if (value.r === lastValue.r &&
+              value.g === lastValue.g &&
+              value.b === lastValue.b) { return; }
+
+        setRawProperty(el, data.property, value, data.type);
+      };
+    })();
+  },
+
+  /**
    * Stuff property into generic `property` key.
    */
   updateConfigForDefault: function () {
@@ -203,6 +259,7 @@ AFRAME.registerComponent('animation', {
     var data = this.data;
     var el = this.el;
     var from;
+    var key;
     var isBoolean;
     var isNumber;
     var to;
@@ -230,7 +287,8 @@ AFRAME.registerComponent('animation', {
       to = data.to === 'true' ? 1 : 0;
     }
 
-    config.targets = {aframeProperty: from};
+    this.targets.aframeProperty = from;
+    config.targets = this.targets;
     config.aframeProperty = to;
     config.update = (function () {
       var lastValue = from;
@@ -249,7 +307,7 @@ AFRAME.registerComponent('animation', {
         }
 
         if (data.isRawProperty) {
-          setRawProperty(el, data.property, value);
+          setRawProperty(el, data.property, value, data.type);
         } else {
           setComponentProperty(el, data.property, value);
         }
@@ -276,18 +334,20 @@ AFRAME.registerComponent('animation', {
     to = AFRAME.utils.coordinates.parse(data.to);
 
     // Animate rotation through radians.
-    if (data.property === 'rotation') {
+    if (data.property === PROP_ROTATION) {
       toRadians(from);
       toRadians(to);
     }
 
     // Set to and from.
-    config.targets = [from];
+    this.targetsArray.length = 0;
+    this.targetsArray.push(from);
+    config.targets = this.targetsArray;
     for (key in to) { config[key] = to[key]; }
 
     // If animating object3D transformation, run more optimized updater.
-    if (data.property === 'position' || data.property === 'rotation' ||
-        data.property === 'scale') {
+    if (data.property === PROP_POSITION || data.property === PROP_ROTATION ||
+        data.property === PROP_SCALE) {
       config.update = (function () {
         var lastValue = {};
         lastValue.x = from.x;
@@ -335,9 +395,12 @@ AFRAME.registerComponent('animation', {
    */
   updateConfig: function () {
     var propType;
-    // Check if vector config.
+
+    // Route config type.
     propType = getPropertyType(this.el, this.data.property);
-    if (propType === 'vec2' || propType === 'vec3' || propType === 'vec4') {
+    if (this.data.isRawProperty && this.data.type === TYPE_COLOR) {
+      this.updateConfigForRawColor();
+    } else if (propType === 'vec2' || propType === 'vec3' || propType === 'vec4') {
       this.updateConfigForVector();
     } else {
       this.updateConfigForDefault();
@@ -375,6 +438,19 @@ AFRAME.registerComponent('animation', {
     removeEventListeners(el, data.startEvents, this.onStartEvent);
     removeEventListeners(el, data.pauseEvents, this.pauseAnimation);
     removeEventListeners(el, data.resumeEvents, this.resumeAnimation);
+  },
+
+  setColorConfig: function (from, to) {
+    colorHelperFrom.set(from);
+    colorHelperTo.set(to);
+    from = this.fromColor;
+    to = this.toColor;
+    from.r = colorHelperFrom.r;
+    from.g = colorHelperFrom.g;
+    from.b = colorHelperFrom.b;
+    to.r = colorHelperTo.r;
+    to.g = colorHelperTo.g;
+    to.b = colorHelperTo.b;
   }
 });
 
@@ -439,14 +515,33 @@ function getRawProperty (el, path) {
   return value;
 }
 
-function setRawProperty (el, path, value) {
-  var currentValue;
+function setRawProperty (el, path, value, type) {
   var i;
   var split;
+  var propertyName;
+  var targetValue;
+
+  // Walk.
   split = splitDot(path);
-  currentValue = el;
-  for (i = 0; i < split.length - 1; i++) { currentValue = currentValue[split[i]]; }
-  currentValue[split[split.length - 1]] = value;
+  targetValue = el;
+  for (i = 0; i < split.length - 1; i++) { targetValue = targetValue[split[i]]; }
+  propertyName = split[split.length - 1];
+
+  // Raw color.
+  if (type === TYPE_COLOR) {
+    if ('r' in targetValue[propertyName]) {
+      targetValue[propertyName].r = value.r;
+      targetValue[propertyName].g = value.g;
+      targetValue[propertyName].b = value.b;
+    } else {
+      targetValue[propertyName].x = value.r;
+      targetValue[propertyName].y = value.g;
+      targetValue[propertyName].z = value.b;
+    }
+    return;
+  }
+
+  targetValue[propertyName] = value;
 }
 
 function splitDot (path) {

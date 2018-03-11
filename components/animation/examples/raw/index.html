@@ -15,8 +15,11 @@
       <a-entity mixin="text textOpacityAnimation" text="value: HELLO WORLD; align: center" position="0 1.5 -1"></a-entity>
 
       <a-sphere position="0 1.5 -2"
-        animation="property: components.material.material.opacity; from: 1; to: 0; dir: alternate; loop: true; isRawProperty: true" material="color: red; transparent: true"
-        animation__scalex="property: object3D.scale.x; from: 1; to: 0.75; dir: alternate; loop: true; isRawProperty: true"></a-sphere>
+        animation="property: components.material.material.opacity; from: 1; to: 0; dir: alternate; loop: true; isRawProperty: true"
+        animation__scalex="property: object3D.scale.x; from: 1; to: 0.75; dir: alternate; loop: true; isRawProperty: true"
+        material="color: red; transparent: true"
+        animation__color="property: components.material.material.color; from: red; to: purple; dir: alternate; loop: true; isRawProperty: true; type: color"
+      ></a-sphere>
 
       <!-- Sky. -->
       <a-sky color="#111"></a-sky>
