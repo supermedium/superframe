@@ -66,6 +66,8 @@
 	var PROP_POSITION = 'position';
 	var PROP_ROTATION = 'rotation';
 	var PROP_SCALE = 'scale';
+	var STRING_COMPONENTS = 'components';
+	var STRING_OBJECT3D = 'object3D';
 
 	/**
 	 * Animation component for A-Frame using anime.js.
@@ -311,7 +313,7 @@
 	    var to;
 
 	    from = data.from || (
-	      data.isRawProperty
+	      isRawProperty(data)
 	        ? getRawProperty(el, data.property)
 	        : getComponentProperty(el, data.property)
 	    );
@@ -352,7 +354,7 @@
 	          value = value >= 1 ? true : false;
 	        }
 
-	        if (data.isRawProperty) {
+	        if (isRawProperty(data)) {
 	          setRawProperty(el, data.property, value, data.type);
 	        } else {
 	          setComponentProperty(el, data.property, value);
@@ -444,7 +446,7 @@
 
 	    // Route config type.
 	    propType = getPropertyType(this.el, this.data.property);
-	    if (this.data.isRawProperty && this.data.type === TYPE_COLOR) {
+	    if (isRawProperty(this.data) && this.data.type === TYPE_COLOR) {
 	      this.updateConfigForRawColor();
 	    } else if (propType === 'vec2' || propType === 'vec3' || propType === 'vec4') {
 	      this.updateConfigForVector();
@@ -594,6 +596,11 @@
 	  if (path in splitCache) { return splitCache[path]; }
 	  splitCache[path] = path.split('.');
 	  return splitCache[path];
+	}
+
+	function isRawProperty (data) {
+	  return data.isRawProperty || data.property.startsWith(STRING_COMPONENTS) ||
+	         data.property.startsWith(STRING_OBJECT3D);
 	}
 
 
