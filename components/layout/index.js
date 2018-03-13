@@ -14,7 +14,8 @@ AFRAME.registerComponent('layout', {
     reverse: {default: false},
     type: {default: 'line', oneOf: ['box', 'circle', 'cube', 'dodecahedron', 'line',
                                     'pyramid']},
-    fill: {default: true, if: {type: ['circle']}}
+    fill: {default: true, if: {type: ['circle']}},
+    align: {default: 'end', oneOf: ['start', 'center', 'end']}
   },
 
   /**
@@ -129,20 +130,23 @@ function getBoxPositions (data, numChildren, marginDefined) {
     marginRow = data.margin;
   }
 
+  var offsetRow = getOffsetItemIndex(data.align, rows);
+  var offsetColumn = getOffsetItemIndex(data.align, data.columns);
+
   for (var row = 0; row < rows; row++) {
     for (var column = 0; column < data.columns; column++) {
       position = [0, 0, 0];
       if (data.plane.indexOf('x') === 0) {
-        position[0] = column * marginColumn;
+        position[0] = (column - offsetColumn) * marginColumn;
       }
       if (data.plane.indexOf('y') === 0) {
-        position[1] = column * marginColumn;
+        position[1] = (column - offsetColumn) * marginColumn;
       }
       if (data.plane.indexOf('y') === 1) {
-        position[1] = row * marginRow;
+        position[1] = (row - offsetRow) * marginRow;
       }
       if (data.plane.indexOf('z') === 1) {
-        position[2] = row * marginRow;
+        position[2] = (row - offsetRow) * marginRow;
       }
       positions.push(position);
     }
@@ -262,6 +266,23 @@ function getPyramidPositions (data, numChildren) {
   ], data.radius / 2);
 }
 module.exports.getPyramidPositions = getPyramidPositions;
+
+/**
+ * Return the item index in a given list to calculate offsets from
+ *
+ * @param {string} align - One of `'start'`, `'center'`, `'end'`
+ * @param {integer} numItems - Total number of items
+ */
+function getOffsetItemIndex (align, numItems) {
+  switch (align) {
+    case 'start':
+      return numItems - 1;
+    case 'center':
+      return (numItems - 1) / 2;
+    case 'end':
+      return 0;
+  }
+}
 
 /**
  * Multiply all coordinates by a scale factor and add translate.
