@@ -15,7 +15,7 @@ AFRAME.registerComponent('layout', {
     type: {default: 'line', oneOf: ['box', 'circle', 'cube', 'dodecahedron', 'line',
                                     'pyramid']},
     fill: {default: true, if: {type: ['circle']}},
-    keepCentered: {default: false}
+    align: {default: 'end', oneOf: ['start', 'center', 'end']}
   },
 
   /**
@@ -130,8 +130,8 @@ function getBoxPositions (data, numChildren, marginDefined) {
     marginRow = data.margin;
   }
 
-  var offsetRow = data.keepCentered ? (rows - 1) / 2 : 0;
-  var offsetColumn = data.keepCentered ? (data.columns - 1) / 2 : 0;
+  var offsetRow = getOffsetItemIndex(data.align, rows);
+  var offsetColumn = getOffsetItemIndex(data.align, data.columns);
 
   for (var row = 0; row < rows; row++) {
     for (var column = 0; column < data.columns; column++) {
@@ -266,6 +266,23 @@ function getPyramidPositions (data, numChildren) {
   ], data.radius / 2);
 }
 module.exports.getPyramidPositions = getPyramidPositions;
+
+/**
+ * Return the item index in a given list to calculate offsets from
+ *
+ * @param {string} align - One of `'start'`, `'center'`, `'end'`
+ * @param {integer} numItems - Total number of items
+ */
+function getOffsetItemIndex (align, numItems) {
+  switch (align) {
+    case 'start':
+      return numItems - 1;
+    case 'center':
+      return (numItems - 1) / 2;
+    case 'end':
+      return 0;
+  }
+}
 
 /**
  * Multiply all coordinates by a scale factor and add translate.
