@@ -4,6 +4,7 @@
     <meta name="description" content="One-dimensional layout of boxes"></meta>
     <meta property="og:image" content="https://raw.githubusercontent.com/ngokevin/kframe/master/components/layout/examples/line/preview.png"></meta>
     <script src="https://aframe.io/releases/0.5.0/aframe.min.js"></script>
+    <script src="https://unpkg.com/aframe-entity-generator-component@3.0.1/dist/aframe-entity-generator-component.min.js"></script>
     <script src="../../dist/aframe-layout-component.min.js"></script>
   </head>
   <body>
@@ -11,22 +12,25 @@
       <a-assets>
         <a-mixin id="cube" geometry="primitive: box"
                  material="color: #FFFBE0"></a-mixin>
-        <a-mixin id="secondary" material="color: #FFB400"></a-mixin>
+        <a-mixin id="c1" material="color: #FFB400"></a-mixin>
+        <a-mixin id="c2" material="color: #B4FF00"></a-mixin>
+        <a-mixin id="c3" material="color: #00B4FF"></a-mixin>
       </a-assets>
 
       <a-entity geometry="primitive: sphere; radius: 1000"
                 material="color: #2994B2; shader: flat" scale="1 1 -1">
       </a-entity>
 
-      <a-entity layout="type: line; margin: 5" position="0 0 -15">
-        <a-entity mixin="cube"></a-entity>
-        <a-entity mixin="cube"></a-entity>
-        <a-entity mixin="cube"></a-entity>
-        <a-entity mixin="cube"></a-entity>
-        <a-entity mixin="cube"></a-entity>
-        <a-entity mixin="cube"></a-entity>
-        <a-entity mixin="cube"></a-entity>
-        <a-entity mixin="cube"></a-entity>
+      <a-entity entity-generator="mixin: cube c1; num: 8"
+                layout="type: line; margin: 5; align: start" position="0 5 -15">
+      </a-entity>
+
+      <a-entity entity-generator="mixin: cube c2; num: 9"
+                layout="type: line; margin: 5; align: center" position="0 0 -15">
+      </a-entity>
+
+      <a-entity entity-generator="mixin: cube c3; num: 9"
+                layout="type: line; margin: 5; align: end" position="0 -5 -15">
       </a-entity>
     </a-scene>
 
