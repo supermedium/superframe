@@ -55,18 +55,7 @@
 	  schema: {
 	    default: '',
 	    parse: function (value) {
-	      var convertedObj;
-	      var hyphened;
-	      var key;
-	      var obj;
-	      obj = styleParser.parse(value);
-	      // Convert camelCase keys from styleParser to hyphen.
-	      convertedObj = {};
-	      for (key in obj) {
-	        hyphened = key.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
-	        convertedObj[hyphened] = obj[key];
-	      }
-	      return convertedObj;
+	      return styleParser.parse(value);
 	    }
 	  },
 
