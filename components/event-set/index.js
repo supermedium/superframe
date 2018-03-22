@@ -52,8 +52,6 @@ AFRAME.registerComponent('event-set', {
     // Set event listener using `_event`.
     event = data._event || this.id;
     target = data._target;
-    delete data._event;
-    delete data._target;
 
     // Decide the target to `setAttribute` on.
     targetEl = target ? el.sceneEl.querySelector(target) : el;
@@ -63,6 +61,7 @@ AFRAME.registerComponent('event-set', {
       var propName;
       // Set attributes.
       for (propName in data) {
+        if (propName === '_event' || propName === '_target') { continue; }
         AFRAME.utils.entity.setComponentProperty.call(this, targetEl, propName,
                                                       data[propName]);
       }
