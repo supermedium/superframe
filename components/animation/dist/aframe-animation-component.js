@@ -103,8 +103,8 @@
 	      default: 0,
 	      parse: function (value) {
 	        // Boolean or integer.
-	        if (value === 'true') { return true; }
-	        if (value === 'false') { return false; }
+	        if (value === true || value === 'true') { return true; }
+	        if (value === false || value === 'false') { return false; }
 	        return parseInt(value, 10);
 	      }
 	    },
