@@ -342,6 +342,97 @@ AFRAME.registerComponent('bind-toggle', {
 });
 
 /**
+ * Render array from state.
+ */
+AFRAME.registerComponent('bind-for', {
+  schema: {
+    for: {type: 'string'},
+    in: {type: 'string'},
+    key: {type: 'string'},
+    template: {type: 'string'}
+  },
+
+  init: function () {
+    // Subscribe to store and register handler to do data-binding to components.
+    this.system = this.el.sceneEl.systems.state;
+
+    this.keysToWatch = [];
+    this.renderedKeys = [];  // Keys that are currently rendered.
+    this.el.addEventListener('bindforrender', this.onStateUpdate.bind(this));
+  },
+
+  update: function () {
+    this.template = document.querySelector(this.data.template).innerHTML.trim();
+    this.onStateUpdate();
+  },
+
+  /**
+   * Handle state update.
+   */
+  onStateUpdate: (function () {
+    var fragment = document.createElement('template');
+    var keys = [];
+
+    return function () {
+      var data = this.data;
+      var el = this.el;
+      var i;
+      var list;
+      var key;
+      var item;
+
+      try {
+        list = select(this.system.state, data.in);
+      } catch (e) {
+        throw new Error(`[aframe-state-component] Key '${data.in}' not found in state.` +
+                        ` #${el.getAttribute('id')}[${this.attrName}]`);
+      }
+      console.log(list);
+
+      keys.length = 0;
+      for (i = 0; i < list.length; i++) {
+        item = list[i];
+        keys.push(item[data.key]);
+
+        // Add item.
+        if (this.renderedKeys.indexOf(item[data.key]) === -1) {
+          fragment.innerHTML = this.renderItem(item, this.template);
+          el.appendChild(fragment.content);
+          el.children[el.children.length - 1].setAttribute('data-bind-for-key',
+                                                           item[data.key]);
+          this.renderedKeys.push(data.key);
+          continue;
+        }
+
+        // TODO: Update item.
+      }
+
+      // Remove items.
+      for (i = 0; i < el.children.length; i++) {
+        key = el.children[i].getAttribute('data-bind-for-key');
+        if (keys.indexOf(key) === -1) { el.removeChild(el.children[i]); }
+      }
+    };
+  })(),
+
+  renderItem: (function () {
+    // Braces, whitespace, optional item name, item key, whitespace, braces.
+    var interpRegex = /{{\s*\w*\.?(\w+)\s*}}/g;
+
+    return function (item, template) {
+      var i;
+      var key;
+      var str;
+      str = template;
+      while (key = interpRegex.exec(template)) {
+        str = str.replace(key[0], item[key[1]]);
+      }
+      return str;
+    };
+  })()
+});
+
+/**
  * Select value from store.
  *
  * @param {object} state - State object.

@@ -7,6 +7,10 @@ var initialState = {
   color: 'red',
   counter: 5,
   enabled: false,
+  shoppingList: [
+    {name: 'eggs', amount: 12},
+    {name: 'milk', amount: 2}
+  ],
   nested: {
     enabled: false,
     enabled2: false
@@ -54,6 +58,18 @@ AFRAME.registerState({
       state.position.x = payload.position.x;
       state.position.y = payload.position.y;
       state.position.z = payload.position.z;
+    },
+
+    shoppingListAdd: (state) => {
+      state.shoppingList.push({name: 'bananas', amount: 6});
+    },
+
+    shoppingListRemove: (state) => {
+      state.shoppingList.splice(0, 1);
+    },
+
+    shoppingListUpdate: (state) => {
+      state.shoppingList[0].amount = 20;
     }
   },
 
@@ -414,6 +430,52 @@ suite('state', function () {
       setTimeout(() => {
         assert.ok('raycastable' in el.components);
         done();
+      });
+    });
+  });
+
+  suite('bind-for', () => {
+    setup(() => {
+      var template = document.createElement('template');
+      template.setAttribute('id', 'shoppingItem');
+      template.innerHTML = `
+        <a-entity class="shoppingItem" text="value: {{ shoppingItem.name }}"
+                  data-amount="{{ shoppingItem.amount }}"></a-entity>
+      `;
+      el.sceneEl.appendChild(template);
+    });
+
+    test('renders list', done => {
+      el.setAttribute('bind-for', {
+        for: 'shoppingItem',
+        in: 'shoppingList',
+        template: '#shoppingItem',
+        key: 'name'
+      });
+      setTimeout(() => {
+        assert.ok(el.children.length, 2);
+        assert.equal(el.children[0].getAttribute('text').value, 'eggs');
+        assert.equal(el.children[0].dataset.amount, 12);
+        assert.equal(el.children[1].getAttribute('text').value, 'milk');
+        assert.equal(el.children[1].dataset.amount, 2);
+        done();
+      });
+    });
+
+    test.only('removes items', done => {
+      el.setAttribute('bind-for', {
+        for: 'shoppingItem',
+        in: 'shoppingList',
+        template: '#shoppingItem',
+        key: 'name'
+      });
+      el.sceneEl.emit('shoppingListRemove');
+      setTimeout(() => {
+        el.sceneEl.emit('bindforrender');
+        setTimeout(() => {
+          assert.equal(el.children.length, 1);
+          done();
+        }, 50);
       });
     });
   });
