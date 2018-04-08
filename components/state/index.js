@@ -387,7 +387,6 @@ AFRAME.registerComponent('bind-for', {
         throw new Error(`[aframe-state-component] Key '${data.in}' not found in state.` +
                         ` #${el.getAttribute('id')}[${this.attrName}]`);
       }
-      console.log(list);
 
       keys.length = 0;
       for (i = 0; i < list.length; i++) {
@@ -400,7 +399,7 @@ AFRAME.registerComponent('bind-for', {
           el.appendChild(fragment.content);
           el.children[el.children.length - 1].setAttribute('data-bind-for-key',
                                                            item[data.key]);
-          this.renderedKeys.push(data.key);
+          this.renderedKeys.push(item[data.key]);
           continue;
         }
 
@@ -410,7 +409,10 @@ AFRAME.registerComponent('bind-for', {
       // Remove items.
       for (i = 0; i < el.children.length; i++) {
         key = el.children[i].getAttribute('data-bind-for-key');
-        if (keys.indexOf(key) === -1) { el.removeChild(el.children[i]); }
+        if (keys.indexOf(key) === -1) {
+          el.children[i].parentNode.removeChild(el.children[i]);
+          this.renderedKeys.splice(this.renderedKeys.indexOf(key), 1);
+        }
       }
     };
   })(),

@@ -462,7 +462,7 @@ suite('state', function () {
       });
     });
 
-    test.only('removes items', done => {
+    test('removes items', done => {
       el.setAttribute('bind-for', {
         for: 'shoppingItem',
         in: 'shoppingList',
@@ -471,11 +471,12 @@ suite('state', function () {
       });
       el.sceneEl.emit('shoppingListRemove');
       setTimeout(() => {
-        el.sceneEl.emit('bindforrender');
+        el.emit('bindforrender');
         setTimeout(() => {
           assert.equal(el.children.length, 1);
+          assert.equal(el.children[0].getAttribute('text').value, 'milk');
           done();
-        }, 50);
+        });
       });
     });
   });
