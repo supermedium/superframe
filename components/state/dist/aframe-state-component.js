@@ -257,7 +257,26 @@ AFRAME.registerSystem('state', {
     }
   },
 
-  select: select // For testing.
+  select: select, // For testing.
+
+  /**
+   * Render template to string with item data.
+   */
+  renderItem: function () {
+    // Braces, whitespace, optional item name, item key, whitespace, braces.
+    var interpRegex = /{{\s*\w*\.?([\w.]+)\s*}}/g;
+
+    return function (item, template) {
+      var i;
+      var match;
+      var str;
+      str = template;
+      while (match = interpRegex.exec(template)) {
+        str = str.replace(match[0], select(item, match[1]));
+      }
+      return str;
+    };
+  }()
 });
 
 /**
@@ -546,7 +565,7 @@ AFRAME.registerComponent('bind-for', {
 
         // Add item.
         if (this.renderedKeys.indexOf(item[data.key]) === -1) {
-          fragment.innerHTML = this.renderItem(item, this.template);
+          fragment.innerHTML = this.system.renderItem(item, this.template);
           el.appendChild(fragment.content);
           el.children[el.children.length - 1].setAttribute('data-bind-for-key', item[data.key]);
           this.renderedKeys.push(item[data.key]);
@@ -569,25 +588,6 @@ AFRAME.registerComponent('bind-for', {
       for (i = 0; i < toRemove.length; i++) {
         toRemove[i].parentNode.removeChild(toRemove[i]);
       }
-    };
-  }(),
-
-  /**
-   * Render template to string with item data.
-   */
-  renderItem: function () {
-    // Braces, whitespace, optional item name, item key, whitespace, braces.
-    var interpRegex = /{{\s*\w*\.?([\w.]+)\s*}}/g;
-
-    return function (item, template) {
-      var i;
-      var match;
-      var str;
-      str = template;
-      while (match = interpRegex.exec(template)) {
-        str = str.replace(match[0], select(item, match[1]));
-      }
-      return str;
     };
   }()
 });
