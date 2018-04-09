@@ -70,6 +70,7 @@ AFRAME.registerState({
 
     shoppingListUpdate: (state, payload) => {
       state.shoppingList.find(item => item.name === payload.name).amount = payload.amount;
+      state.shoppingList.__dirty = true;
     }
   },
 
@@ -478,9 +479,8 @@ suite('state', function () {
         template: '#shoppingItem',
         key: 'name'
       });
-      el.sceneEl.emit('shoppingListAdd');
       setTimeout(() => {
-        el.emit('bindforrender');
+        el.sceneEl.emit('shoppingListAdd');
         setTimeout(() => {
           assert.ok(el.children.length, 3);
           assert.equal(el.children[2].getAttribute('text').value, 'bananas');
@@ -499,12 +499,9 @@ suite('state', function () {
       });
       el.sceneEl.emit('shoppingListRemove');
       setTimeout(() => {
-        el.emit('bindforrender');
-        setTimeout(() => {
-          assert.equal(el.children.length, 1);
-          assert.equal(el.children[0].getAttribute('text').value, 'milk');
-          done();
-        });
+        assert.equal(el.children.length, 1);
+        assert.equal(el.children[0].getAttribute('text').value, 'milk');
+        done();
       });
     });
 
@@ -521,11 +518,8 @@ suite('state', function () {
         assert.equal(milkEl.getAttribute('text').value, '2');
         el.sceneEl.emit('shoppingListUpdate', {name: 'milk', amount: 20});
         setTimeout(() => {
-          el.emit('bindforrender');
-          setTimeout(() => {
-            assert.equal(milkEl.getAttribute('text').value, '20');
-            done();
-          });
+          assert.equal(milkEl.getAttribute('text').value, '20');
+          done();
         });
       });
     });

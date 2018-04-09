@@ -1,3 +1,5 @@
+var wrapArray = require('./lib/array').wrapArray;
+
 // Singleton state definition.
 var State = {
   initialState: {},
@@ -11,10 +13,20 @@ AFRAME.registerState = function (definition) {
 
 AFRAME.registerSystem('state', {
   init: function () {
+    var key;
+
     this.diff = {};
     this.state = AFRAME.utils.clone(State.initialState);
     this.subscriptions = [];
     this.initEventHandlers();
+
+    // Wrap array to detect dirty.
+    for (key in this.state) {
+      if (this.state[key].constructor === Array) {
+        this.state[key].__dirty = true;
+        wrapArray(this.state[key]);
+      }
+    }
 
     this.lastState = AFRAME.utils.clone(this.state);
 
@@ -55,8 +67,21 @@ AFRAME.registerSystem('state', {
 
     // Notify subscriptions / binders.
     for (i = 0; i < this.subscriptions.length; i++) {
-      if (!this.shouldUpdate(this.subscriptions[i].keysToWatch, this.diff)) { continue; }
-      this.subscriptions[i].onStateUpdate(this.state, actionName, payload);
+      if (this.subscriptions[i].name === 'bind-for') {
+        // For arrays and bind-for, check __dirty flag on array rather than the diff.
+        if (!this.state[this.subscriptions[i].keysToWatch[0]].__dirty) { continue; }
+      } else {
+        if (!this.shouldUpdate(this.subscriptions[i].keysToWatch, this.diff)) { continue; }
+      }
+
+      this.subscriptions[i].onStateUpdate();
+    }
+
+    // Unset array dirty.
+    for (key in this.state) {
+      if (this.state[key].constructor === Array) {
+        this.state[key].__dirty = false;
+      }
     }
 
     // Emit.
@@ -219,6 +244,7 @@ AFRAME.registerComponent('bind', {
     if (bindForEl) {
       this.bindFor = bindForEl.getAttribute('bind-for');
       this.bindForKey = this.el.getAttribute('data-bind-for-key');
+      this.keysToWatch.push(this.bindFor.in);
       bindForEl.addEventListener('bindforrender', this.onStateUpdate.bind(this));
     } else {
       this.bindFor = '';
@@ -381,9 +407,11 @@ AFRAME.registerComponent('bind-for', {
     this.keysToWatch = [];
     this.renderedKeys = [];  // Keys that are currently rendered.
     this.el.addEventListener('bindforrender', this.onStateUpdate.bind(this));
+    this.system.subscribe(this);
   },
 
   update: function () {
+    this.keysToWatch[0] = this.data.in;
     this.template = document.querySelector(this.data.template).innerHTML.trim();
     this.onStateUpdate();
   },
