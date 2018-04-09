@@ -219,6 +219,7 @@ AFRAME.registerComponent('bind', {
     if (bindForEl) {
       this.bindFor = bindForEl.getAttribute('bind-for');
       this.bindForKey = this.el.getAttribute('data-bind-for-key');
+      bindForEl.addEventListener('bindforrender', this.onStateUpdate.bind(this));
     } else {
       this.bindFor = '';
       this.bindForKey = '';

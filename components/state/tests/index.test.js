@@ -68,8 +68,8 @@ AFRAME.registerState({
       state.shoppingList.splice(0, 1);
     },
 
-    shoppingListUpdate: (state) => {
-      state.shoppingList[1].amount = 20;
+    shoppingListUpdate: (state, payload) => {
+      state.shoppingList.find(item => item.name === payload.name).amount = payload.amount;
     }
   },
 
@@ -448,7 +448,8 @@ suite('state', function () {
       template = document.createElement('template');
       template.setAttribute('id', 'shoppingItemTemplate2');
       template.innerHTML = `
-        <a-entity class="shoppingItem" bind__text="value: shoppingItem.amount"></a-entity>
+        <a-entity class="shoppingItem" bind__text="value: shoppingItem.amount"
+                  data-type="{{ shoppingItem.name }}"></a-entity>
       `;
       el.sceneEl.appendChild(template);
     });
@@ -514,13 +515,18 @@ suite('state', function () {
         template: '#shoppingItemTemplate2',
         key: 'name'
       });
-      el.sceneEl.emit('shoppingListUpdate');
       setTimeout(() => {
-        el.emit('bindforrender');
+        var milkEl;
+        milkEl = el.querySelector('[data-bind-for-key="milk"]');
+        assert.equal(milkEl.getAttribute('text').value, '2');
+        el.sceneEl.emit('shoppingListUpdate', {name: 'milk', amount: 20});
         setTimeout(() => {
-          assert.equal(el.children[1].getAttribute('text').value, '20');
-          done();
-        }, 200);
+          el.emit('bindforrender');
+          setTimeout(() => {
+            assert.equal(milkEl.getAttribute('text').value, '20');
+            done();
+          });
+        });
       });
     });
   });
