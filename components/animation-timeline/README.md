@@ -185,8 +185,8 @@ Install and use by directly including the [browser files](dist):
 <head>
   <title>My A-Frame Scene</title>
   <script src="https://aframe.io/releases/0.8.0/aframe.min.js"></script>
-  <script src="https://unpkg.com/aframe-animation-component@4.0.0-beta8/dist/aframe-animation-timeline-component.min.js"></script>
-  <script src="https://unpkg.com/aframe-animation-timeline-component/dist/aframe-animation-timeline-component.min.js"></script>
+  <script src="https://unpkg.com/aframe-animation-component@^4.1.1/dist/aframe-animation-timeline-component.min.js"></script>
+  <script src="https://unpkg.com/aframe-animation-timeline-component@^1.3.1/dist/aframe-animation-timeline-component.min.js"></script>
 </head>
 
 <body>

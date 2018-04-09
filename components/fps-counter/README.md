@@ -26,7 +26,7 @@ Install and use by directly including the [browser files](dist):
 <head>
   <title>My A-Frame Scene</title>
   <script src="https://aframe.io/releases/0.7.1/aframe.min.js"></script>
-  <script src="https://unpkg.com/aframe-fps-counter-component/dist/aframe-fps-counter-component.min.js"></script>
+  <script src="https://unpkg.com/aframe-fps-counter-component@^1.0.1/dist/aframe-fps-counter-component.min.js"></script>
 </head>
 
 <body>
