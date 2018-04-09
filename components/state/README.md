@@ -91,6 +91,75 @@ in response to state changes.
 A `stateupdate` event will be fired, but we probably don't need to use it. The
 event might later be useful if we develop a debugging front-end for the state.
 
+#### Rendering Lists
+
+The state component comes with a `bind-for` component that can render an array
+in state from a template. Say we have an array in state:
+
+```js
+AFRAME.registerState({
+  initialState: {
+    shoppingList: [
+      {name: 'milk', amount: 2},
+      {name: 'eggs', amount: 12}
+    ]
+  }
+});
+```
+
+We use `bind-for`. We provide `for` (the iterator variable name), `in` (pointer
+to the array in state), and `name` (name of key representing unique identifier
+between every element). Then we have a `<template>` which will be used to
+render each individual item.
+
+Then we can bind properties to the individual array element either using the
+`bind` component, using the `in` value as the pointer (i.e.,
+`shoppingItem.name`). Or we can use braces (`{{ }}`), which the `bind-for`
+component will statically interpolate the variable:
+
+```html
+<a-entity bind-for="for: shoppingItem; in: shoppingList; key: name">
+  <template>
+    <a-entity bind__text="value: shoppingItem.name"
+              data-amount="{{ shoppingItem.amount }}"></a-entity>
+  </template>
+</a-entity>
+```
+
+This will result in:
+
+```html
+<a-entity bind-for="for: shoppingItem; in: shoppingList; key: name">
+  <template>
+    <!-- ... -->
+  </template>
+  <a-entity bind__text="value: shoppingItem.name"
+            text="value: milk"
+            data-amount="2"
+            data-bind-for-key="milk"></a-entity>
+  <a-entity bind__text="value: shoppingItem.name"
+            text="value: eggs"
+            data-amount="12"
+            data-bind-for-key="eggs"></a-entity>
+</a-entity>
+```
+
+`bind-for` will automatically render new entities, remove old entities
+respective to changes in the array in the state. Updates are handled through
+individual `bind`s.
+
+#### Detecting Changes in Arrays
+
+Arrays are references so the state system tries to detect when a change is made
+before re-rendering. Changes to the array itself are detecting by wrapping
+array methods and setting the `__dirty` flag.
+
+Although detecting changes to objects within an array is a bit harder. For now,
+I developed a dirty solution. If you touch an object within an array, set
+`state.myArray.__dirty = true;`. Perhaps in the future, we will have dedicated
+methods for modifying arrays and objects in a way the state component can
+detect.
+
 #### Computed State
 
 To attach additional computed state after the action is processed, specify a

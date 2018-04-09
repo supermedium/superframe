@@ -225,6 +225,7 @@ AFRAME.registerComponent('bind', {
   },
 
   update: function () {
+    var bindForEl;
     var data = this.data;
     var key;
     var property;
@@ -403,16 +404,20 @@ AFRAME.registerComponent('bind-for', {
   init: function () {
     // Subscribe to store and register handler to do data-binding to components.
     this.system = this.el.sceneEl.systems.state;
+    this.onStateUpdate = this.onStateUpdate.bind(this);
 
     this.keysToWatch = [];
     this.renderedKeys = [];  // Keys that are currently rendered.
-    this.el.addEventListener('bindforrender', this.onStateUpdate.bind(this));
     this.system.subscribe(this);
   },
 
   update: function () {
     this.keysToWatch[0] = this.data.in;
-    this.template = document.querySelector(this.data.template).innerHTML.trim();
+    if (this.el.children[0] && this.el.children[0].tagName === 'TEMPLATE') {
+      this.template = this.el.children[0].innerHTML.trim();
+    } else {
+      this.template = document.querySelector(this.data.template).innerHTML.trim();
+    }
     this.onStateUpdate();
   },
 
@@ -422,6 +427,7 @@ AFRAME.registerComponent('bind-for', {
   onStateUpdate: (function () {
     var fragment = document.createElement('template');
     var keys = [];
+    var toRemove = [];
 
     return function () {
       var data = this.data;
@@ -455,12 +461,17 @@ AFRAME.registerComponent('bind-for', {
       }
 
       // Remove items.
+      toRemove.length = 0;
       for (i = 0; i < el.children.length; i++) {
+        if (el.children[i].tagName === 'TEMPLATE') { continue; }
         key = el.children[i].getAttribute('data-bind-for-key');
         if (keys.indexOf(key) === -1) {
-          el.children[i].parentNode.removeChild(el.children[i]);
+          toRemove.push(el.children[i]);
           this.renderedKeys.splice(this.renderedKeys.indexOf(key), 1);
         }
+      }
+      for (i = 0; i < toRemove.length; i++) {
+        toRemove[i].parentNode.removeChild(toRemove[i]);
       }
     };
   })(),
