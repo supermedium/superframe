@@ -69,7 +69,7 @@ AFRAME.registerState({
     },
 
     shoppingListUpdate: (state) => {
-      state.shoppingList[0].amount = 20;
+      state.shoppingList[1].amount = 20;
     }
   },
 
@@ -436,11 +436,19 @@ suite('state', function () {
 
   suite('bind-for', () => {
     setup(() => {
-      var template = document.createElement('template');
+      var template;
+      template = document.createElement('template');
       template.setAttribute('id', 'shoppingItem');
       template.innerHTML = `
         <a-entity class="shoppingItem" text="value: {{ shoppingItem.name }}"
                   data-amount="{{ shoppingItem.amount }}"></a-entity>
+      `;
+      el.sceneEl.appendChild(template);
+
+      template = document.createElement('template');
+      template.setAttribute('id', 'shoppingItemTemplate2');
+      template.innerHTML = `
+        <a-entity class="shoppingItem" bind__text="value: shoppingItem.amount"></a-entity>
       `;
       el.sceneEl.appendChild(template);
     });
@@ -462,6 +470,25 @@ suite('state', function () {
       });
     });
 
+    test('renders added list item', done => {
+      el.setAttribute('bind-for', {
+        for: 'shoppingItem',
+        in: 'shoppingList',
+        template: '#shoppingItem',
+        key: 'name'
+      });
+      el.sceneEl.emit('shoppingListAdd');
+      setTimeout(() => {
+        el.emit('bindforrender');
+        setTimeout(() => {
+          assert.ok(el.children.length, 3);
+          assert.equal(el.children[2].getAttribute('text').value, 'bananas');
+          assert.equal(el.children[2].dataset.amount, 6);
+          done();
+        });
+      });
+    });
+
     test('removes items', done => {
       el.setAttribute('bind-for', {
         for: 'shoppingItem',
@@ -477,6 +504,23 @@ suite('state', function () {
           assert.equal(el.children[0].getAttribute('text').value, 'milk');
           done();
         });
+      });
+    });
+
+    test('can bind to item', done => {
+      el.setAttribute('bind-for', {
+        for: 'shoppingItem',
+        in: 'shoppingList',
+        template: '#shoppingItemTemplate2',
+        key: 'name'
+      });
+      el.sceneEl.emit('shoppingListUpdate');
+      setTimeout(() => {
+        el.emit('bindforrender');
+        setTimeout(() => {
+          assert.equal(el.children[1].getAttribute('text').value, '20');
+          done();
+        }, 200);
       });
     });
   });

@@ -165,9 +165,9 @@ AFRAME.registerComponent('bind', {
 
       // Parse style-like object as keys to values.
       data = {};
-      properties = value.split(';');
+      properties = split(value, ';');
       for (i = 0; i < properties.length; i++) {
-        pair = properties[i].trim().split(':');
+        pair = split(properties[i].trim(), ':');
         data[pair[0]] = pair[1].trim();
       }
       return data;
@@ -177,9 +177,14 @@ AFRAME.registerComponent('bind', {
   multiple: true,
 
   init: function () {
-    this.system = this.el.sceneEl.systems.state;
+    var bindForEl;
+    var bindForName;
+    var data = this.data;
+    var key;
+
     this.keysToWatch = [];
     this.onStateUpdate = this.onStateUpdate.bind(this);
+    this.system = this.el.sceneEl.systems.state;
 
     // Whether we are binding by namespace (e.g., bind__foo="prop1: true").
     this.isNamespacedBind =
@@ -192,8 +197,6 @@ AFRAME.registerComponent('bind', {
 
     // Subscribe to store and register handler to do data-binding to components.
     this.system.subscribe(this);
-
-    this.onStateUpdate(this.system.state);
   },
 
   update: function () {
@@ -201,35 +204,50 @@ AFRAME.registerComponent('bind', {
     var key;
     var property;
 
-    this.keysToWatch.length = 0;
-
     // Index `keysToWatch` to only update state on relevant changes.
+    this.keysToWatch.length = 0;
     if (typeof data === 'string') {
       parseKeysToWatch(this.keysToWatch, data);
-      return;
+    } else {
+      for (key in data) {
+        parseKeysToWatch(this.keysToWatch, data[key]);
+      }
     }
-    for (key in data) {
-      parseKeysToWatch(this.keysToWatch, data[key]);
+
+    // Check if any properties are part of an iteration in bind-for.
+    bindForEl = this.el.closest('[bind-for]');
+    if (bindForEl) {
+      this.bindFor = bindForEl.getAttribute('bind-for');
+      this.bindForKey = this.el.getAttribute('data-bind-for-key');
+    } else {
+      this.bindFor = '';
+      this.bindForKey = '';
     }
+
+    // Update.
+    this.onStateUpdate();
   },
 
   /**
    * Handle state update.
    */
-  onStateUpdate: function (state, actionName) {
+  onStateUpdate: function () {
     // Update component with the state.
     var hasKeys = false;
     var el = this.el;
     var propertyName;
     var stateSelector;
+    var state;
     var value;
 
     if (this.isNamespacedBind) { clearObject(this.updateObj); }
 
+    state = this.system.state;
+
     // Single-property bind.
     if (typeof this.data !== 'object') {
       try {
-        value = select(state, this.data);
+        value = select(state, this.data, this.bindFor, this.bindForKey);
       } catch (e) {
         throw new Error(`[aframe-state-component] Key '${this.data}' not found in state.` +
                         ` #${this.el.getAttribute('id')}[${this.attrName}]`);
@@ -248,7 +266,7 @@ AFRAME.registerComponent('bind', {
       // Pointer to a value in the state (e.g., `player.health`).
       stateSelector = this.data[propertyName].trim();
       try {
-        value = select(state, stateSelector);
+        value = select(state, stateSelector, this.bindFor, this.bindForKey);
       } catch (e) {
         throw new Error(`[aframe-state-component] Key '${stateSelector}' not found in state.` +
                         ` #${this.el.getAttribute('id')}[${this.attrName}]`);
@@ -307,7 +325,7 @@ AFRAME.registerComponent('bind-toggle', {
     // Subscribe to store and register handler to do data-binding to components.
     this.system.subscribe(this);
 
-    this.onStateUpdate(this.system.state);
+    this.onStateUpdate();
   },
 
   update: function () {
@@ -318,9 +336,12 @@ AFRAME.registerComponent('bind-toggle', {
   /**
    * Handle state update.
    */
-  onStateUpdate: function (state, actionName) {
+  onStateUpdate: function () {
     var el = this.el;
+    var state;
     var value;
+
+    state = this.system.state;
 
     try {
       value = select(state, this.data);
@@ -402,8 +423,6 @@ AFRAME.registerComponent('bind-for', {
           this.renderedKeys.push(item[data.key]);
           continue;
         }
-
-        // TODO: Update item.
       }
 
       // Remove items.
@@ -417,17 +436,20 @@ AFRAME.registerComponent('bind-for', {
     };
   })(),
 
+  /**
+   * Render template to string with item data.
+   */
   renderItem: (function () {
     // Braces, whitespace, optional item name, item key, whitespace, braces.
-    var interpRegex = /{{\s*\w*\.?(\w+)\s*}}/g;
+    var interpRegex = /{{\s*\w*\.?([\w.]+)\s*}}/g;
 
     return function (item, template) {
       var i;
-      var key;
+      var match;
       var str;
       str = template;
-      while (key = interpRegex.exec(template)) {
-        str = str.replace(key[0], item[key[1]]);
+      while (match = interpRegex.exec(template)) {
+        str = str.replace(match[0], select(item, match[1]));
       }
       return str;
     };
@@ -435,22 +457,23 @@ AFRAME.registerComponent('bind-for', {
 });
 
 /**
- * Select value from store.
+ * Select value from store. Handles boolean operations, calls `selectProperty`.
  *
  * @param {object} state - State object.
  * @param {string} selector - Dot-delimited store keys (e.g., game.player.health).
  */
-function select (state, selector) {
+function select (state, selector, bindFor, bindForKey) {
   var i;
   var runningBool;
   var tokens;
+  var value;
 
   // If just single selector, then grab value.
-  tokens = selector.split(/\s+/);
-  if (tokens.length === 1) { return selectProperty(state, selector); }
+  tokens = split(selector, /\s+/);
+  if (tokens.length === 1) { return selectProperty(state, selector, bindFor, bindForKey); }
 
   // If has boolean expression, evaluate.
-  runningBool = selectProperty(state, tokens[0]);
+  runningBool = selectProperty(state, tokens[0], bindFor, bindForKey);
   for (i = 1; i < tokens.length; i += 2) {
     if (tokens[i] === '||') {
       runningBool = runningBool || selectProperty(state, tokens[i + 1]);
@@ -461,23 +484,43 @@ function select (state, selector) {
   return runningBool;
 }
 
-function selectProperty (state, selector) {
+/**
+ * Does actual selecting and walking of state.
+ */
+function selectProperty (state, selector, bindFor, bindForKey) {
   var i;
-  var split;
-  var value = state;
-  split = stripNot(selector).split('.');
-  for (i = 0; i < split.length; i++) {
-    value = value[split[i]];
+  var originalSelector;
+  var splitted;
+  var value;
+
+  // If bindFor, select the array. Then later, we filter the array.
+  if (bindFor && selector.startsWith(bindFor.for)) {
+    originalSelector = selector;
+    selector = bindFor.in;
   }
+
+  // Walk.
+  value = state;
+  splitted = split(stripNot(selector), '.');
+  for (i = 0; i < splitted.length; i++) {
+    value = value[splitted[i]];
+  }
+
+  if (bindFor) {
+    for (i = 0; i < value.length; i++) {
+      if (value[i][bindFor.key] !== bindForKey) { continue; }
+      value = selectProperty(value[i], originalSelector.replace(`${bindFor.for}.`, ''));
+      break;
+    }
+  }
+
+  // Boolean.
   if (selector[0] === '!' && selector[1] === '!') { return !!value; }
   if (selector[0] === '!') { return !value; }
   return value;
 }
 
-function clearObject (obj) {
-  var key;
-  for (key in obj) { delete obj[key]; }
-}
+function clearObject (obj) { for (var key in obj) { delete obj[key]; } }
 
 /**
  * Helper to compose object of handlers, merging functions handling same action.
@@ -496,7 +539,8 @@ function composeHandlers () {
         if (outputHandlers[actionName].constructor === Array) {
           outputHandlers[actionName].push(inputHandlers[i][actionName]);
         } else {
-          outputHandlers[actionName] = [outputHandlers[actionName], inputHandlers[i][actionName]];
+          outputHandlers[actionName] = [outputHandlers[actionName],
+                                        inputHandlers[i][actionName]];
         }
       } else {
         outputHandlers[actionName] = inputHandlers[i][actionName];
@@ -552,4 +596,15 @@ function stripNot (str) {
     return str.replace('!', '');
   }
   return str;
+}
+
+/**
+ * Cached split.
+ */
+var SPLIT_CACHE = {};
+function split (str, delimiter) {
+  if (!SPLIT_CACHE[delimiter]) { SPLIT_CACHE[delimiter] = {}; }
+  if (SPLIT_CACHE[delimiter][str]) { return SPLIT_CACHE[delimiter][str]; }
+  SPLIT_CACHE[delimiter][str] = str.split(delimiter);
+  return SPLIT_CACHE[delimiter][str];
 }
