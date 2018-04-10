@@ -1,6 +1,7 @@
 /* global assert, setup, suite, test */
 require('aframe');
-require('../index.js');
+require('../index');
+var array = require('../lib/array');
 var entityFactory = require('./helpers').entityFactory;
 
 var initialState = {
@@ -558,5 +559,18 @@ suite('state', function () {
       assert.equal(system.select({foo: true, bar: true, qux: true}, 'qux && bar && foo'), true);
       assert.equal(system.select({foo: true, bar: {qux: false}}, 'bar.qux && foo'), false);
     });
+  });
+});
+
+suite('array', function () {
+  test('wraps array to set __dirty', () => {
+    var arr = [];
+    assert.equal(arr.__dirty, undefined);
+    arr.push(0);
+    assert.equal(arr.__dirty, undefined);
+    array.wrapArray(arr);
+    arr.push(1);
+    assert.equal(arr.__dirty, true);
+    assert.equal(arr.length, 2);
   });
 });
