@@ -52,7 +52,7 @@ Install and use by directly including the [browser files](dist):
 <body>
   <a-scene>
     <a-entity hand-controls="right" aabb-collider="objects: .box"></a-entity>
-    <a-box class="box" color="blue" position="0 1 -5'></a-box>
+    <a-box class="box" color="blue" position="0 1 -5"></a-box>
   </a-scene>
 </body>
 ```
