@@ -559,6 +559,15 @@ suite('state', function () {
       assert.equal(system.select({foo: true, bar: true, qux: true}, 'qux && bar && foo'), true);
       assert.equal(system.select({foo: true, bar: {qux: false}}, 'bar.qux && foo'), false);
     });
+
+    test('handles comparisons', () => {
+      assert.equal(system.select({color: 'red'}, "color == 'red'"), true);
+      assert.equal(system.select({color: 'red'}, "color === 'red'"), true);
+      assert.equal(system.select({color: 'red'}, "color != 'blue'"), true);
+      assert.equal(system.select({color: 'red'}, "color !== 'blue'"), true);
+      assert.equal(system.select({color: 'red'}, "color == 'blue'"), false);
+      assert.equal(system.select({color: 'red'}, "color === 'red' || color === 'blue'"), true);
+    });
   });
 });
 

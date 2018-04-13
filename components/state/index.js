@@ -496,6 +496,8 @@ AFRAME.registerComponent('bind-for', {
   })()
 });
 
+var QUOTE_RE = /'/g;
+
 /**
  * Select value from store. Handles boolean operations, calls `selectProperty`.
  *
@@ -503,6 +505,8 @@ AFRAME.registerComponent('bind-for', {
  * @param {string} selector - Dot-delimited store keys (e.g., game.player.health).
  */
 function select (state, selector, bindFor, bindForKey) {
+  var firstValue;
+  var secondValue;
   var i;
   var runningBool;
   var tokens;
@@ -515,9 +519,20 @@ function select (state, selector, bindFor, bindForKey) {
   // If has boolean expression, evaluate.
   runningBool = selectProperty(state, tokens[0], bindFor, bindForKey);
   for (i = 1; i < tokens.length; i += 2) {
-    if (tokens[i] === '||') {
+    if (tokens[i] === '==' || tokens[i] === '===' || tokens[i] === '!=' ||
+        tokens[i] === '!==') {
+      // Comparison (color === 'red').
+      firstValue = selectProperty(state, tokens[i - 1]);
+      secondValue = tokens[i + 1].replace(QUOTE_RE, '');
+      runningBool = tokens[i].indexOf('!') === -1
+        ? firstValue === secondValue
+        : firstValue !== secondValue;
+      i++;
+    } else if (tokens[i] === '||') {
+      // Or.
       runningBool = runningBool || selectProperty(state, tokens[i + 1]);
     } else if (tokens[i] === '&&') {
+      // Not.
       runningBool = runningBool && selectProperty(state, tokens[i + 1]);
     }
   }
