@@ -31,7 +31,7 @@ AFRAME.registerComponent('proxy-event', {
       var i;
       if (!data.captureBubbles && evt.target !== el) { return; }
       for (i = 0; i < to.length; i++) {
-        to[i].emit(data.as || data.event, null, data.bubbles);
+        to[i].emit(data.as || data.event, evt['detail'] ? evt.detail : null, data.bubbles);
       }
     });
   }
