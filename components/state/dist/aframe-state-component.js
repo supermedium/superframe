@@ -592,7 +592,12 @@ AFRAME.registerComponent('bind-for', {
   }()
 });
 
+var AND = '&&';
 var QUOTE_RE = /'/g;
+var OR = '||';
+var COMPARISONS = ['==', '===', '!=', '!=='];
+var tempTokenArray = [];
+var tokenArray = [];
 
 /**
  * Select value from store. Handles boolean operations, calls `selectProperty`.
@@ -615,28 +620,45 @@ function select(state, selector, bindFor, bindForKey) {
     return selectProperty(state, selector, bindFor, bindForKey);
   }
 
+  // Evaluate comparisons.
+  tokenArray.length = 0;
+  copyArray(tempTokenArray, tokens);
+  for (i = 0; i < tempTokenArray.length; i++) {
+    if (COMPARISONS.indexOf(tempTokenArray[i]) === -1) {
+      tokenArray.push(tempTokenArray[i]);
+      continue;
+    }
+
+    // Comparison (color === 'red').
+    // Pop previous value since that is one of comparsion value.
+    firstValue = selectProperty(state, tokenArray.pop());
+    // Lookup second value.
+    secondValue = tempTokenArray[i + 1].replace(QUOTE_RE, '');
+    // Evaluate (equals or not equals).
+    comparisonResult = tempTokenArray[i].indexOf('!') === -1 ? firstValue === secondValue : firstValue !== secondValue;
+    tokenArray.push(comparisonResult);
+    i++;
+  }
+
+  // Was single comparison.
+  if (tokenArray.length === 1) {
+    return tokenArray[0];
+  }
+
   // If has boolean expression, evaluate.
-  runningBool = selectProperty(state, tokens[0], bindFor, bindForKey);
-  for (i = 1; i < tokens.length; i += 2) {
-    if (tokens[i] === '==' || tokens[i] === '===' || tokens[i] === '!=' || tokens[i] === '!==') {
-      // Comparison (color === 'red').
-      firstValue = selectProperty(state, tokens[i - 1]);
-      secondValue = tokens[i + 1].replace(QUOTE_RE, '');
-      comparisonResult = tokens[i].indexOf('!') === -1 ? firstValue === secondValue : firstValue !== secondValue;
-      if (tokens[i - 2] === '||') {
-        runningBool = runningBool || comparisonResult;
-      } else if (tokens[i - 2] === '&&') {
-        runningBool = runningBool && comparisonResult;
-      } else {
-        runningBool = comparisonResult;
-      }
-      i++;
-    } else if (tokens[i] === '||') {
-      // Or.
-      runningBool = runningBool || selectProperty(state, tokens[i + 1]);
-    } else if (tokens[i] === '&&') {
-      // Not.
-      runningBool = runningBool && selectProperty(state, tokens[i + 1]);
+  runningBool = tokenArray[0].constructor === Boolean ? tokenArray[0] : selectProperty(state, tokenArray[0], bindFor, bindForKey);
+  for (i = 1; i < tokenArray.length; i += 2) {
+    if (tokenArray[i] !== OR && tokenArray[i] !== AND) {
+      continue;
+    }
+    // Check if was evaluated comparison (bool) or a selector (string).
+    tokenArray[i + 1] = tokenArray[i + 1].constructor === Boolean ? tokenArray[i + 1] : selectProperty(state, tokenArray[i + 1]);
+
+    // Evaluate boolean.
+    if (tokenArray[i] === OR) {
+      runningBool = runningBool || tokenArray[i + 1];
+    } else if (tokenArray[i] === AND) {
+      runningBool = runningBool && tokenArray[i + 1];
     }
   }
   return runningBool;
@@ -780,6 +802,14 @@ function split(str, delimiter) {
   }
   SPLIT_CACHE[delimiter][str] = str.split(delimiter);
   return SPLIT_CACHE[delimiter][str];
+}
+
+function copyArray(dest, src) {
+  var i;
+  dest.length = 0;
+  for (i = 0; i < src.length; i++) {
+    dest[i] = src[i];
+  }
 }
 
 /***/ }),
