@@ -567,6 +567,7 @@ suite('state', function () {
       assert.equal(system.select({color: 'red'}, "color !== 'blue'"), true);
       assert.equal(system.select({color: 'red'}, "color == 'blue'"), false);
       assert.equal(system.select({color: 'red'}, "color === 'red' || color === 'blue'"), true);
+      assert.equal(system.select({color: 'red', enabled: false}, "!enabled || color === 'blue'"), true);
     });
   });
 });

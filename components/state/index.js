@@ -505,10 +505,11 @@ var QUOTE_RE = /'/g;
  * @param {string} selector - Dot-delimited store keys (e.g., game.player.health).
  */
 function select (state, selector, bindFor, bindForKey) {
+  var comparisonResult;
   var firstValue;
-  var secondValue;
   var i;
   var runningBool;
+  var secondValue;
   var tokens;
   var value;
 
@@ -524,9 +525,16 @@ function select (state, selector, bindFor, bindForKey) {
       // Comparison (color === 'red').
       firstValue = selectProperty(state, tokens[i - 1]);
       secondValue = tokens[i + 1].replace(QUOTE_RE, '');
-      runningBool = tokens[i].indexOf('!') === -1
+      comparisonResult = tokens[i].indexOf('!') === -1
         ? firstValue === secondValue
         : firstValue !== secondValue;
+      if (tokens[i - 2] === '||') {
+        runningBool = runningBool || comparisonResult;
+      } else if (tokens[i - 2] === '&&') {
+        runningBool = runningBool && comparisonResult;
+      } else {
+        runningBool = comparisonResult;
+      }
       i++;
     } else if (tokens[i] === '||') {
       // Or.
