@@ -568,8 +568,19 @@ suite('state', function () {
       assert.equal(system.select({color: 'red'}, "color == 'blue'"), false);
       assert.equal(system.select({color: 'red'}, "color === 'red' || color === 'blue'"), true);
       assert.equal(system.select({color: 'red', enabled: false}, "!enabled || color === 'blue'"), true);
-      assert.equal(system.select({color: 'red'}, "!color || color === 'blue'"), false);
+      assert.strictEqual(system.select({color: 'red'}, "!color || color === 'blue'"), false);
+      assert.strictEqual(system.select({color: 'red'}, "!color || color === 'red'"), true);
     });
+  });
+
+  test('keysToWatch', () => {
+    el.setAttribute('bind__visible', "foo");
+    assert.shallowDeepEqual(el.components['bind__visible'].keysToWatch, ['foo']);
+
+    el.setAttribute('bind__foo', "!foo || foo === 'foo' && bar !== 'bar'");
+    assert.shallowDeepEqual(
+      el.components['bind__foo'].keysToWatch,
+      ['foo', 'bar']);
   });
 });
 

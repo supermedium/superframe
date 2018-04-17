@@ -654,12 +654,14 @@ function composeFunctions () {
 }
 module.exports.composeFunctions = composeFunctions;
 
+var NO_WATCH_TOKENS = ['||', '&&', '!=', '!==', '==', '==='];
 function parseKeysToWatch (keys, str) {
   var i;
   var tokens;
   tokens = str.split(/\s+/);
   for (i = 0; i < tokens.length; i++) {
-    if (tokens[i] !== '||' && tokens[i] !== '&&') {
+    if (NO_WATCH_TOKENS.indexOf(tokens[i]) === -1 && !tokens[i].startsWith("'") &&
+        keys.indexOf(tokens[i]) === -1) {
       keys.push(parseKeyToWatch(tokens[i]));
     }
   }
