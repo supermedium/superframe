@@ -62,9 +62,6 @@ AFRAME.registerSystem('state', {
     for (key in this.diff) { delete this.diff[key]; }
     AFRAME.utils.diff(this.lastState, this.state, this.diff);
 
-    // Store last state.
-    this.copyState(this.lastState, this.state);
-
     // Notify subscriptions / binders.
     for (i = 0; i < this.subscriptions.length; i++) {
       if (this.subscriptions[i].name === 'bind-for') {
@@ -83,6 +80,10 @@ AFRAME.registerSystem('state', {
         this.state[key].__dirty = false;
       }
     }
+
+    // Store last state.
+    // TODO: copyState messes with the diff.
+    this.copyState(this.lastState, this.state);
 
     // Emit.
     this.eventDetail.action = actionName;
