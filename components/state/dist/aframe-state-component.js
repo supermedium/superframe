@@ -258,26 +258,35 @@ AFRAME.registerSystem('state', {
     }
   },
 
-  select: select, // For testing.
-
   /**
    * Render template to string with item data.
    */
-  renderItem: function () {
+  renderTemplate: function () {
     // Braces, whitespace, optional item name, item key, whitespace, braces.
+    var fragment = document.createElement('template');
     var interpRegex = /{{\s*\w*\.?([\w.]+)\s*}}/g;
 
-    return function (item, template) {
-      var i;
+    return function (template, data, asString) {
       var match;
       var str;
+
       str = template;
       while (match = interpRegex.exec(template)) {
-        str = str.replace(match[0], select(item, match[1]));
+        str = str.replace(match[0], select(data, match[1]) || '');
       }
-      return str;
+
+      // Return as string.
+      if (asString) {
+        return str;
+      }
+
+      // Return as DOM.
+      fragment.innerHTML = str;
+      return fragment.content;
     };
-  }()
+  }(),
+
+  select: select
 });
 
 /**
@@ -541,7 +550,6 @@ AFRAME.registerComponent('bind-for', {
    * Handle state update.
    */
   onStateUpdate: function () {
-    var fragment = document.createElement('template');
     var keys = [];
     var toRemove = [];
 
@@ -566,8 +574,7 @@ AFRAME.registerComponent('bind-for', {
 
         // Add item.
         if (this.renderedKeys.indexOf(item[data.key]) === -1) {
-          fragment.innerHTML = this.system.renderItem(item, this.template);
-          el.appendChild(fragment.content);
+          el.appendChild(this.system.renderTemplate(this.template, item));
           el.children[el.children.length - 1].setAttribute('data-bind-for-key', item[data.key]);
           this.renderedKeys.push(item[data.key]);
           continue;
