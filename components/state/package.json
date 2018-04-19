@@ -1,6 +1,6 @@
 {
   "name": "aframe-state-component",
-  "version": "3.1.6",
+  "version": "3.1.7",
   "description": "State management for A-Frame using single global state modified through actions. State flows down to application via declarative binding.",
   "main": "dist/aframe-state-component.js",
   "unpkg": "dist/aframe-state-component.min.js",

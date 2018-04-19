@@ -582,6 +582,15 @@ suite('state', function () {
       el.components['bind__foo'].keysToWatch,
       ['foo', 'bar']);
   });
+
+  test('renderTemplate', () => {
+    var rendered;
+
+    rendered = system.renderTemplate('<a-entity foo="foo: {{ value }}"></a-entity>', {
+      value: 'red'
+    }, true);
+    assert.equal(rendered, '<a-entity foo="foo: red"></a-entity>');
+  });
 });
 
 suite('array', function () {

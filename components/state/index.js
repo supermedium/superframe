@@ -168,7 +168,7 @@ AFRAME.registerSystem('state', {
   renderTemplate: (function () {
     // Braces, whitespace, optional item name, item key, whitespace, braces.
     var fragment = document.createElement('template');
-    var interpRegex = /{{\s*\w*\.?([\w.]+)\s*}}/g;
+    var interpRegex = /{{\s*(\w*\.)?([\w.]+)\s*}}/g;
 
     return function (template, data, asString) {
       var match;
@@ -176,7 +176,9 @@ AFRAME.registerSystem('state', {
 
       str = template;
       while (match = interpRegex.exec(template)) {
-        str = str.replace(match[0], select(data, match[1]) || '');
+        str = str.replace(
+          match[0],
+          select(data, match[2]) || '');
       }
 
       // Return as string.
