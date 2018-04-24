@@ -76,7 +76,7 @@ AFRAME.registerSystem('state', {
 
     // Unset array dirty.
     for (key in this.state) {
-      if (this.state[key].constructor === Array) {
+      if (this.state[key] && this.state[key].constructor === Array) {
         this.state[key].__dirty = false;
       }
     }
@@ -595,6 +595,7 @@ function selectProperty (state, selector, bindFor, bindForKey) {
   value = state;
   splitted = split(stripNot(selector), '.');
   for (i = 0; i < splitted.length; i++) {
+    if (!value) { console.error('[state] Not found:', splitted, splitted[i]); }
     value = value[splitted[i]];
   }
 
