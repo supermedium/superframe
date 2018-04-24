@@ -190,7 +190,9 @@ AFRAME.registerComponent('aabb-collider', {
 
     if (newIntersectedEls.length) {
       el.emit('hitstart', this.hitStartEventDetail);
-    } },
+    }
+  },
+
   /**
    * AABB collision detection.
    * 3D version of https://www.youtube.com/watch?v=ghqD3e37R7E

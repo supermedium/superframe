@@ -595,7 +595,7 @@ function selectProperty (state, selector, bindFor, bindForKey) {
   value = state;
   splitted = split(stripNot(selector), '.');
   for (i = 0; i < splitted.length; i++) {
-    if (!(splitted[i] in value)) {
+    if (i < splitted.length - 1 && !(splitted[i] in value)) {
       console.error('[state] Not found:', splitted, splitted[i]);
     }
     value = value[splitted[i]];
