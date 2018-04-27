@@ -120,6 +120,7 @@
 	    this.timeline = AFRAME.anime.timeline({
 	      autoplay: false,
 	      complete: function () {
+	        self.animationIsPlaying = false;
 	        self.el.emit('animationtimelinecomplete', self.eventDetail);
 	      },
 	      direction: this.data.direction,
