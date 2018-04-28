@@ -426,6 +426,7 @@ AFRAME.registerComponent('animation', {
     var componentName;
     var data = this.data;
     var el = this.el;
+    var self = this;
 
     if (data.from) { return false; }
 
@@ -437,6 +438,9 @@ AFRAME.registerComponent('animation', {
     el.addEventListener('componentinitialized', function wait (evt) {
       if (evt.detail.name !== componentName) { return; }
       cb();
+      // Since the config was created async, create the animation now since we missed it
+      // earlier.
+      self.animation = anime(self.config);
       el.removeEventListener('componentinitialized', wait);
     });
     return true;
