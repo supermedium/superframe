@@ -458,6 +458,7 @@ AFRAME.registerComponent('animation', {
       component = this.el.components[componentName];
       if (componentName === this.attrName) { continue; }
       if (component.name !== 'animation') { continue; }
+      if (!component.animationIsPlaying) { continue; }
       if (component.data.property !== this.data.property) { continue; }
       component.animationIsPlaying = false;
     }
