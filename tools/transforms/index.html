@@ -48,6 +48,31 @@
   }
 </style>
 
+<script>
+  AFRAME.registerComponent('cube-material', {
+    dependencies: ['geometry'],
+
+    play: function () {
+			var textureLoader = new THREE.TextureLoader();
+			var texture0 = textureLoader.load('cube/negx.png');
+			var texture1 = textureLoader.load('cube/posx.png');
+			var texture2 = textureLoader.load('cube/negy.png');
+			var texture3 = textureLoader.load('cube/posy.png');
+			var texture4 = textureLoader.load('cube/negz.png');
+			var texture5 = textureLoader.load('cube/posz.png');
+			var materials = [
+				new THREE.MeshBasicMaterial({map: texture0}),
+				new THREE.MeshBasicMaterial({map: texture1}),
+				new THREE.MeshBasicMaterial({map: texture2}),
+				new THREE.MeshBasicMaterial({map: texture3}),
+				new THREE.MeshBasicMaterial({map: texture4}),
+			  new THREE.MeshBasicMaterial({map: texture5})
+			];
+      this.el.getObject3D('mesh').material = new THREE.MeshFaceMaterial(materials);
+    }
+  });
+</script>
+
 <a-scene embedded="true">
   <a-entity environment="preset: forest; shadow: true" position="0 -3 0">
     <a-image src="logo.png" opacity="0.75" position="11 1 -12" rotation="-45 -50 0" width="5.12" height="2.56" visible="false"></a-image>
@@ -61,7 +86,7 @@
 
   <a-entity id="grandparent" shadow>
     <a-entity id="parent">
-      <a-box id="child" src="texture.png"></a-box>
+      <a-box id="child" cube-material></a-box>
     </a-entity>
   </a-entity>
 </a-scene>
@@ -147,7 +172,7 @@
   function scaleListener (target, axis, input, info, worldInfo) {
     return function () {
       var value = parseFloat(input.value);
-      target.object3D.scale.x = value;
+      target.object3D.scale[axis] = value;
       info.innerHTML = value.toFixed(2);
       updateWorldInfo();
     };
