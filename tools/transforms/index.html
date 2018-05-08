@@ -49,7 +49,10 @@
 </style>
 
 <a-scene embedded="true">
-  <a-entity environment="preset: forest; shadow: true" position="0 -3 0"></a-entity>
+  <a-entity environment="preset: forest; shadow: true" position="0 -3 0">
+    <a-image src="logo.png" opacity="0.75" position="11 1 -12" rotation="-45 -50 0" width="5.12" height="2.56" visible="false"></a-image>
+  </a-entity>
+
   <a-light position="-1 0 -1"></a-light>
   <a-light position="1 0 -0.5" intensity="0.65"></a-light>
   <a-light position="0.25 0 1" intensity="0.25"></a-light>
@@ -64,7 +67,7 @@
 </a-scene>
 
 <div id="sidebar">
-  <h1>Composed Transform Visualizer</h1>
+  <h1>Transform Visualizer</h1>
   <div id="inputDiv"></div>
   <div id="worldInfoDiv"></div>
 </div>
@@ -163,4 +166,8 @@
       sWorldInfo.innerHTML = `${vec.x.toFixed(2)} ${vec.y.toFixed(2)} ${vec.z.toFixed(2)}`;
     });
   }
+
+  setTimeout(() => {
+    document.querySelector('a-image').object3D.visible = true;
+  }, 1000);
 </script>
