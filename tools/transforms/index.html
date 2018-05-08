@@ -122,7 +122,7 @@
       worldInfoWrapper.classList.add(target.id);
       worldInfoWrapper.innerHTML = `${target.id} World ${transform}: `;
       var worldInfo = document.createElement('span');
-      worldInfo.innerHTML = `${transform === 'rotation' ? '0 0 0' : '1 1 1'}`;
+      worldInfo.innerHTML = `${transform === 'rotation' ? '0 0 0' : '1.00 1.00 1.00'}`;
       worldInfo.classList.add('worldInfo');
       worldInfo.setAttribute('data-target', target.id);
       worldInfo.setAttribute('data-transform', transform);
@@ -141,7 +141,7 @@
         input.setAttribute('min', transform === 'rotation' ? -180 : 0.5);
         input.setAttribute('max', transform === 'rotation' ? 180 : 2);
         input.setAttribute('step', transform === 'rotation' ? 45 : 0.25);
-        input.setAttribute('value', transform === 'rotation' ? 0 : 1);
+        input.setAttribute('value', transform === 'rotation' ? 0 : '1.00');
         targetDiv.appendChild(input);
 
         // Create info.
