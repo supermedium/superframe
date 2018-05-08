@@ -145,7 +145,7 @@
     return function () {
       var value = parseFloat(input.value);
       target.object3D.scale.x = value;
-      sInfo.innerHTML = value.toFixed(2);
+      info.innerHTML = value.toFixed(2);
       updateWorldInfo();
     };
   }
@@ -160,7 +160,7 @@
 
       var sWorldInfo = $(`.worldInfo[data-target="${target.id}"][data-transform="scale"]`)
       target.object3D.getWorldScale(vec);
-      sWorldInfo.innerHTML = `${vec.x.toFixed(1)} ${vec.y.toFixed(1)} ${vec.z.toFixed(1)}`;
+      sWorldInfo.innerHTML = `${vec.x.toFixed(2)} ${vec.y.toFixed(2)} ${vec.z.toFixed(2)}`;
     });
   }
 </script>
