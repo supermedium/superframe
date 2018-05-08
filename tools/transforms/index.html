@@ -70,6 +70,8 @@
 </div>
 
 <script>
+  var $ = sel => document.querySelector(sel);
+  var $$ = sel => document.querySelectorAll(sel);
   var grandparent = document.querySelector('#grandparent');
   var parent = document.querySelector('#parent');
   var child = document.querySelector('#child');
@@ -92,7 +94,10 @@
       worldInfoWrapper.classList.add(target.id);
       worldInfoWrapper.innerHTML = `${target.id} World ${transform}: `;
       var worldInfo = document.createElement('span');
-      worldInfo .innerHTML = `${transform === 'rotation' ? '0 0 0' : '1 1 1'}`;
+      worldInfo.innerHTML = `${transform === 'rotation' ? '0 0 0' : '1 1 1'}`;
+      worldInfo.classList.add('worldInfo');
+      worldInfo.setAttribute('data-target', target.id);
+      worldInfo.setAttribute('data-transform', transform);
       worldInfoWrapper.appendChild(worldInfo);
       worldInfoDiv.appendChild(worldInfoWrapper);
 
@@ -131,10 +136,8 @@
     return function () {
       var value = parseFloat(input.value);
       target.object3D.rotation[axis] = THREE.Math.degToRad(value);
-      info.innerHTML = value.toFixed(1);
-      var eul = new THREE.Euler();
-      target.object3D.getWorldRotation(eul);
-      worldInfo.innerHTML = `${THREE.Math.radToDeg(eul.x.toFixed(1))} ${THREE.Math.radToDeg(eul.y.toFixed(1))} ${THREE.Math.radToDeg(eul.z.toFixed(1))}`;
+      info.innerHTML = value.toFixed(0);
+      updateWorldInfo();
     };
   }
 
@@ -142,10 +145,22 @@
     return function () {
       var value = parseFloat(input.value);
       target.object3D.scale.x = value;
-      sInfo.innerHTML = value.toFixed(1);
-      var vec = new THREE.Vector3();
-      target.object3D.getWorldScale(vec);
-      worldInfo.innerHTML = `${vec.x.toFixed(1)} ${vec.y.toFixed(1)} ${vec.z.toFixed(1)}`;
+      sInfo.innerHTML = value.toFixed(2);
+      updateWorldInfo();
     };
+  }
+
+  var eul = new THREE.Euler();
+  var vec = new THREE.Vector3();
+  function updateWorldInfo () {
+    targets.forEach(target => {
+      var rWorldInfo = $(`.worldInfo[data-target="${target.id}"][data-transform="rotation"]`)
+      target.object3D.getWorldRotation(eul);
+      rWorldInfo.innerHTML = `${THREE.Math.radToDeg(eul.x).toFixed(0)} ${THREE.Math.radToDeg(eul.y).toFixed(0)} ${THREE.Math.radToDeg(eul.z).toFixed(0)}`;
+
+      var sWorldInfo = $(`.worldInfo[data-target="${target.id}"][data-transform="scale"]`)
+      target.object3D.getWorldScale(vec);
+      sWorldInfo.innerHTML = `${vec.x.toFixed(1)} ${vec.y.toFixed(1)} ${vec.z.toFixed(1)}`;
+    });
   }
 </script>
