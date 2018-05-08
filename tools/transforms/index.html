@@ -61,12 +61,12 @@
 			var texture4 = textureLoader.load('cube/negz.png');
 			var texture5 = textureLoader.load('cube/posz.png');
 			var materials = [
-				new THREE.MeshBasicMaterial({map: texture0}),
-				new THREE.MeshBasicMaterial({map: texture1}),
-				new THREE.MeshBasicMaterial({map: texture2}),
-				new THREE.MeshBasicMaterial({map: texture3}),
-				new THREE.MeshBasicMaterial({map: texture4}),
-			  new THREE.MeshBasicMaterial({map: texture5})
+				new THREE.MeshStandardMaterial({map: texture0}),
+				new THREE.MeshStandardMaterial({map: texture1}),
+				new THREE.MeshStandardMaterial({map: texture2}),
+				new THREE.MeshStandardMaterial({map: texture3}),
+				new THREE.MeshStandardMaterial({map: texture4}),
+			  new THREE.MeshStandardMaterial({map: texture5})
 			];
       this.el.getObject3D('mesh').material = new THREE.MeshFaceMaterial(materials);
     }
