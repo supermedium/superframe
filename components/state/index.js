@@ -56,7 +56,7 @@ AFRAME.registerSystem('state', {
     State.handlers[actionName](this.state, payload);
 
     // Post-compute.
-    State.computeState(this.state);
+    State.computeState(this.state, actionName, payload);
 
     // Get a diff to optimize bind updates.
     for (key in this.diff) { delete this.diff[key]; }
