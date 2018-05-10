@@ -6,6 +6,7 @@ var entityFactory = require('./helpers').entityFactory;
 
 var initialState = {
   color: 'red',
+  colors: ['red', 'orange', 'yellow'],
   counter: 5,
   enabled: false,
   shoppingList: [
@@ -440,7 +441,7 @@ suite('state', function () {
     setup(() => {
       var template;
       template = document.createElement('template');
-      template.setAttribute('id', 'shoppingItem');
+      template.setAttribute('id', 'shoppingItemTemplate');
       template.innerHTML = `
         <a-entity class="shoppingItem" text="value: {{ shoppingItem.name }}"
                   data-amount="{{ shoppingItem.amount }}"></a-entity>
@@ -454,13 +455,20 @@ suite('state', function () {
                   data-type="{{ shoppingItem.name }}"></a-entity>
       `;
       el.sceneEl.appendChild(template);
+
+      template = document.createElement('template');
+      template.setAttribute('id', 'colorTemplate');
+      template.innerHTML = `
+        <a-entity class="color" bind__text="value: color" data-color="{{ color }}"></a-entity>
+      `;
+      el.sceneEl.appendChild(template);
     });
 
-    test('renders list', done => {
+    test('renders from list of objects', done => {
       el.setAttribute('bind-for', {
         for: 'shoppingItem',
         in: 'shoppingList',
-        template: '#shoppingItem',
+        template: '#shoppingItemTemplate',
         key: 'name'
       });
       setTimeout(() => {
@@ -473,11 +481,29 @@ suite('state', function () {
       });
     });
 
+    test('renders from list of strings', done => {
+      el.setAttribute('bind-for', {
+        for: 'color',
+        in: 'colors',
+        template: '#colorTemplate'
+      });
+      setTimeout(() => {
+        assert.equal(el.children.length, 3);
+        assert.equal(el.children[0].getAttribute('text').value, 'red');
+        assert.equal(el.children[1].getAttribute('text').value, 'orange');
+        assert.equal(el.children[2].getAttribute('text').value, 'yellow');
+        assert.equal(el.children[0].dataset.color, 'red');
+        assert.equal(el.children[1].dataset.color, 'orange');
+        assert.equal(el.children[2].dataset.color, 'yellow');
+        done();
+      });
+    });
+
     test('renders added list item', done => {
       el.setAttribute('bind-for', {
         for: 'shoppingItem',
         in: 'shoppingList',
-        template: '#shoppingItem',
+        template: '#shoppingItemTemplate',
         key: 'name'
       });
       setTimeout(() => {
@@ -495,7 +521,7 @@ suite('state', function () {
       el.setAttribute('bind-for', {
         for: 'shoppingItem',
         in: 'shoppingList',
-        template: '#shoppingItem',
+        template: '#shoppingItemTemplate',
         key: 'name'
       });
       el.sceneEl.emit('shoppingListRemove');

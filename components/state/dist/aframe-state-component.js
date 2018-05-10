@@ -91,6 +91,8 @@ var State = {
   computeState: function computeState() {/* no-op */}
 };
 
+var TYPE_OBJECT = 'object';
+
 AFRAME.registerState = function (definition) {
   AFRAME.utils.extend(State, definition);
 };
@@ -272,7 +274,7 @@ AFRAME.registerSystem('state', {
 
       str = template;
       while (match = interpRegex.exec(template)) {
-        str = str.replace(match[0], select(data, match[2]) || '');
+        str = str.replace(match[0], (typeof data === 'undefined' ? 'undefined' : _typeof(data)) === TYPE_OBJECT ? select(data, match[2]) || '' : data);
       }
 
       // Return as string.
@@ -348,6 +350,8 @@ AFRAME.registerComponent('bind', {
 
     // Subscribe to store and register handler to do data-binding to components.
     this.system.subscribe(this);
+
+    this.onStateUpdate = this.onStateUpdate.bind(this);
   },
 
   update: function update() {
@@ -372,7 +376,7 @@ AFRAME.registerComponent('bind', {
       this.bindFor = bindForEl.getAttribute('bind-for');
       this.bindForKey = this.el.getAttribute('data-bind-for-key');
       this.keysToWatch.push(this.bindFor.in);
-      bindForEl.addEventListener('bindforrender', this.onStateUpdate.bind(this));
+      bindForEl.addEventListener('bindforrender', this.onStateUpdate);
     } else {
       this.bindFor = '';
       this.bindForKey = '';
@@ -401,14 +405,14 @@ AFRAME.registerComponent('bind', {
     state = this.system.state;
 
     // Single-property bind.
-    if (_typeof(this.data) !== 'object') {
+    if (_typeof(this.data) !== TYPE_OBJECT) {
       try {
         value = select(state, this.data, this.bindFor, this.bindForKey);
       } catch (e) {
         throw new Error('[aframe-state-component] Key \'' + this.data + '\' not found in state.' + (' #' + this.el.getAttribute('id') + '[' + this.attrName + ']'));
       }
 
-      if (typeof value !== 'object ' && _typeof(this.lastData) !== 'object' && this.lastData === value) {
+      if ((typeof value === 'undefined' ? 'undefined' : _typeof(value)) !== TYPE_OBJECT && _typeof(this.lastData) !== TYPE_OBJECT && this.lastData === value) {
         return;
       }
 
@@ -426,7 +430,7 @@ AFRAME.registerComponent('bind', {
         throw new Error('[aframe-state-component] Key \'' + stateSelector + '\' not found in state.' + (' #' + this.el.getAttribute('id') + '[' + this.attrName + ']'));
       }
 
-      if ((typeof value === 'undefined' ? 'undefined' : _typeof(value)) !== 'object' && _typeof(this.lastData[propertyName]) !== 'object' && this.lastData[propertyName] === value) {
+      if ((typeof value === 'undefined' ? 'undefined' : _typeof(value)) !== TYPE_OBJECT && _typeof(this.lastData[propertyName]) !== TYPE_OBJECT && this.lastData[propertyName] === value) {
         continue;
       }
 
@@ -569,14 +573,18 @@ AFRAME.registerComponent('bind-for', {
 
       keys.length = 0;
       for (i = 0; i < list.length; i++) {
+        var keyValue;
         item = list[i];
-        keys.push(item[data.key]);
+
+        // If key not defined, use index (e.g., array of strings).
+        keyValue = data.key ? item[data.key] : i.toString();
+        keys.push(keyValue);
 
         // Add item.
-        if (this.renderedKeys.indexOf(item[data.key]) === -1) {
+        if (this.renderedKeys.indexOf(keyValue) === -1) {
           el.appendChild(this.system.renderTemplate(this.template, item));
-          el.children[el.children.length - 1].setAttribute('data-bind-for-key', item[data.key]);
-          this.renderedKeys.push(item[data.key]);
+          el.children[el.children.length - 1].setAttribute('data-bind-for-key', keyValue);
+          this.renderedKeys.push(keyValue);
           continue;
         }
       }
@@ -697,7 +705,13 @@ function selectProperty(state, selector, bindFor, bindForKey) {
     value = value[splitted[i]];
   }
 
+  // Select from array (bind-for).
   if (bindFor) {
+    // Simple array.
+    if (!bindFor.key) {
+      return value[bindForKey];
+    }
+    // Array of objects.
     for (i = 0; i < value.length; i++) {
       if (value[i][bindFor.key] !== bindForKey) {
         continue;
