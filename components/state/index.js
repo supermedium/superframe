@@ -276,12 +276,12 @@ AFRAME.registerComponent('bind', {
     }
 
     // Check if any properties are part of an iteration in bind-for.
-    bindForEl = this.el.closest('[bind-for]');
-    if (bindForEl) {
-      this.bindFor = bindForEl.getAttribute('bind-for');
+    this.bindForEl = this.el.closest('[bind-for]');
+    if (this.bindForEl) {
+      this.bindFor = this.bindForEl.getAttribute('bind-for');
       this.bindForKey = this.el.getAttribute('data-bind-for-key');
       this.keysToWatch.push(this.bindFor.in);
-      bindForEl.addEventListener('bindforrender', this.onStateUpdate);
+      this.bindForEl.addEventListener('bindforrender', this.onStateUpdate);
     } else {
       this.bindFor = '';
       this.bindForKey = '';
@@ -303,6 +303,7 @@ AFRAME.registerComponent('bind', {
     var state;
     var value;
 
+    if (!el.parentNode) { return; }
     if (this.isNamespacedBind) { clearObject(this.updateObj); }
 
     state = this.system.state;
@@ -367,6 +368,9 @@ AFRAME.registerComponent('bind', {
 
   remove: function () {
     this.system.unsubscribe(this);
+    if (this.bindForEl) {
+      this.bindForEl.removeEventListener('bindforrender', this.onStateUpdate);
+    }
   }
 });
 

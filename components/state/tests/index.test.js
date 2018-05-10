@@ -62,6 +62,21 @@ AFRAME.registerState({
       state.position.z = payload.position.z;
     },
 
+    colorAdd: (state) => {
+      state.colors.push('green');
+    },
+
+    colorShift: (state) => {
+      state.colors.splice(0, 1);
+    },
+
+    colorReplace: (state) => {
+      state.colors.length = 0;
+      state.colors.push('blue');
+      state.colors.push('indigo');
+      state.colors.push('violet');
+    },
+
     shoppingListAdd: (state) => {
       state.shoppingList.push({name: 'bananas', amount: 6});
     },
@@ -464,6 +479,12 @@ suite('state', function () {
       el.sceneEl.appendChild(template);
     });
 
+    teardown(() => {
+      while (el.children.length !== 0) {
+        el.removeChild(el.children[0]);
+      }
+    });
+
     test('renders from list of objects', done => {
       el.setAttribute('bind-for', {
         for: 'shoppingItem',
@@ -489,6 +510,9 @@ suite('state', function () {
       });
       setTimeout(() => {
         assert.equal(el.children.length, 3);
+        assert.equal(el.children[0].getAttribute('data-bind-for-key'), '0');
+        assert.equal(el.children[1].getAttribute('data-bind-for-key'), '1');
+        assert.equal(el.children[2].getAttribute('data-bind-for-key'), '2');
         assert.equal(el.children[0].getAttribute('text').value, 'red');
         assert.equal(el.children[1].getAttribute('text').value, 'orange');
         assert.equal(el.children[2].getAttribute('text').value, 'yellow');
@@ -496,6 +520,63 @@ suite('state', function () {
         assert.equal(el.children[1].dataset.color, 'orange');
         assert.equal(el.children[2].dataset.color, 'yellow');
         done();
+      });
+    });
+
+    test('can add to list of strings', done => {
+      el.setAttribute('bind-for', {
+        for: 'color',
+        in: 'colors',
+        template: '#colorTemplate'
+      });
+      setTimeout(() => {
+        assert.equal(el.children.length, 3);
+        el.emit('colorAdd');
+        setTimeout(() => {
+          assert.equal(el.children.length, 4);
+          done();
+        });
+      });
+    });
+
+    test('reset simple list of strings', done => {
+      el.setAttribute('bind-for', {
+        for: 'color',
+        in: 'colors',
+        template: '#colorTemplate'
+      });
+      setTimeout(() => {
+        assert.equal(el.children.length, 3);
+        el.emit('colorReplace');
+        setTimeout(() => {
+          assert.equal(el.children.length, 3);
+          assert.equal(el.children[0].getAttribute('text').value, 'blue');
+          assert.equal(el.children[1].getAttribute('text').value, 'indigo');
+          assert.equal(el.children[2].getAttribute('text').value, 'violet');
+          done();
+        });
+      });
+    });
+
+    test('can remove from list of strings', done => {
+      el.setAttribute('bind-for', {
+        for: 'color',
+        in: 'colors',
+        template: '#colorTemplate'
+      });
+      setTimeout(() => {
+        assert.equal(el.children.length, 3);
+        el.emit('colorShift');
+        setTimeout(() => {
+          assert.equal(el.children.length, 2);
+          assert.equal(el.children[0].getAttribute('text').value, 'orange');
+          assert.equal(el.children[1].getAttribute('text').value, 'yellow');
+          el.emit('colorAdd');
+          setTimeout(() => {
+            assert.equal(el.children[2].getAttribute('text').value, 'green');
+            done();
+          });
+        });
       });
     });
 
