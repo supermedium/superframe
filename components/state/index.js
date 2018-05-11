@@ -8,6 +8,7 @@ var State = {
 };
 
 var TYPE_OBJECT = 'object';
+var WHITESPACE_REGEX = /s+/;
 
 AFRAME.registerState = function (definition) {
   AFRAME.utils.extend(State, definition);
@@ -451,7 +452,7 @@ AFRAME.registerComponent('bind-for', {
   },
 
   update: function () {
-    this.keysToWatch[0] = this.data.in;
+    this.keysToWatch[0] = split(this.data.in, '.')[0];
     if (this.el.children[0] && this.el.children[0].tagName === 'TEMPLATE') {
       this.template = this.el.children[0].innerHTML.trim();
     } else {
