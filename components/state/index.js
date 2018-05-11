@@ -333,6 +333,7 @@ AFRAME.registerComponent('bind', {
       stateSelector = this.data[propertyName].trim();
       try {
         value = select(state, stateSelector, this.bindFor, this.bindForKey);
+        if (this.bindFor && value === undefined) { return; }
       } catch (e) {
         throw new Error(`[aframe-state-component] Key '${stateSelector}' not found in state.` +
                         ` #${this.el.getAttribute('id')}[${this.attrName}]`);

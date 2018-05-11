@@ -474,7 +474,9 @@ suite('state', function () {
       template = document.createElement('template');
       template.setAttribute('id', 'colorTemplate');
       template.innerHTML = `
-        <a-entity class="color" bind__text="value: color" data-color="{{ color }}"></a-entity>
+        <a-entity>
+          <a-entity class="color" bind__text="value: color" data-color="{{ color }}"></a-entity>
+        </a-entity>
       `;
       el.sceneEl.appendChild(template);
     });
@@ -513,12 +515,12 @@ suite('state', function () {
         assert.equal(el.children[0].getAttribute('data-bind-for-key'), '0');
         assert.equal(el.children[1].getAttribute('data-bind-for-key'), '1');
         assert.equal(el.children[2].getAttribute('data-bind-for-key'), '2');
-        assert.equal(el.children[0].getAttribute('text').value, 'red');
-        assert.equal(el.children[1].getAttribute('text').value, 'orange');
-        assert.equal(el.children[2].getAttribute('text').value, 'yellow');
-        assert.equal(el.children[0].dataset.color, 'red');
-        assert.equal(el.children[1].dataset.color, 'orange');
-        assert.equal(el.children[2].dataset.color, 'yellow');
+        assert.equal(el.children[0].children[0].getAttribute('text').value, 'red');
+        assert.equal(el.children[1].children[0].getAttribute('text').value, 'orange');
+        assert.equal(el.children[2].children[0].getAttribute('text').value, 'yellow');
+        assert.equal(el.children[0].children[0].dataset.color, 'red');
+        assert.equal(el.children[1].children[0].dataset.color, 'orange');
+        assert.equal(el.children[2].children[0].dataset.color, 'yellow');
         done();
       });
     });
@@ -550,9 +552,9 @@ suite('state', function () {
         el.emit('colorReplace');
         setTimeout(() => {
           assert.equal(el.children.length, 3);
-          assert.equal(el.children[0].getAttribute('text').value, 'blue');
-          assert.equal(el.children[1].getAttribute('text').value, 'indigo');
-          assert.equal(el.children[2].getAttribute('text').value, 'violet');
+          assert.equal(el.children[0].children[0].getAttribute('text').value, 'blue');
+          assert.equal(el.children[1].children[0].getAttribute('text').value, 'indigo');
+          assert.equal(el.children[2].children[0].getAttribute('text').value, 'violet');
           done();
         });
       });
@@ -569,11 +571,11 @@ suite('state', function () {
         el.emit('colorShift');
         setTimeout(() => {
           assert.equal(el.children.length, 2);
-          assert.equal(el.children[0].getAttribute('text').value, 'orange');
-          assert.equal(el.children[1].getAttribute('text').value, 'yellow');
+          assert.equal(el.children[0].children[0].getAttribute('text').value, 'orange');
+          assert.equal(el.children[1].children[0].getAttribute('text').value, 'yellow');
           el.emit('colorAdd');
           setTimeout(() => {
-            assert.equal(el.children[2].getAttribute('text').value, 'green');
+            assert.equal(el.children[2].children[0].getAttribute('text').value, 'green');
             done();
           });
         });
