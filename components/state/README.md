@@ -101,7 +101,8 @@ Comparisons (`==`, `===`, `!=`, `!==`):
 #### Rendering Lists
 
 The state component comes with a `bind-for` component that can render an array
-in state from a template. Say we have an array in state:
+in state from a template. Say we have an array in state (currently must be at
+the root of the state):
 
 ```js
 AFRAME.registerState({
