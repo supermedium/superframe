@@ -278,9 +278,10 @@ AFRAME.registerComponent('bind', {
 
     // Check if any properties are part of an iteration in bind-for.
     this.bindForEl = this.el.closest('[bind-for]');
+    this.bindRootEl = this.el.closest('[data-bind-for-key]');
     if (this.bindForEl) {
       this.bindFor = this.bindForEl.getAttribute('bind-for');
-      this.bindForKey = this.el.getAttribute('data-bind-for-key');
+      this.bindForKey = this.bindRootEl.getAttribute('data-bind-for-key');
       this.keysToWatch.push(this.bindFor.in);
       this.bindForEl.addEventListener('bindforrender', this.onStateUpdate);
     } else {
@@ -514,6 +515,8 @@ AFRAME.registerComponent('bind-for', {
       for (i = 0; i < toRemove.length; i++) {
         toRemove[i].parentNode.removeChild(toRemove[i]);
       }
+
+      this.el.emit('bindforrender', null, false);
     };
   })()
 });
