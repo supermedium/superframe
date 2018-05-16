@@ -36,6 +36,10 @@ AFRAME.registerState({
 });
 ```
 
+Best practices is to keep the state purely state (numbers, strings, booleans)
+and functions that act on the state. Don't store or work upon entities in state
+(store IDs instead). State should be serializable and bindable.
+
 #### Modifying State
 
 To update the state, we can dispatch an action using an event:

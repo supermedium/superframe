@@ -111,7 +111,7 @@ AFRAME.registerSystem('state', {
 
     // Wrap array to detect dirty.
     for (key in this.state) {
-      if (this.state[key].constructor === Array) {
+      if (this.state[key] && this.state[key].constructor === Array) {
         this.state[key].__dirty = true;
         wrapArray(this.state[key]);
       }
@@ -431,6 +431,9 @@ AFRAME.registerComponent('bind', {
       stateSelector = this.data[propertyName].trim();
       try {
         value = select(state, stateSelector, this.bindFor, this.bindForKey);
+        if (this.bindFor && value === undefined) {
+          return;
+        }
       } catch (e) {
         throw new Error('[aframe-state-component] Key \'' + stateSelector + '\' not found in state.' + (' #' + this.el.getAttribute('id') + '[' + this.attrName + ']'));
       }
