@@ -91,6 +91,9 @@ AFRAME.registerComponent('animation', {
     this.targets = {};
     this.targetsArray = [];
 
+    this.updateConfigForDefault = this.updateConfigForDefault.bind(this);
+    this.updateConfigForRawColor = this.updateConfigForRawColor.bind(this);
+
     this.config = {
       complete: function () {
         self.animationIsPlaying = false;
@@ -220,6 +223,10 @@ AFRAME.registerComponent('animation', {
     var key;
     var to;
 
+    if (this.waitComponentInitRawProperty(this.updateConfigForRawColor)) {
+      return;
+    }
+
     from = data.from || getRawProperty(el, data.property);
     to = data.to;
 
@@ -242,7 +249,6 @@ AFRAME.registerComponent('animation', {
       return function (anim) {
         var value;
         value = anim.animatables[0].target;
-
         // For animation timeline.
           if (value.r === lastValue.r &&
               value.g === lastValue.g &&
@@ -265,6 +271,10 @@ AFRAME.registerComponent('animation', {
     var isBoolean;
     var isNumber;
     var to;
+
+    if (this.waitComponentInitRawProperty(this.updateConfigForDefault)) {
+      return;
+    }
 
     from = data.from || (
       isRawProperty(data)
@@ -410,6 +420,33 @@ AFRAME.registerComponent('animation', {
   },
 
   /**
+   * Wait for component to initialize.
+   */
+  waitComponentInitRawProperty: function (cb) {
+    var componentName;
+    var data = this.data;
+    var el = this.el;
+    var self = this;
+
+    if (data.from) { return false; }
+
+    if (!data.property.startsWith(STRING_COMPONENTS)) { return false; }
+
+    componentName = splitDot(data.property)[1];
+    if (el.components[componentName]) { return false; }
+
+    el.addEventListener('componentinitialized', function wait (evt) {
+      if (evt.detail.name !== componentName) { return; }
+      cb();
+      // Since the config was created async, create the animation now since we missed it
+      // earlier.
+      self.animation = anime(self.config);
+      el.removeEventListener('componentinitialized', wait);
+    });
+    return true;
+  },
+
+  /**
    * Make sure two animations on the same property don't fight each other.
    * e.g., animation__mouseenter="property: material.opacity"
    *       animation__mouseleave="property: material.opacity"
@@ -421,6 +458,7 @@ AFRAME.registerComponent('animation', {
       component = this.el.components[componentName];
       if (componentName === this.attrName) { continue; }
       if (component.name !== 'animation') { continue; }
+      if (!component.animationIsPlaying) { continue; }
       if (component.data.property !== this.data.property) { continue; }
       component.animationIsPlaying = false;
     }
@@ -513,7 +551,9 @@ function getRawProperty (el, path) {
   var value;
   split = splitDot(path);
   value = el;
-  for (i = 0; i < split.length; i++) { value = value[split[i]]; }
+  for (i = 0; i < split.length; i++) {
+    value = value[split[i]];
+  }
   return value;
 }
 

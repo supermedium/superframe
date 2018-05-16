@@ -7,6 +7,9 @@ var State = {
   computeState: function () { /* no-op */ }
 };
 
+var TYPE_OBJECT = 'object';
+var WHITESPACE_REGEX = /s+/;
+
 AFRAME.registerState = function (definition) {
   AFRAME.utils.extend(State, definition);
 }
@@ -56,14 +59,11 @@ AFRAME.registerSystem('state', {
     State.handlers[actionName](this.state, payload);
 
     // Post-compute.
-    State.computeState(this.state);
+    State.computeState(this.state, actionName, payload);
 
     // Get a diff to optimize bind updates.
     for (key in this.diff) { delete this.diff[key]; }
     AFRAME.utils.diff(this.lastState, this.state, this.diff);
-
-    // Store last state.
-    this.copyState(this.lastState, this.state);
 
     // Notify subscriptions / binders.
     for (i = 0; i < this.subscriptions.length; i++) {
@@ -79,10 +79,14 @@ AFRAME.registerSystem('state', {
 
     // Unset array dirty.
     for (key in this.state) {
-      if (this.state[key].constructor === Array) {
+      if (this.state[key] && this.state[key].constructor === Array) {
         this.state[key].__dirty = false;
       }
     }
+
+    // Store last state.
+    // TODO: copyState messes with the diff.
+    this.copyState(this.lastState, this.state);
 
     // Emit.
     this.eventDetail.action = actionName;
@@ -161,7 +165,37 @@ AFRAME.registerSystem('state', {
     }
   },
 
-  select: select  // For testing.
+  /**
+   * Render template to string with item data.
+   */
+  renderTemplate: (function () {
+    // Braces, whitespace, optional item name, item key, whitespace, braces.
+    var fragment = document.createElement('template');
+    var interpRegex = /{{\s*(\w*\.)?([\w.]+)\s*}}/g;
+
+    return function (template, data, asString) {
+      var match;
+      var str;
+
+      str = template;
+      while (match = interpRegex.exec(template)) {
+        str = str.replace(
+          match[0],
+          typeof data === TYPE_OBJECT
+            ? select(data, match[2]) || ''
+            : data);
+      }
+
+      // Return as string.
+      if (asString) { return str; }
+
+      // Return as DOM.
+      fragment.innerHTML = str;
+      return fragment.content;
+    };
+  })(),
+
+  select: select
 });
 
 /**
@@ -222,6 +256,8 @@ AFRAME.registerComponent('bind', {
 
     // Subscribe to store and register handler to do data-binding to components.
     this.system.subscribe(this);
+
+    this.onStateUpdate = this.onStateUpdate.bind(this);
   },
 
   update: function () {
@@ -241,12 +277,13 @@ AFRAME.registerComponent('bind', {
     }
 
     // Check if any properties are part of an iteration in bind-for.
-    bindForEl = this.el.closest('[bind-for]');
-    if (bindForEl) {
-      this.bindFor = bindForEl.getAttribute('bind-for');
-      this.bindForKey = this.el.getAttribute('data-bind-for-key');
+    this.bindForEl = this.el.closest('[bind-for]');
+    this.bindRootEl = this.el.closest('[data-bind-for-key]');
+    if (this.bindForEl) {
+      this.bindFor = this.bindForEl.getAttribute('bind-for');
+      this.bindForKey = this.bindRootEl.getAttribute('data-bind-for-key');
       this.keysToWatch.push(this.bindFor.in);
-      bindForEl.addEventListener('bindforrender', this.onStateUpdate.bind(this));
+      this.bindForEl.addEventListener('bindforrender', this.onStateUpdate);
     } else {
       this.bindFor = '';
       this.bindForKey = '';
@@ -268,12 +305,13 @@ AFRAME.registerComponent('bind', {
     var state;
     var value;
 
+    if (!el.parentNode) { return; }
     if (this.isNamespacedBind) { clearObject(this.updateObj); }
 
     state = this.system.state;
 
     // Single-property bind.
-    if (typeof this.data !== 'object') {
+    if (typeof this.data !== TYPE_OBJECT) {
       try {
         value = select(state, this.data, this.bindFor, this.bindForKey);
       } catch (e) {
@@ -281,8 +319,8 @@ AFRAME.registerComponent('bind', {
                         ` #${this.el.getAttribute('id')}[${this.attrName}]`);
       }
 
-      if (typeof value !== 'object '&&
-          typeof this.lastData !== 'object' &&
+      if (typeof value !== TYPE_OBJECT &&
+          typeof this.lastData !== TYPE_OBJECT &&
           this.lastData === value) { return; }
 
       AFRAME.utils.entity.setComponentProperty(el, this.id, value);
@@ -295,13 +333,14 @@ AFRAME.registerComponent('bind', {
       stateSelector = this.data[propertyName].trim();
       try {
         value = select(state, stateSelector, this.bindFor, this.bindForKey);
+        if (this.bindFor && value === undefined) { return; }
       } catch (e) {
         throw new Error(`[aframe-state-component] Key '${stateSelector}' not found in state.` +
                         ` #${this.el.getAttribute('id')}[${this.attrName}]`);
       }
 
-      if (typeof value !== 'object' &&
-          typeof this.lastData[propertyName] !== 'object' &&
+      if (typeof value !== TYPE_OBJECT &&
+          typeof this.lastData[propertyName] !== TYPE_OBJECT &&
           this.lastData[propertyName] === value) { continue; }
 
       // Remove component if value is `undefined`.
@@ -332,6 +371,9 @@ AFRAME.registerComponent('bind', {
 
   remove: function () {
     this.system.unsubscribe(this);
+    if (this.bindForEl) {
+      this.bindForEl.removeEventListener('bindforrender', this.onStateUpdate);
+    }
   }
 });
 
@@ -412,7 +454,7 @@ AFRAME.registerComponent('bind-for', {
   },
 
   update: function () {
-    this.keysToWatch[0] = this.data.in;
+    this.keysToWatch[0] = split(this.data.in, '.')[0];
     if (this.el.children[0] && this.el.children[0].tagName === 'TEMPLATE') {
       this.template = this.el.children[0].innerHTML.trim();
     } else {
@@ -425,7 +467,6 @@ AFRAME.registerComponent('bind-for', {
    * Handle state update.
    */
   onStateUpdate: (function () {
-    var fragment = document.createElement('template');
     var keys = [];
     var toRemove = [];
 
@@ -446,16 +487,18 @@ AFRAME.registerComponent('bind-for', {
 
       keys.length = 0;
       for (i = 0; i < list.length; i++) {
+        var keyValue;
         item = list[i];
-        keys.push(item[data.key]);
+
+        // If key not defined, use index (e.g., array of strings).
+        keyValue = data.key ? item[data.key] : i.toString();
+        keys.push(keyValue);
 
         // Add item.
-        if (this.renderedKeys.indexOf(item[data.key]) === -1) {
-          fragment.innerHTML = this.renderItem(item, this.template);
-          el.appendChild(fragment.content);
-          el.children[el.children.length - 1].setAttribute('data-bind-for-key',
-                                                           item[data.key]);
-          this.renderedKeys.push(item[data.key]);
+        if (this.renderedKeys.indexOf(keyValue) === -1) {
+          el.appendChild(this.system.renderTemplate(this.template, item));
+          el.children[el.children.length - 1].setAttribute('data-bind-for-key', keyValue);
+          this.renderedKeys.push(keyValue);
           continue;
         }
       }
@@ -473,28 +516,18 @@ AFRAME.registerComponent('bind-for', {
       for (i = 0; i < toRemove.length; i++) {
         toRemove[i].parentNode.removeChild(toRemove[i]);
       }
-    };
-  })(),
 
-  /**
-   * Render template to string with item data.
-   */
-  renderItem: (function () {
-    // Braces, whitespace, optional item name, item key, whitespace, braces.
-    var interpRegex = /{{\s*\w*\.?([\w.]+)\s*}}/g;
-
-    return function (item, template) {
-      var i;
-      var match;
-      var str;
-      str = template;
-      while (match = interpRegex.exec(template)) {
-        str = str.replace(match[0], select(item, match[1]));
-      }
-      return str;
+      this.el.emit('bindforrender', null, false);
     };
   })()
 });
+
+var AND = '&&';
+var QUOTE_RE = /'/g;
+var OR = '||';
+var COMPARISONS = ['==', '===', '!=', '!=='];
+var tempTokenArray = [];
+var tokenArray = [];
 
 /**
  * Select value from store. Handles boolean operations, calls `selectProperty`.
@@ -503,8 +536,11 @@ AFRAME.registerComponent('bind-for', {
  * @param {string} selector - Dot-delimited store keys (e.g., game.player.health).
  */
 function select (state, selector, bindFor, bindForKey) {
+  var comparisonResult;
+  var firstValue;
   var i;
   var runningBool;
+  var secondValue;
   var tokens;
   var value;
 
@@ -512,13 +548,47 @@ function select (state, selector, bindFor, bindForKey) {
   tokens = split(selector, /\s+/);
   if (tokens.length === 1) { return selectProperty(state, selector, bindFor, bindForKey); }
 
+  // Evaluate comparisons.
+  tokenArray.length = 0;
+  copyArray(tempTokenArray, tokens);
+  for (i = 0; i < tempTokenArray.length; i++) {
+    if (COMPARISONS.indexOf(tempTokenArray[i]) === -1) {
+      tokenArray.push(tempTokenArray[i]);
+      continue;
+    }
+
+    // Comparison (color === 'red').
+    // Pop previous value since that is one of comparsion value.
+    firstValue = selectProperty(state, tokenArray.pop());
+    // Lookup second value.
+    secondValue = tempTokenArray[i + 1].replace(QUOTE_RE, '');
+    // Evaluate (equals or not equals).
+    comparisonResult = tempTokenArray[i].indexOf('!') === -1
+      ? firstValue === secondValue
+      : firstValue !== secondValue;
+    tokenArray.push(comparisonResult);
+    i++;
+  }
+
+  // Was single comparison.
+  if (tokenArray.length === 1) { return tokenArray[0]; }
+
   // If has boolean expression, evaluate.
-  runningBool = selectProperty(state, tokens[0], bindFor, bindForKey);
-  for (i = 1; i < tokens.length; i += 2) {
-    if (tokens[i] === '||') {
-      runningBool = runningBool || selectProperty(state, tokens[i + 1]);
-    } else if (tokens[i] === '&&') {
-      runningBool = runningBool && selectProperty(state, tokens[i + 1]);
+  runningBool = tokenArray[0].constructor === Boolean
+    ? tokenArray[0]
+    : selectProperty(state, tokenArray[0], bindFor, bindForKey);
+  for (i = 1; i < tokenArray.length; i += 2) {
+    if (tokenArray[i] !== OR && tokenArray[i] !== AND) { continue; }
+    // Check if was evaluated comparison (bool) or a selector (string).
+    tokenArray[i + 1] = tokenArray[i + 1].constructor === Boolean
+      ? tokenArray[i + 1]
+      : selectProperty(state, tokenArray[i + 1]);
+
+    // Evaluate boolean.
+    if (tokenArray[i] === OR) {
+      runningBool = runningBool || tokenArray[i + 1];
+    } else if (tokenArray[i] === AND) {
+      runningBool = runningBool && tokenArray[i + 1];
     }
   }
   return runningBool;
@@ -543,10 +613,17 @@ function selectProperty (state, selector, bindFor, bindForKey) {
   value = state;
   splitted = split(stripNot(selector), '.');
   for (i = 0; i < splitted.length; i++) {
+    if (i < splitted.length - 1 && !(splitted[i] in value)) {
+      console.error('[state] Not found:', splitted, splitted[i]);
+    }
     value = value[splitted[i]];
   }
 
+  // Select from array (bind-for).
   if (bindFor) {
+    // Simple array.
+    if (!bindFor.key) { return value[bindForKey]; }
+    // Array of objects.
     for (i = 0; i < value.length; i++) {
       if (value[i][bindFor.key] !== bindForKey) { continue; }
       value = selectProperty(value[i], originalSelector.replace(`${bindFor.for}.`, ''));
@@ -610,12 +687,14 @@ function composeFunctions () {
 }
 module.exports.composeFunctions = composeFunctions;
 
+var NO_WATCH_TOKENS = ['||', '&&', '!=', '!==', '==', '==='];
 function parseKeysToWatch (keys, str) {
   var i;
   var tokens;
   tokens = str.split(/\s+/);
   for (i = 0; i < tokens.length; i++) {
-    if (tokens[i] !== '||' && tokens[i] !== '&&') {
+    if (NO_WATCH_TOKENS.indexOf(tokens[i]) === -1 && !tokens[i].startsWith("'") &&
+        keys.indexOf(tokens[i]) === -1) {
       keys.push(parseKeyToWatch(tokens[i]));
     }
   }
@@ -647,4 +726,12 @@ function split (str, delimiter) {
   if (SPLIT_CACHE[delimiter][str]) { return SPLIT_CACHE[delimiter][str]; }
   SPLIT_CACHE[delimiter][str] = str.split(delimiter);
   return SPLIT_CACHE[delimiter][str];
+}
+
+function copyArray (dest, src) {
+  var i;
+  dest.length = 0;
+  for (i = 0 ; i < src.length; i++) {
+    dest[i] = src[i];
+  }
 }

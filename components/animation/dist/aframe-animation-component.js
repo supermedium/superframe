@@ -137,6 +137,9 @@
 	    this.targets = {};
 	    this.targetsArray = [];
 
+	    this.updateConfigForDefault = this.updateConfigForDefault.bind(this);
+	    this.updateConfigForRawColor = this.updateConfigForRawColor.bind(this);
+
 	    this.config = {
 	      complete: function () {
 	        self.animationIsPlaying = false;
@@ -266,6 +269,10 @@
 	    var key;
 	    var to;
 
+	    if (this.waitComponentInitRawProperty(this.updateConfigForRawColor)) {
+	      return;
+	    }
+
 	    from = data.from || getRawProperty(el, data.property);
 	    to = data.to;
 
@@ -288,7 +295,6 @@
 	      return function (anim) {
 	        var value;
 	        value = anim.animatables[0].target;
-
 	        // For animation timeline.
 	          if (value.r === lastValue.r &&
 	              value.g === lastValue.g &&
@@ -311,6 +317,10 @@
 	    var isBoolean;
 	    var isNumber;
 	    var to;
+
+	    if (this.waitComponentInitRawProperty(this.updateConfigForDefault)) {
+	      return;
+	    }
 
 	    from = data.from || (
 	      isRawProperty(data)
@@ -456,6 +466,29 @@
 	  },
 
 	  /**
+	   * Wait for component to initialize.
+	   */
+	  waitComponentInitRawProperty: function (cb) {
+	    var componentName;
+	    var data = this.data;
+	    var el = this.el;
+
+	    if (data.from) { return false; }
+
+	    if (!data.property.startsWith(STRING_COMPONENTS)) { return false; }
+
+	    componentName = splitDot(data.property)[1];
+	    if (el.components[componentName]) { return false; }
+
+	    el.addEventListener('componentinitialized', function wait (evt) {
+	      if (evt.detail.name !== componentName) { return; }
+	      cb();
+	      el.removeEventListener('componentinitialized', wait);
+	    });
+	    return true;
+	  },
+
+	  /**
 	   * Make sure two animations on the same property don't fight each other.
 	   * e.g., animation__mouseenter="property: material.opacity"
 	   *       animation__mouseleave="property: material.opacity"
@@ -559,7 +592,9 @@
 	  var value;
 	  split = splitDot(path);
 	  value = el;
-	  for (i = 0; i < split.length; i++) { value = value[split[i]]; }
+	  for (i = 0; i < split.length; i++) {
+	    value = value[split[i]];
+	  }
 	  return value;
 	}
 

@@ -1,0 +1,198 @@
+<script src="https://aframe.io/releases/0.8.2/aframe.min.js"></script>
+<script src="https://unpkg.com/aframe-environment-component@1.0.0/dist/aframe-environment-component.min.js"></script>
+
+<style>
+  label,
+  p {
+    color: #FD77B6;
+  }
+  span {
+    color: #82EEE1;
+  }
+  #sidebar {
+    background: #444;
+    border-right: 1px solid #82EEE1;
+    color: #FAFAFA;
+    font-family: monospace;
+    height: 100%;
+    left: 0;
+    padding: 20px;
+    position: fixed;
+    text-transform: uppercase;
+    top: 0;
+    width: 40%;
+    z-index: 99999;
+  }
+  div {
+    margin-bottom: 10px;
+  }
+  #inputDiv {
+    border-bottom: 1px solid #DDD;
+    padding-bottom: 10px;
+  }
+  #worldInfoDiv {
+    padding-top : 5px;
+  }
+  .parent {
+    padding-left: 30px
+  }
+  .child {
+    padding-left: 60px
+  }
+  a-scene {
+    height: 100%;
+    position: fixed;
+    right: 0;
+    top: 0;
+    width: 60%;
+  }
+</style>
+
+<script>
+  AFRAME.registerComponent('cube-material', {
+    dependencies: ['geometry'],
+
+    play: function () {
+			var textureLoader = new THREE.TextureLoader();
+			var texture0 = textureLoader.load('cube/negx.png');
+			var texture1 = textureLoader.load('cube/posx.png');
+			var texture2 = textureLoader.load('cube/negy.png');
+			var texture3 = textureLoader.load('cube/posy.png');
+			var texture4 = textureLoader.load('cube/negz.png');
+			var texture5 = textureLoader.load('cube/posz.png');
+			var materials = [
+				new THREE.MeshStandardMaterial({map: texture0}),
+				new THREE.MeshStandardMaterial({map: texture1}),
+				new THREE.MeshStandardMaterial({map: texture2}),
+				new THREE.MeshStandardMaterial({map: texture3}),
+				new THREE.MeshStandardMaterial({map: texture4}),
+			  new THREE.MeshStandardMaterial({map: texture5})
+			];
+      this.el.getObject3D('mesh').material = new THREE.MeshFaceMaterial(materials);
+    }
+  });
+</script>
+
+<a-scene embedded="true">
+  <a-entity environment="preset: forest; shadow: true" position="0 -3 0">
+    <a-image src="logo.png" opacity="0.75" position="11 1 -12" rotation="-45 -50 0" width="5.12" height="2.56" visible="false"></a-image>
+  </a-entity>
+
+  <a-light position="-1 0 -1"></a-light>
+  <a-light position="1 0 -0.5" intensity="0.65"></a-light>
+  <a-light position="0.25 0 1" intensity="0.25"></a-light>
+
+  <a-camera position="0 0.75 4"></a-camera>
+
+  <a-entity id="grandparent" shadow>
+    <a-entity id="parent">
+      <a-box id="child" cube-material></a-box>
+    </a-entity>
+  </a-entity>
+</a-scene>
+
+<div id="sidebar">
+  <h1>Transform Visualizer</h1>
+  <div id="inputDiv"></div>
+  <div id="worldInfoDiv"></div>
+</div>
+
+<script>
+  var $ = sel => document.querySelector(sel);
+  var $$ = sel => document.querySelectorAll(sel);
+  var grandparent = document.querySelector('#grandparent');
+  var parent = document.querySelector('#parent');
+  var child = document.querySelector('#child');
+
+  var inputDiv = document.getElementById('inputDiv');
+  var worldInfoDiv = document.getElementById('worldInfoDiv');
+
+  var targets = [grandparent, parent, child];
+  var transforms = ['rotation', 'scale'];
+  var axes = ['x', 'y', 'z'];
+
+  targets.forEach(target => {
+    var targetDiv = document.createElement('div');
+    targetDiv.classList.add(target.id);
+    inputDiv.appendChild(targetDiv);
+
+    transforms.forEach(transform => {
+      // Create world info.
+      var worldInfoWrapper = document.createElement('p');
+      worldInfoWrapper.classList.add(target.id);
+      worldInfoWrapper.innerHTML = `${target.id} World ${transform}: `;
+      var worldInfo = document.createElement('span');
+      worldInfo.innerHTML = `${transform === 'rotation' ? '0 0 0' : '1.00 1.00 1.00'}`;
+      worldInfo.classList.add('worldInfo');
+      worldInfo.setAttribute('data-target', target.id);
+      worldInfo.setAttribute('data-transform', transform);
+      worldInfoWrapper.appendChild(worldInfo);
+      worldInfoDiv.appendChild(worldInfoWrapper);
+
+      axes.forEach(axis => {
+        // Create label.
+        var label = document.createElement('label');
+        label.innerHTML = `${target.id} ${transform} ${axis}`;
+        targetDiv.appendChild(label);
+
+        // Create input.
+        var input = document.createElement('input');
+        input.setAttribute('type', 'range');
+        input.setAttribute('min', transform === 'rotation' ? -180 : 0.5);
+        input.setAttribute('max', transform === 'rotation' ? 180 : 2);
+        input.setAttribute('step', transform === 'rotation' ? 45 : 0.25);
+        input.setAttribute('value', transform === 'rotation' ? 0 : '1.00');
+        targetDiv.appendChild(input);
+
+        // Create info.
+        var info = document.createElement('span');
+        info.innerHTML = input.value;
+        targetDiv.appendChild(info);
+
+        // Add input listener.
+        input.addEventListener('input', transform === 'rotation'
+          ? rotationListener(target, axis, input, info, worldInfo)
+          : scaleListener(target, axis, input, info, worldInfo)
+        );
+
+        targetDiv.appendChild(document.createElement('br'));
+      });
+    });
+  });
+
+  function rotationListener (target, axis, input, info, worldInfo) {
+    return function () {
+      var value = parseFloat(input.value);
+      target.object3D.rotation[axis] = THREE.Math.degToRad(value);
+      info.innerHTML = value.toFixed(0);
+      updateWorldInfo();
+    };
+  }
+
+  function scaleListener (target, axis, input, info, worldInfo) {
+    return function () {
+      var value = parseFloat(input.value);
+      target.object3D.scale[axis] = value;
+      info.innerHTML = value.toFixed(2);
+      updateWorldInfo();
+    };
+  }
+
+  var eul = new THREE.Euler();
+  var vec = new THREE.Vector3();
+  function updateWorldInfo () {
+    targets.forEach(target => {
+      var rWorldInfo = $(`.worldInfo[data-target="${target.id}"][data-transform="rotation"]`)
+      target.object3D.getWorldRotation(eul);
+      rWorldInfo.innerHTML = `${THREE.Math.radToDeg(eul.x).toFixed(0)} ${THREE.Math.radToDeg(eul.y).toFixed(0)} ${THREE.Math.radToDeg(eul.z).toFixed(0)}`;
+
+      var sWorldInfo = $(`.worldInfo[data-target="${target.id}"][data-transform="scale"]`)
+      target.object3D.getWorldScale(vec);
+      sWorldInfo.innerHTML = `${vec.x.toFixed(2)} ${vec.y.toFixed(2)} ${vec.z.toFixed(2)}`;
+    });
+  }
+
+  setTimeout(() => {
+    document.querySelector('a-image').object3D.visible = true;
+  }, 1000);
+</script>

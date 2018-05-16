@@ -14,6 +14,7 @@ AFRAME.registerComponent('animation-timeline', {
         return parseInt(value, 10);
       }
     },
+    pauseEvents: {type: 'array'},
     startEvents: {type: 'array'},
     timeline: {type: 'string'}
   },
@@ -33,6 +34,10 @@ AFRAME.registerComponent('animation-timeline', {
     // Wait for start events.
     for (i = 0; i < data.startEvents.length; i++) {
       this.el.addEventListener(data.startEvents[i], this.beginAnimation);
+    }
+
+    for (i = 0; i < data.pauseEvents.length; i++) {
+      this.el.addEventListener(data.pauseEvents[i], this.pauseAnimation);
     }
   },
 
@@ -74,6 +79,7 @@ AFRAME.registerComponent('animation-timeline', {
     this.timeline = AFRAME.anime.timeline({
       autoplay: false,
       complete: function () {
+        self.animationIsPlaying = false;
         self.el.emit('animationtimelinecomplete', self.eventDetail);
       },
       direction: this.data.direction,
@@ -136,12 +142,17 @@ AFRAME.registerComponent('animation-timeline', {
                         animationEl.getAttribute('select') + '`.');
       }
       component.updateConfig();
+      component.stopRelatedAnimations();
       config = cloneConfig(component.config);
       config.offset = offset + additionalOffset;
       this.timeline.add(config);
     }
 
     return (config.duration || 0) + (config.delay || 0) + additionalOffset;
+  },
+
+  pauseAnimation: function () {
+    this.animationIsPlaying = false;
   }
 });
 

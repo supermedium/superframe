@@ -1,10 +1,12 @@
 /* global assert, setup, suite, test */
 require('aframe');
-require('../index.js');
+require('../index');
+var array = require('../lib/array');
 var entityFactory = require('./helpers').entityFactory;
 
 var initialState = {
   color: 'red',
+  colors: ['red', 'orange', 'yellow'],
   counter: 5,
   enabled: false,
   shoppingList: [
@@ -58,6 +60,21 @@ AFRAME.registerState({
       state.position.x = payload.position.x;
       state.position.y = payload.position.y;
       state.position.z = payload.position.z;
+    },
+
+    colorAdd: (state) => {
+      state.colors.push('green');
+    },
+
+    colorShift: (state) => {
+      state.colors.splice(0, 1);
+    },
+
+    colorReplace: (state) => {
+      state.colors.length = 0;
+      state.colors.push('blue');
+      state.colors.push('indigo');
+      state.colors.push('violet');
     },
 
     shoppingListAdd: (state) => {
@@ -439,7 +456,7 @@ suite('state', function () {
     setup(() => {
       var template;
       template = document.createElement('template');
-      template.setAttribute('id', 'shoppingItem');
+      template.setAttribute('id', 'shoppingItemTemplate');
       template.innerHTML = `
         <a-entity class="shoppingItem" text="value: {{ shoppingItem.name }}"
                   data-amount="{{ shoppingItem.amount }}"></a-entity>
@@ -453,13 +470,28 @@ suite('state', function () {
                   data-type="{{ shoppingItem.name }}"></a-entity>
       `;
       el.sceneEl.appendChild(template);
+
+      template = document.createElement('template');
+      template.setAttribute('id', 'colorTemplate');
+      template.innerHTML = `
+        <a-entity>
+          <a-entity class="color" bind__text="value: color" data-color="{{ color }}"></a-entity>
+        </a-entity>
+      `;
+      el.sceneEl.appendChild(template);
     });
 
-    test('renders list', done => {
+    teardown(() => {
+      while (el.children.length !== 0) {
+        el.removeChild(el.children[0]);
+      }
+    });
+
+    test('renders from list of objects', done => {
       el.setAttribute('bind-for', {
         for: 'shoppingItem',
         in: 'shoppingList',
-        template: '#shoppingItem',
+        template: '#shoppingItemTemplate',
         key: 'name'
       });
       setTimeout(() => {
@@ -472,11 +504,89 @@ suite('state', function () {
       });
     });
 
+    test('renders from list of strings', done => {
+      el.setAttribute('bind-for', {
+        for: 'color',
+        in: 'colors',
+        template: '#colorTemplate'
+      });
+      setTimeout(() => {
+        assert.equal(el.children.length, 3);
+        assert.equal(el.children[0].getAttribute('data-bind-for-key'), '0');
+        assert.equal(el.children[1].getAttribute('data-bind-for-key'), '1');
+        assert.equal(el.children[2].getAttribute('data-bind-for-key'), '2');
+        assert.equal(el.children[0].children[0].getAttribute('text').value, 'red');
+        assert.equal(el.children[1].children[0].getAttribute('text').value, 'orange');
+        assert.equal(el.children[2].children[0].getAttribute('text').value, 'yellow');
+        assert.equal(el.children[0].children[0].dataset.color, 'red');
+        assert.equal(el.children[1].children[0].dataset.color, 'orange');
+        assert.equal(el.children[2].children[0].dataset.color, 'yellow');
+        done();
+      });
+    });
+
+    test('can add to list of strings', done => {
+      el.setAttribute('bind-for', {
+        for: 'color',
+        in: 'colors',
+        template: '#colorTemplate'
+      });
+      setTimeout(() => {
+        assert.equal(el.children.length, 3);
+        el.emit('colorAdd');
+        setTimeout(() => {
+          assert.equal(el.children.length, 4);
+          done();
+        });
+      });
+    });
+
+    test('reset simple list of strings', done => {
+      el.setAttribute('bind-for', {
+        for: 'color',
+        in: 'colors',
+        template: '#colorTemplate'
+      });
+      setTimeout(() => {
+        assert.equal(el.children.length, 3);
+        el.emit('colorReplace');
+        setTimeout(() => {
+          assert.equal(el.children.length, 3);
+          assert.equal(el.children[0].children[0].getAttribute('text').value, 'blue');
+          assert.equal(el.children[1].children[0].getAttribute('text').value, 'indigo');
+          assert.equal(el.children[2].children[0].getAttribute('text').value, 'violet');
+          done();
+        });
+      });
+    });
+
+    test('can remove from list of strings', done => {
+      el.setAttribute('bind-for', {
+        for: 'color',
+        in: 'colors',
+        template: '#colorTemplate'
+      });
+      setTimeout(() => {
+        assert.equal(el.children.length, 3);
+        el.emit('colorShift');
+        setTimeout(() => {
+          assert.equal(el.children.length, 2);
+          assert.equal(el.children[0].children[0].getAttribute('text').value, 'orange');
+          assert.equal(el.children[1].children[0].getAttribute('text').value, 'yellow');
+          el.emit('colorAdd');
+          setTimeout(() => {
+            assert.equal(el.children[2].children[0].getAttribute('text').value, 'green');
+            done();
+          });
+        });
+      });
+    });
+
     test('renders added list item', done => {
       el.setAttribute('bind-for', {
         for: 'shoppingItem',
         in: 'shoppingList',
-        template: '#shoppingItem',
+        template: '#shoppingItemTemplate',
         key: 'name'
       });
       setTimeout(() => {
@@ -494,7 +604,7 @@ suite('state', function () {
       el.setAttribute('bind-for', {
         for: 'shoppingItem',
         in: 'shoppingList',
-        template: '#shoppingItem',
+        template: '#shoppingItemTemplate',
         key: 'name'
       });
       el.sceneEl.emit('shoppingListRemove');
@@ -558,5 +668,49 @@ suite('state', function () {
       assert.equal(system.select({foo: true, bar: true, qux: true}, 'qux && bar && foo'), true);
       assert.equal(system.select({foo: true, bar: {qux: false}}, 'bar.qux && foo'), false);
     });
+
+    test('handles comparisons', () => {
+      assert.equal(system.select({color: 'red'}, "color == 'red'"), true);
+      assert.equal(system.select({color: 'red'}, "color === 'red'"), true);
+      assert.equal(system.select({color: 'red'}, "color != 'blue'"), true);
+      assert.equal(system.select({color: 'red'}, "color !== 'blue'"), true);
+      assert.equal(system.select({color: 'red'}, "color == 'blue'"), false);
+      assert.equal(system.select({color: 'red'}, "color === 'red' || color === 'blue'"), true);
+      assert.equal(system.select({color: 'red', enabled: false}, "!enabled || color === 'blue'"), true);
+      assert.strictEqual(system.select({color: 'red'}, "!color || color === 'blue'"), false);
+      assert.strictEqual(system.select({color: 'red'}, "!color || color === 'red'"), true);
+    });
+  });
+
+  test('keysToWatch', () => {
+    el.setAttribute('bind__visible', "foo");
+    assert.shallowDeepEqual(el.components['bind__visible'].keysToWatch, ['foo']);
+
+    el.setAttribute('bind__foo', "!foo || foo === 'foo' && bar !== 'bar'");
+    assert.shallowDeepEqual(
+      el.components['bind__foo'].keysToWatch,
+      ['foo', 'bar']);
+  });
+
+  test('renderTemplate', () => {
+    var rendered;
+
+    rendered = system.renderTemplate('<a-entity foo="foo: {{ value }}"></a-entity>', {
+      value: 'red'
+    }, true);
+    assert.equal(rendered, '<a-entity foo="foo: red"></a-entity>');
+  });
+});
+
+suite('array', function () {
+  test('wraps array to set __dirty', () => {
+    var arr = [];
+    assert.equal(arr.__dirty, undefined);
+    arr.push(0);
+    assert.equal(arr.__dirty, undefined);
+    array.wrapArray(arr);
+    arr.push(1);
+    assert.equal(arr.__dirty, true);
+    assert.equal(arr.length, 2);
   });
 });

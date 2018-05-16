@@ -36,6 +36,23 @@ AFRAME.registerState({
 });
 ```
 
+#### Modifying State
+
+To update the state, we can dispatch an action using an event:
+
+```js
+AFRAME.scenes[0].emit('increaseScore', {points: 50});
+
+// Or manually dispatched:
+// AFRAME.scenes[0].systems.state.dispatch('increaseScore', {points: 50});
+```
+
+The binding components will automatically and selectively update the entities
+in response to state changes.
+
+A `stateupdate` event will be fired, but we probably don't need to use it. The
+event might later be useful if we develop a debugging front-end for the state.
+
 #### Binding State
 
 Then we can declarative bind pieces of the state into the A-Frame application
@@ -58,7 +75,7 @@ entirely based on a boolean value.
 
 #### Expressions
 
-Boolean expressions are supported in binding.
+Simple expressions are supported in binding.
 
 NOT (`!`) and BOOL (`!!`):
 
@@ -74,27 +91,18 @@ OR (`||`) and AND (`&&`):
 <a-entity bind__gun="enabled: gunGrabbed && !!bullets || isRobot"></a-entity>
 ```
 
-#### Modifying State
+Comparisons (`==`, `===`, `!=`, `!==`):
 
-To update the state, we can dispatch an action using an event:
-
-```js
-AFRAME.scenes[0].emit('increaseScore', {points: 50});
-
-// Or manually dispatched:
-// AFRAME.scenes[0].systems.state.dispatch('increaseScore', {points: 50});
+```html
+<a-entity bind__fly="enabled: animal === 'bird'"></a-entity>
+<a-entity bind__legs="enabled: animal !== 'snake'"></a-entity>
 ```
-
-The binding components will automatically and selectively update the entities
-in response to state changes.
-
-A `stateupdate` event will be fired, but we probably don't need to use it. The
-event might later be useful if we develop a debugging front-end for the state.
 
 #### Rendering Lists
 
 The state component comes with a `bind-for` component that can render an array
-in state from a template. Say we have an array in state:
+in state from a template. Say we have an array in state (currently must be at
+the root of the state):
 
 ```js
 AFRAME.registerState({
