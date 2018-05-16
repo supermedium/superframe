@@ -17,7 +17,9 @@ var initialState = {
     enabled: false,
     enabled2: false
   },
-  position: {x: 0, y: 0, z: 0}
+  position: {x: 0, y: 0, z: 0},
+  initialNull: null,
+  initialUndefined: undefined
 };
 
 AFRAME.registerState({

@@ -25,7 +25,7 @@ AFRAME.registerSystem('state', {
 
     // Wrap array to detect dirty.
     for (key in this.state) {
-      if (this.state[key].constructor === Array) {
+      if (this.state[key] && this.state[key].constructor === Array) {
         this.state[key].__dirty = true;
         wrapArray(this.state[key]);
       }
