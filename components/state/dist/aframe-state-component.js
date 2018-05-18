@@ -82,15 +82,18 @@ return /******/ (function(modules) { // webpackBootstrap
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-var wrapArray = __webpack_require__(1).wrapArray;
+var diff = __webpack_require__(1);
+var wrapArray = __webpack_require__(2).wrapArray;
 
 // Singleton state definition.
 var State = {
   initialState: {},
+  nonBindedStateKeys: [],
   handlers: {},
   computeState: function computeState() {/* no-op */}
 };
 
+var STATE_UPDATE_EVENT = 'stateupdate';
 var TYPE_OBJECT = 'object';
 var WHITESPACE_REGEX = /s+/;
 
@@ -151,7 +154,7 @@ AFRAME.registerSystem('state', {
     for (key in this.diff) {
       delete this.diff[key];
     }
-    AFRAME.utils.diff(this.lastState, this.state, this.diff);
+    diff(this.lastState, this.state, this.diff, State.nonBindedStateKeys);
 
     // Notify subscriptions / binders.
     for (i = 0; i < this.subscriptions.length; i++) {
@@ -183,16 +186,21 @@ AFRAME.registerSystem('state', {
     // Emit.
     this.eventDetail.action = actionName;
     this.eventDetail.payload = payload;
-    this.el.emit('stateupdate', this.eventDetail);
+    this.el.emit(STATE_UPDATE_EVENT, this.eventDetail);
   },
 
   /**
    * Store last state through a deep extend, but not for arrays.
    */
-  copyState: function copyState(lastState, state) {
+  copyState: function copyState(lastState, state, isRecursive) {
     var key;
 
     for (key in state) {
+      // Don't copy pieces of state keys that are non-binded or untracked.
+      if (!isRecursive && State.nonBindedStateKeys.indexOf(key) !== -1) {
+        continue;
+      }
+
       // Nested state.
       if (state[key] && state[key].constructor === Object) {
         if (!(key in lastState)) {
@@ -201,7 +209,7 @@ AFRAME.registerSystem('state', {
           continue;
         }
         // Recursively copy state.
-        this.copyState(lastState[key], state[key]);
+        this.copyState(lastState[key], state[key], true);
         continue;
       }
 
@@ -853,6 +861,72 @@ function copyArray(dest, src) {
 
 /***/ }),
 /* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/**
+ * Computes the difference between two objects with ability to ignore keys.
+ *
+ * @param {object} a - First object to compare (e.g., oldData).
+ * @param {object} b - Second object to compare (e.g., newData).
+ * @returns {object}
+ *   Difference object where set of keys note which values were not equal, and values are
+ *   `b`'s values.
+ */
+module.exports = function () {
+  var keys = [];
+
+  return function (a, b, targetObject, ignoreKeys) {
+    var aVal;
+    var bVal;
+    var bKey;
+    var diff;
+    var key;
+    var i;
+    var isComparingObjects;
+
+    diff = targetObject || {};
+
+    // Collect A keys.
+    keys.length = 0;
+    for (key in a) {
+      keys.push(key);
+    }
+
+    if (!b) {
+      return diff;
+    }
+
+    // Collect B keys.
+    for (bKey in b) {
+      if (keys.indexOf(bKey) === -1) {
+        keys.push(bKey);
+      }
+    }
+
+    for (i = 0; i < keys.length; i++) {
+      key = keys[i];
+
+      // Ignore specified keys.
+      if (ignoreKeys && ignoreKeys.indexOf(key) !== -1) {
+        continue;
+      }
+
+      aVal = a[key];
+      bVal = b[key];
+      isComparingObjects = aVal && bVal && aVal.constructor === Object && bVal.constructor === Object;
+      if (isComparingObjects && !AFRAME.utils.deepEqual(aVal, bVal) || !isComparingObjects && aVal !== bVal) {
+        diff[key] = bVal;
+      }
+    }
+    return diff;
+  };
+}();
+
+/***/ }),
+/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";

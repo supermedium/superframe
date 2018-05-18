@@ -1,12 +1,15 @@
+var diff = require('./lib/diff');
 var wrapArray = require('./lib/array').wrapArray;
 
 // Singleton state definition.
 var State = {
   initialState: {},
+  nonBindedStateKeys: [],
   handlers: {},
   computeState: function () { /* no-op */ }
 };
 
+var STATE_UPDATE_EVENT = 'stateupdate';
 var TYPE_OBJECT = 'object';
 var WHITESPACE_REGEX = /s+/;
 
@@ -63,7 +66,7 @@ AFRAME.registerSystem('state', {
 
     // Get a diff to optimize bind updates.
     for (key in this.diff) { delete this.diff[key]; }
-    AFRAME.utils.diff(this.lastState, this.state, this.diff);
+    diff(this.lastState, this.state, this.diff, State.nonBindedStateKeys);
 
     // Notify subscriptions / binders.
     for (i = 0; i < this.subscriptions.length; i++) {
@@ -91,16 +94,19 @@ AFRAME.registerSystem('state', {
     // Emit.
     this.eventDetail.action = actionName;
     this.eventDetail.payload = payload;
-    this.el.emit('stateupdate', this.eventDetail);
+    this.el.emit(STATE_UPDATE_EVENT, this.eventDetail);
   },
 
   /**
    * Store last state through a deep extend, but not for arrays.
    */
-  copyState: function (lastState, state) {
+  copyState: function (lastState, state, isRecursive) {
     var key;
 
     for (key in state) {
+      // Don't copy pieces of state keys that are non-binded or untracked.
+      if (!isRecursive && State.nonBindedStateKeys.indexOf(key) !== -1) { continue; }
+
       // Nested state.
       if (state[key] && state[key].constructor === Object) {
         if (!(key in lastState)) {
@@ -109,7 +115,7 @@ AFRAME.registerSystem('state', {
           continue;
         }
         // Recursively copy state.
-        this.copyState(lastState[key], state[key]);
+        this.copyState(lastState[key], state[key], true);
         continue;
       }
 

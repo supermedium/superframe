@@ -228,6 +228,28 @@ AFRAME.registerState({
 });
 ```
 
+#### Optimizing State
+
+If you are storing objects in state that don't need to be checked for changes
+nor binded to entities, then you can optimize the state component on updates as it
+checks for changes. By setting `nonBindedStateKeys` array, on state updates,
+these keys will be skipped when doing state diffing and copying.
+
+```js
+AFRAME.registerState({
+  nonBindedStateKeys: ['starMap'],
+
+  state: {
+    starMap: {
+      alphaCentari: {
+        // ...
+      },
+      // ...
+    }
+  }
+});
+```
+
 ### Installation
 
 #### Browser
