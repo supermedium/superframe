@@ -77,8 +77,9 @@ AFRAME.registerComponent('gltf-part', {
     src: {type: 'asset'}
   },
 
-  init: function () {
+  update: function () {
     var el = this.el;
+    if (!this.data.part && this.data.src) { return; }
     this.getModel(function (modelPart) {
       if (!modelPart) { return; }
       el.setObject3D('mesh', modelPart)
