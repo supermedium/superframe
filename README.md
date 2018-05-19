@@ -16,6 +16,7 @@ See documentation for individual components:
 - [atlas-uvs](https://github.com/ngokevin/kframe/tree/master/components/atlas-uvs/) - An A-Frame component to set UVs onto a plane geometry given a gridded texture atlas.
 - [audioanalyser](https://github.com/ngokevin/kframe/tree/master/components/audioanalyser/) - Audio visualizations in A-Frame using Web Audio (AnalyserNode)
 - [broadcast](https://github.com/ngokevin/kframe/tree/master/components/broadcast/) - Multi-user in A-Frame using raw websockets
+- [debug-cursor](https://github.com/ngokevin/kframe/tree/master/components/debug-cursor/) - A component to pretty-log cursor events.
 - [entity-generator](https://github.com/ngokevin/kframe/tree/master/components/entity-generator/) - Generate a number of entities in A-Frame given a mixin
 - [event-set](https://github.com/ngokevin/kframe/tree/master/components/event-set/) - Set properties in response to events in A-Frame
 - [firebase](https://github.com/ngokevin/kframe/tree/master/components/firebase/) - Multi-user in A-Frame using Firebase
@@ -33,6 +34,7 @@ See documentation for individual components:
 - [sun-sky](https://github.com/ngokevin/kframe/tree/master/components/sun-sky/) - Gradient sky with adjustable sun in A-Frame
 - [template](https://github.com/ngokevin/kframe/tree/master/components/template/) - Encapsulate groups of entities, use templating engines, and do string interpolations in A-Frame
 - [text-geometry](https://github.com/ngokevin/kframe/tree/master/components/text-geometry/) - Geometry-based text for A-Frame
+- [thumb-controls](https://github.com/ngokevin/kframe/tree/master/components/thumb-controls/) - An A-Frame component that provides and normalizes directional events for thumbpads and thumbsticks.
 
 
 ## Local Installation
