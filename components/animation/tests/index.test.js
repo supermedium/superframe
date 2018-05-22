@@ -54,8 +54,8 @@ suite('animation', function () {
     test('emits animationcomplete event', function (done) {
       el.addEventListener('animationbegin', evt => {
         el.addEventListener('animationcomplete', evt => { done(); });
-        component.tick(1);
-        component.tick(99999);
+        component.tick(1, 1);
+        component.tick(100000, 99999);
       });
       el.setAttribute('animation', {property: 'position', to: '2 2 2'});
     });
