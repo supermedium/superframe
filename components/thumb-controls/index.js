@@ -41,7 +41,7 @@ AFRAME.registerComponent('thumb-controls', {
   dependencies: ['tracked-controls'],
 
   schema: {
-    thresholdAngle: {default: 70},
+    thresholdAngle: {default: 89.5},
     thresholdPad: {default: 0.05},
     thresholdStick: {default: 0.75}
   },
@@ -140,12 +140,25 @@ AFRAME.registerComponent('thumb-controls', {
    */
   getDirection: function () {
     var angle;
+    var bottomThreshold;
     var i;
     var threshold;
+    var topThreshold;
     angle = this.getAngle();
     threshold = this.data.thresholdAngle / 2;
     for (i = 0; i < ANGLES.length; i++) {
-      if (angle >= (ANGLES[i] - threshold) && angle <= (ANGLES[i] + threshold)) {
+      topThreshold = ANGLES[i] + threshold;
+      if (topThreshold > 360) { topThreshold = topThreshold - 360; }
+
+      bottomThreshold = ANGLES[i] - threshold;
+      if (bottomThreshold < 0) {
+        if ((angle >= 360 + bottomThreshold && angle <= 360) ||
+            (angle >= 0 && angle <= topThreshold)) {
+          return DIRECTIONS[i];
+        }
+      }
+
+      if (angle >= bottomThreshold && angle <= topThreshold) {
         return DIRECTIONS[i];
       }
     }
