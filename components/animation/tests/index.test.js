@@ -59,5 +59,29 @@ suite('animation', function () {
       });
       el.setAttribute('animation', {property: 'position', to: '2 2 2'});
     });
+
+    test('emits animationcomplete event twice', function (done) {
+      var calledOnce = false;
+      el.addEventListener('animationbegin', evt => {
+        component.tick(1, 1);
+        component.tick(100000, 99999);
+      });
+
+      el.addEventListener('animationcomplete', evt => {
+        if (calledOnce) {
+          done();
+        } else {
+          calledOnce = true;
+          component.el.emit('startAnimation');
+        }
+      });
+
+      el.setAttribute('animation', {
+        property: 'position',
+        to: '2 2 2',
+        startEvents: 'startAnimation'
+      });
+      component.el.emit('startAnimation');
+    });
   });
 });
