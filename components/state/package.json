@@ -1,6 +1,6 @@
 {
   "name": "aframe-state-component",
-  "version": "3.3.1",
+  "version": "3.4.0",
   "description": "State management for A-Frame using single global state modified through actions. State flows down to application via declarative binding.",
   "main": "dist/aframe-state-component.js",
   "unpkg": "dist/aframe-state-component.min.js",
@@ -9,6 +9,7 @@
     "dist": "webpack && NODE_ENV=production webpack",
     "postpublish": "npm run dist",
     "test": "karma start ./tests/karma.conf.js --browsers Firefox",
+    "test:chrome": "karma start ./tests/karma.conf.js --browsers Chrome",
     "start": "npm run dev"
   },
   "repository": {

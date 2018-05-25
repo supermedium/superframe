@@ -274,7 +274,6 @@ AFRAME.registerSystem('state', {
    */
   renderTemplate: function () {
     // Braces, whitespace, optional item name, item key, whitespace, braces.
-    var fragment = document.createElement('template');
     var interpRegex = /{{\s*(\w*\.)?([\w.]+)\s*}}/g;
 
     return function (template, data, asString) {
@@ -292,8 +291,7 @@ AFRAME.registerSystem('state', {
       }
 
       // Return as DOM.
-      fragment.innerHTML = str;
-      return fragment.content;
+      return document.createRange().createContextualFragment(str);
     };
   }(),
 
