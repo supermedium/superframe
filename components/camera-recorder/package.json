@@ -5,8 +5,9 @@
   "main": "index.js",
   "unpkg": "dist/aframe-camera-recorder-component.min.js",
   "scripts": {
+    "build": "webpack index.js dist/aframe-camera-recorder-component.js",
     "dev": "budo index.js:dist/aframe-camera-recorder-component.min.js --port 7000 --live --open",
-    "dist": "npm run rollup && uglifyjs dist/aframe-camera-recorder-component.js > dist/aframe-camera-recorder-component.min.js",
+    "dist": "npm run build && uglifyjs dist/aframe-camera-recorder-component.js > dist/aframe-camera-recorder-component.min.js",
     "lint": "semistandard -v | snazzy",
     "prepublish": "npm run dist",
     "ghpages": "ghpages",

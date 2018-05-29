@@ -13,6 +13,8 @@ if (typeof AFRAME === 'undefined') {
  * tilt, pan, dolly
  */
 AFRAME.registerComponent('camera-recorder', {
+  dependencies: ['camera'],
+
   schema: {
     dur: {default: 3000},
     enabled: {default: true},
@@ -25,6 +27,7 @@ AFRAME.registerComponent('camera-recorder', {
     positionTo: {type: 'vec3'},
     rotationFrom: {type: 'vec3'},
     rotationTo: {type: 'vec3'},
+    showControls: {default: true},
     workers: {default: 16},
     workerPath: {default: './'}
   },
@@ -47,11 +50,6 @@ AFRAME.registerComponent('camera-recorder', {
       workersPath: data.workerPath
     });
     this.time = 0;
-
-    // Disable other controls.
-    this.el.removeAttribute('look-controls');
-    this.el.removeAttribute('wasd-controls');
-    this.el.sceneEl.setAttribute('vr-mode-ui', 'enabled', false);
 
     // To tell what is developer-defined.
     domAttributes = this.el.getDOMAttribute('camera-recorder');
@@ -84,15 +82,30 @@ AFRAME.registerComponent('camera-recorder', {
 
     if ('lookAt' in domAttributes) {
       this.lookAt = new THREE.Vector3().copy(data.lookAt);
+      this.el.getObject3D('camera').rotation.y = Math.PI;
     }
 
-    this.injectRecordButton();
-    this.injectDryRunButton();
+    if (data.showControls) {
+      this.injectRecordButton();
+      this.injectDryRunButton();
+    }
+
+    el.addEventListener('camerarecorderstart', () => { this.startRecording(); });
+    el.addEventListener('camerarecorderdrystart', () => { this.startRecording(true); });
+  },
+
+  play: function () {
+    // Disable other controls.
+    setTimeout(() => {
+      this.el.setAttribute('look-controls', 'enabled', false);
+      this.el.setAttribute('wasd-controls', 'enabled', false);
+      this.el.sceneEl.setAttribute('vr-mode-ui', 'enabled', false);
+    });
   },
 
   tick: function () {
     if (this.lookAt) {
-      this.el.getObject3D('camera').lookAt(this.lookAt);
+      this.el.object3D.lookAt(this.lookAt);
     }
   },
 
