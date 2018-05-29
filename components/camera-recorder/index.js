@@ -20,15 +20,17 @@ AFRAME.registerComponent('camera-recorder', {
     enabled: {default: true},
     framerate: {default: 60},
     lookAt: {type: 'vec3'},
+    holdTimeBefore: {default: 500},
+    holdTimeAfter: {default: 1000},
     motionBlurEnabled: {default: true},
     name: {default: ''},
-    quality: {default: 75},
+    quality: {default: 85},
     positionFrom: {type: 'vec3'},
     positionTo: {type: 'vec3'},
     rotationFrom: {type: 'vec3'},
     rotationTo: {type: 'vec3'},
     showControls: {default: true},
-    workers: {default: 16},
+    workers: {default: 8},
     workerPath: {default: './'}
   },
 
@@ -57,6 +59,7 @@ AFRAME.registerComponent('camera-recorder', {
     if ('positionTo' in domAttributes) {
       el.setAttribute('animation__recorderposition', {
         property: 'position',
+        delay: data.holdTimeBefore,
         dur: data.dur,
         easing: 'linear',
         from: 'positionFrom' in domAttributes
@@ -70,6 +73,7 @@ AFRAME.registerComponent('camera-recorder', {
     if ('rotationTo' in domAttributes) {
       el.setAttribute('animation__recorderrotation', {
         property: 'rotation',
+        delay: data.holdTimeBefore,
         dur: data.dur,
         easing: 'linear',
         from: 'rotationFrom' in domAttributes
@@ -115,7 +119,8 @@ AFRAME.registerComponent('camera-recorder', {
     this.time += dt;
 
     // Finished.
-    if (this.time > this.data.dur) {
+    if (this.time >
+        this.data.dur + this.data.holdTimeBefore + this.data.holdTimeAfter) {
       this.isRecording = false;
       this.capture.stop();
       this.capture.save();
@@ -143,7 +148,7 @@ AFRAME.registerComponent('camera-recorder', {
       this.startRecording();
     });
 
-    this.recordDutton = button;
+    this.recordButton = button;
   },
 
   injectDryRunButton: function () {
