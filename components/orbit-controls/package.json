@@ -1,13 +1,13 @@
 {
-  "name": "aframe-orbit-controls-component",
+  "name": "aframe-orbit-controls",
   "version": "1.0.0",
   "description": "Orbit controls component for A-Frame.",
   "main": "index.js",
-  "unpkg": "dist/aframe-orbit-controls-component.min.js",
+  "unpkg": "dist/aframe-orbit-controls.min.js",
   "scripts": {
-    "build": "webpack index.js dist/aframe-orbit-controls-component.js",
-    "dev": "budo index.js:dist/aframe-orbit-controls-component.min.js --port 7000 --live --open",
-    "dist": "npm run build && uglifyjs dist/aframe-orbit-controls-component.js > dist/aframe-orbit-controls-component.min.js",
+    "build": "webpack index.js dist/aframe-orbit-controls.js",
+    "dev": "budo index.js:dist/aframe-orbit-controls.min.js --port 7000 --live --open",
+    "dist": "npm run build && uglifyjs dist/aframe-orbit-controls.js > dist/aframe-orbit-controls.min.js",
     "lint": "semistandard -v | snazzy",
     "prepublish": "npm run dist",
     "ghpages": "ghpages",

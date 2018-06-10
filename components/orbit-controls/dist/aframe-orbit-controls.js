@@ -1182,6 +1182,10 @@ AFRAME.registerComponent('orbit-controls', {
 
     this.target = new THREE.Vector3();
     el.getObject3D('camera').position.copy(this.data.initialPosition);
+
+    if (el.hasAttribute('look-controls')) {
+      el.setAttribute('look-controls', 'enabled', false);
+    }
   },
 
   update: function (oldData) {
