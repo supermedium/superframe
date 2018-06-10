@@ -16,6 +16,7 @@ See documentation for individual components:
 - [atlas-uvs](https://github.com/ngokevin/kframe/tree/master/components/atlas-uvs/) - An A-Frame component to set UVs onto a plane geometry given a gridded texture atlas.
 - [audioanalyser](https://github.com/ngokevin/kframe/tree/master/components/audioanalyser/) - Audio visualizations in A-Frame using Web Audio (AnalyserNode)
 - [broadcast](https://github.com/ngokevin/kframe/tree/master/components/broadcast/) - Multi-user in A-Frame using raw websockets
+- [camera-recorder](https://github.com/ngokevin/kframe/tree/master/components/camera-recorder/) - A component to film and record A-Frame scenes with a controlled camera (pans, dollies, tilts).
 - [debug-cursor](https://github.com/ngokevin/kframe/tree/master/components/debug-cursor/) - A component to pretty-log cursor events.
 - [entity-generator](https://github.com/ngokevin/kframe/tree/master/components/entity-generator/) - Generate a number of entities in A-Frame given a mixin
 - [event-set](https://github.com/ngokevin/kframe/tree/master/components/event-set/) - Set properties in response to events in A-Frame
@@ -28,6 +29,7 @@ See documentation for individual components:
 - [log](https://github.com/ngokevin/kframe/tree/master/components/log/) - In-VR console logs for A-Frame.
 - [look-at](https://github.com/ngokevin/kframe/tree/master/components/look-at/) - Rotate an entity to face towards another entity in A-Frame
 - [mountain](https://github.com/ngokevin/kframe/tree/master/components/mountain/) - Mountain terrain in A-Frame using randomly-generated height maps
+- [orbit-controls](https://github.com/ngokevin/kframe/tree/master/components/orbit-controls/) - Orbit controls component for A-Frame.
 - [proxy-event](https://github.com/ngokevin/kframe/tree/master/components/proxy-event/) - A component to declaratively proxy events for A-Frame.
 - [randomizer](https://github.com/ngokevin/kframe/tree/master/components/randomizer/) - Randomize color, position, rotation, and scale in A-Frame
 - [state](https://github.com/ngokevin/kframe/tree/master/components/state/) - State management for A-Frame using single global state modified through actions. State flows down to application via declarative binding.
