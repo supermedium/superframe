@@ -1,7 +1,7 @@
 {
   "name": "aframe-orbit-controls",
-  "version": "1.1.0",
-  "description": "Orbit controls component for A-Frame.",
+  "version": "1.1.1",
+  "description": "Orbit controls for A-Frame.",
   "main": "index.js",
   "unpkg": "dist/aframe-orbit-controls.min.js",
   "scripts": {

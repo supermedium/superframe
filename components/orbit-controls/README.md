@@ -1,9 +1,9 @@
-## aframe-orbit-controls-component
+## aframe-orbit-controls
 
 [![Version](http://img.shields.io/npm/v/aframe-orbit-controls-component.svg?style=flat-square)](https://npmjs.org/package/aframe-orbit-controls-component)
 [![License](http://img.shields.io/npm/l/aframe-orbit-controls-component.svg?style=flat-square)](https://npmjs.org/package/aframe-orbit-controls-component)
 
-Orbit controls component for [A-Frame](https://aframe.io).
+Orbit controls for [A-Frame](https://aframe.io).
 
 ![](https://user-images.githubusercontent.com/674727/41206637-d58d7ec0-6cbb-11e8-8161-966396f45b79.gif)
 
