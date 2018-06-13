@@ -271,6 +271,9 @@ AFRAME.registerComponent('camera-recorder', {
   startRecording: function (isDryRun) {
     this.el.emit('camerarecorderanimationstart');
 
+    this.el.object3D.position.set(0, 0, 0);
+    this.el.object3D.rotation.set(0, 0, 0);
+
     setTimeout(() => {
       if ('lookAt' in this.el.getDOMAttribute('camera-recorder')) {
         this.el.getObject3D('camera').rotation.y = Math.PI;
