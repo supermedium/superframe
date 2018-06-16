@@ -7,6 +7,9 @@ Orbit controls for [A-Frame](https://aframe.io).
 
 ![](https://user-images.githubusercontent.com/674727/41206637-d58d7ec0-6cbb-11e8-8161-966396f45b79.gif)
 
+Scene above built in [Supercraft](https://supermedium.com/supercraft) by Robert
+Karpinski (@riskieee).
+
 Automatically toggles `look-controls` on and off when entering and exiting VR.
 
 Great for using as a viewer, better and easier than using WASD + mouse-drag,
