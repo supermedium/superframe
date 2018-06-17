@@ -128,7 +128,12 @@ AFRAME.registerSystem('state', {
     };
 
     this.el.addEventListener('loaded', function () {
-      _this.dispatch('@@INIT');
+      var i;
+      // Initial dispatch.
+      for (i = 0; i < _this.subscriptions.length; i++) {
+        _this.subscriptions[i].onStateUpdate(_this.state, '@@INIT', {});
+      }
+      State.computeState(_this.state, '@@INIT');
     });
   },
 
@@ -375,7 +380,7 @@ AFRAME.registerComponent('bind', {
 
     // Check if any properties are part of an iteration in bind-for.
     bindForEl = this.el.closest('[bind-for]');
-    if (bindForEl && !bindForEl === this.el) {
+    if (bindForEl && bindForEl !== this.el) {
       this.bindForEl = bindForEl;
       this.bindRootEl = this.el.closest('[data-bind-for-key]');
       this.bindFor = this.bindForEl.getAttribute('bind-for');
