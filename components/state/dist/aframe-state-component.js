@@ -129,11 +129,12 @@ AFRAME.registerSystem('state', {
 
     this.el.addEventListener('loaded', function () {
       var i;
+      // Initial compute.
+      State.computeState(_this.state, '@@INIT');
       // Initial dispatch.
       for (i = 0; i < _this.subscriptions.length; i++) {
         _this.subscriptions[i].onStateUpdate(_this.state, '@@INIT', {});
       }
-      State.computeState(_this.state, '@@INIT');
     });
   },
 
