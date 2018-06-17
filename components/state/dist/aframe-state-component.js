@@ -128,11 +128,7 @@ AFRAME.registerSystem('state', {
     };
 
     this.el.addEventListener('loaded', function () {
-      var i;
-      // Initial dispatch.
-      for (i = 0; i < _this.subscriptions.length; i++) {
-        _this.subscriptions[i].onStateUpdate(_this.state, '@@INIT', {});
-      }
+      _this.dispatch('@@INIT');
     });
   },
 
