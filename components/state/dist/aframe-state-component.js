@@ -133,7 +133,7 @@ AFRAME.registerSystem('state', {
       State.computeState(_this.state, '@@INIT');
       // Initial dispatch.
       for (i = 0; i < _this.subscriptions.length; i++) {
-        _this.subscriptions[i].onStateUpdate(_this.state, '@@INIT', {});
+        _this.subscriptions[i].onStateUpdate(_this.state);
       }
     });
   },

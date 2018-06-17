@@ -47,7 +47,7 @@ AFRAME.registerSystem('state', {
       State.computeState(this.state, '@@INIT');
       // Initial dispatch.
       for (i = 0; i < this.subscriptions.length; i++) {
-        this.subscriptions[i].onStateUpdate(this.state, '@@INIT', {});
+        this.subscriptions[i].onStateUpdate(this.state);
       }
     });
   },
