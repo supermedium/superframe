@@ -374,9 +374,10 @@ AFRAME.registerComponent('bind', {
     }
 
     // Check if any properties are part of an iteration in bind-for.
-    this.bindForEl = this.el.closest('[bind-for]');
-    this.bindRootEl = this.el.closest('[data-bind-for-key]');
-    if (this.bindForEl) {
+    bindForEl = this.el.closest('[bind-for]');
+    if (bindForEl && !bindForEl === this.el) {
+      this.bindForEl = bindForEl;
+      this.bindRootEl = this.el.closest('[data-bind-for-key]');
       this.bindFor = this.bindForEl.getAttribute('bind-for');
       this.bindForKey = this.bindRootEl.getAttribute('data-bind-for-key');
       this.keysToWatch.push(this.bindFor.in);
