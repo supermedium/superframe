@@ -38,7 +38,7 @@ AFRAME.registerComponent('orbit-controls', {
 
     oldPosition = new THREE.Vector3();
 
-    el.sceneEl.addEventListener('enter-vr', () => {
+    el.sceneEl.addEventListener('enter-vr', function() {
       if (!AFRAME.utils.device.checkHeadsetConnected() &&
           !AFRAME.utils.device.isMobile()) { return; }
       this.controls.enabled = false;
@@ -49,7 +49,7 @@ AFRAME.registerComponent('orbit-controls', {
       }
     });
 
-    el.sceneEl.addEventListener('exit-vr', () => {
+    el.sceneEl.addEventListener('exit-vr', function() {
       if (!AFRAME.utils.device.checkHeadsetConnected() &&
           !AFRAME.utils.device.isMobile()) { return; }
       this.controls.enabled = true;
@@ -60,10 +60,10 @@ AFRAME.registerComponent('orbit-controls', {
     });
 
     document.body.style.cursor = 'grab';
-    document.addEventListener('mousedown', () => {
+    document.addEventListener('mousedown', function() {
       document.body.style.cursor = 'grabbing';
     });
-    document.addEventListener('mouseup', () => {
+    document.addEventListener('mouseup', function() {
       document.body.style.cursor = 'grab';
     });
 
