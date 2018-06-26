@@ -4,6 +4,7 @@
 AFRAME.registerComponent('proxy-event', {
   schema: {
     captureBubbles: {default: false},
+    enabled: {default: true},
     event: {type: 'string'},
     from: {type: 'string'},
     to: {type: 'string'},
@@ -44,6 +45,7 @@ AFRAME.registerComponent('proxy-event', {
     } else {
       el.addEventListener(data.event, function (evt) {
         var data = self.data;
+        if (!data.enabled) { return; }
         if (!data.captureBubbles && evt.target !== el) { return; }
         for (i = 0; i < to.length; i++) {
           to[i].emit(data.as || data.event, evt['detail'] ? evt.detail : null, data.bubbles);
@@ -57,6 +59,7 @@ AFRAME.registerComponent('proxy-event', {
     var self = this;
     fromEl.addEventListener(data.event, function (evt) {
       var data = self.data;
+      if (!data.enabled) { return; }
       if (!data.captureBubbles && evt.target !== fromEl) { return; }
       self.el.emit(data.as || data.event, evt['detail'] ? evt.detail : null, false);
     });

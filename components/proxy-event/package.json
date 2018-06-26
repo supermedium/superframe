@@ -1,6 +1,6 @@
 {
   "name": "aframe-proxy-event-component",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "A component to declaratively proxy events for A-Frame.",
   "main": "index.js",
   "unpkg": "dist/aframe-proxy-event-component.min.js",

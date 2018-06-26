@@ -12,6 +12,7 @@ For [A-Frame](https://aframe.io).
 | Property       | Description                                                                                                          | Default Value |
 | --------       | -----------                                                                                                          | ------------- |
 | captureBubbles | Whether to capture children's bubble events.                                                                         | false         |
+| enabled        | Boolean used to toggle. If false, event will not be proxied.                                                         | true          |
 | event          | Event name to proxy.                                                                                                 | ''            |
 | from           | Selector of entities to proxy event from. If set to `PARENT`, then will listen to parent for event.                  | ''            |
 | to             | Selector of entities to proxy event to. If set to `CHILDREN`, then the event is recursively proxied to all children. | ''            |
