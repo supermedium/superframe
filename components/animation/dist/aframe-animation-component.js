@@ -232,7 +232,6 @@
 	  beginAnimation: function () {
 	    this.updateConfig();
 	    this.time = 0;
-	    this.animation.seek(0);
 	    this.animationIsPlaying = true;
 	    this.stopRelatedAnimations();
 	    this.el.emit('animationbegin', this.eventDetail);
@@ -250,6 +249,12 @@
 	   * startEvents callback.
 	   */
 	  onStartEvent: function () {
+	    this.updateConfig();
+	    if (this.animation) {
+	      this.animation.pause();
+	    }
+	    this.animation = anime(this.config);
+
 	    // Include the delay before each start event.
 	    if (this.data.delay) {
 	      setTimeout(this.beginAnimation, this.data.delay);
@@ -472,6 +477,7 @@
 	    var componentName;
 	    var data = this.data;
 	    var el = this.el;
+	    var self = this;
 
 	    if (data.from) { return false; }
 
@@ -483,6 +489,9 @@
 	    el.addEventListener('componentinitialized', function wait (evt) {
 	      if (evt.detail.name !== componentName) { return; }
 	      cb();
+	      // Since the config was created async, create the animation now since we missed it
+	      // earlier.
+	      self.animation = anime(self.config);
 	      el.removeEventListener('componentinitialized', wait);
 	    });
 	    return true;
@@ -500,6 +509,7 @@
 	      component = this.el.components[componentName];
 	      if (componentName === this.attrName) { continue; }
 	      if (component.name !== 'animation') { continue; }
+	      if (!component.animationIsPlaying) { continue; }
 	      if (component.data.property !== this.data.property) { continue; }
 	      component.animationIsPlaying = false;
 	    }

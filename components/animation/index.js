@@ -186,7 +186,6 @@ AFRAME.registerComponent('animation', {
   beginAnimation: function () {
     this.updateConfig();
     this.time = 0;
-    this.animation.seek(0);
     this.animationIsPlaying = true;
     this.stopRelatedAnimations();
     this.el.emit('animationbegin', this.eventDetail);
@@ -204,6 +203,12 @@ AFRAME.registerComponent('animation', {
    * startEvents callback.
    */
   onStartEvent: function () {
+    this.updateConfig();
+    if (this.animation) {
+      this.animation.pause();
+    }
+    this.animation = anime(this.config);
+
     // Include the delay before each start event.
     if (this.data.delay) {
       setTimeout(this.beginAnimation, this.data.delay);
