@@ -125,7 +125,7 @@ between every element). Then we have a `<template>` which will be used to
 render each individual item.
 
 Then we can bind properties to the individual array element either using the
-`bind` component, using the `in` value as the pointer (i.e.,
+`bind` component, using the `for` value as the pointer (i.e.,
 `shoppingItem.name`). Or we can use braces (`{{ }}`), which the `bind-for`
 component will statically interpolate the variable:
 
