@@ -276,6 +276,7 @@ AFRAME.registerSystem('state', {
    */
   renderTemplate: function () {
     // Braces, whitespace, optional item name, item key, whitespace, braces.
+    var div = document.createElement('div');
     var interpRegex = /{{\s*(\w*\.)?([\w.]+)\s*}}/g;
 
     return function (template, data, asString) {
@@ -293,7 +294,8 @@ AFRAME.registerSystem('state', {
       }
 
       // Return as DOM.
-      return document.createRange().createContextualFragment(str);
+      div.innerHTML = str;
+      return div;
     };
   }(),
 
@@ -581,9 +583,11 @@ AFRAME.registerComponent('bind-for', {
       var data = this.data;
       var el = this.el;
       var i;
+      var j;
       var list;
       var key;
       var item;
+      var renderedContainer;
 
       try {
         list = select(this.system.state, data.in);
@@ -602,7 +606,10 @@ AFRAME.registerComponent('bind-for', {
 
         // Add item.
         if (this.renderedKeys.indexOf(keyValue) === -1) {
-          el.appendChild(this.system.renderTemplate(this.template, item));
+          renderedContainer = this.system.renderTemplate(this.template, item);
+          for (j = 0; j < renderedContainer.children.length; j++) {
+            el.appendChild(renderedContainer.children[j]);
+          }
           el.children[el.children.length - 1].setAttribute('data-bind-for-key', keyValue);
           this.renderedKeys.push(keyValue);
           continue;
