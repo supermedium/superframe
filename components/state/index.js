@@ -498,7 +498,7 @@ AFRAME.registerComponent('bind-for', {
         item = list[i];
 
         // If key not defined, use index (e.g., array of strings).
-        keyValue = data.key ? item[data.key] : i.toString();
+        keyValue = data.key ? item[data.key].toString() : i.toString();
         keys.push(keyValue);
 
         // Add item.
