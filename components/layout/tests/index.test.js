@@ -23,6 +23,23 @@ describe('layout', function () {
     });
   });
 
+  describe('child-attached', function () {
+    it('updates when child is attached', function (done) {
+      var el = this.el;
+      el.setAttribute('layout', 'type: box; margin: 1');
+      appendChildren(el, 1).then(function () {
+        appendChildren(el, 1).then(function () {
+          appendChildren(el, 1).then(function () {
+            assert.equal(getPos(el.children[0]), '0 0 0');
+            assert.equal(getPos(el.children[1]), '0 1 0');
+            assert.equal(getPos(el.children[2]), '0 2 0');
+            done();
+          });
+        });
+      });
+    });
+  });
+
   describe('remove', function () {
     it('can reset positions', function (done) {
       var el = this.el;

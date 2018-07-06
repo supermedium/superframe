@@ -14,14 +14,5 @@ beforeEach(function () {
 });
 
 afterEach(function () {
-  // Clean up any attached elements.
-  ['canvas', 'a-assets', 'a-scene'].forEach(function (tagName) {
-    var els = document.querySelectorAll(tagName);
-    for (var i = 0; i < els.length; i++) {
-      els[i].parentNode.removeChild(els[i]);
-    }
-  });
-  AScene.scene = null;
-
   this.sinon.restore();
 });

@@ -7,7 +7,7 @@
     "dev": "budo index.js:dist/aframe-layout-component.min.js --port 7005 --live --open",
     "dist": "webpack index.js dist/aframe-layout-component.js && webpack -p index.js dist/aframe-layout-component.min.js",
     "postpublish": "npm run dist",
-    "test": "karma start ./tests/karma.conf.js"
+    "test": "karma start ./tests/karma.conf.js --browsers Chrome"
   },
   "repository": {
     "type": "git",
@@ -42,6 +42,12 @@
     "karma-mocha-reporter": "^1.1.3",
     "karma-sinon-chai": "^1.1.0",
     "mocha": "^2.3.4",
+    "sinon": "^6.1.0",
+    "sinon-chai": "^3.2.0",
     "webpack": "^1.14.0"
+  },
+  "dependencies": {
+    "aframe": "^0.8.2",
+    "karma-chrome-launcher": "^2.2.0"
   }
 }
