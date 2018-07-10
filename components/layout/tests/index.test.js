@@ -19,7 +19,7 @@ describe('layout', function () {
         assert.equal(getPos(children[1]), '0 1 0');
         assert.equal(getPos(children[2]), '0 2 0');
         done();
-      });
+      }).catch(console.error);
     });
   });
 
@@ -30,11 +30,13 @@ describe('layout', function () {
       appendChildren(el, 1).then(function () {
         appendChildren(el, 1).then(function () {
           appendChildren(el, 1).then(function () {
-            assert.equal(getPos(el.children[0]), '0 0 0');
-            assert.equal(getPos(el.children[1]), '0 1 0');
-            assert.equal(getPos(el.children[2]), '0 2 0');
-            done();
-          });
+            setTimeout(() => {
+              assert.equal(getPos(el.children[0]), '0 0 0');
+              assert.equal(getPos(el.children[1]), '0 1 0');
+              assert.equal(getPos(el.children[2]), '0 2 0');
+              done();
+            });
+          }).catch(console.error);
         });
       });
     });

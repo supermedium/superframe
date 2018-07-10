@@ -3,14 +3,14 @@
     <title>Dynamic Layout</title>
     <meta name="description" content="Dynamic circular layout of boxes"></meta>
     <meta property="og:image" content="https://raw.githubusercontent.com/ngokevin/kframe/master/components/layout/examples/dynamic/preview.png"></meta>
-    <script src="https://aframe.io/releases/0.5.0/aframe.min.js"></script>
+    <script src="https://aframe.io/releases/0.8.2/aframe.min.js"></script>
     <script src="../../dist/aframe-layout-component.min.js"></script>
     <script>
       AFRAME.registerComponent('randomize-layout', {
         schema: {type: 'string'},
 
         tick: function (t, dt) {
-          if (t - this.time < 50) { return; }
+          if (t - this.time < 250) { return; }
           this.time = t;
 
           if (Math.random() < .1) {
@@ -28,7 +28,7 @@
     <a-scene>
       <a-assets>
         <a-mixin id="cube" geometry="primitive: box; depth: .1; height: .1; width: .1"
-                 material="color: #FFFBE0">
+                 material="color: blue">
         </a-mixin>
         <a-mixin id="secondary" material="color: #FFB400"></a-mixin>
       </a-assets>
@@ -37,7 +37,7 @@
                 material="color: #2994B2; shader: flat" scale="1 1 -1">
       </a-entity>
 
-      <a-entity layout="type: circle; radius: 10" position="0 0 -10" rotation="0 0 45"
+      <a-entity layout="type: circle; radius: 5" position="0 1.6 -10" rotation="0 0 45"
                 randomize-layout="cube">
         <a-entity mixin="cube"></a-entity>
         <a-entity mixin="cube"></a-entity>
