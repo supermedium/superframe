@@ -1,6 +1,6 @@
 {
   "name": "aframe-layout-component",
-  "version": "5.0.0",
+  "version": "5.0.1",
   "description": "Position and layout child entities in 3D space for A-Frame",
   "main": "index.js",
   "scripts": {

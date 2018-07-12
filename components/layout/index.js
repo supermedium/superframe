@@ -328,6 +328,7 @@ function scalePositions (scale) {
 function setPositions (els, positions) {
   var i;
   for (i = 0; i < positions.length; i += 3) {
+    if (!els[i / 3]) { return; }
     els[i / 3].object3D.position.set(positions[i], positions[i + 1], positions[i + 2]);
   }
 }
