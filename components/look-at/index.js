@@ -80,13 +80,13 @@ AFRAME.registerComponent('look-at', {
   tick: function (t) {
     // Track target object position. Depends on parent object keeping global transforms up
     // to state with updateMatrixWorld(). In practice, this is handled by the renderer.
-    var target;
+    var target = new THREE.Vector3();
     var target3D = this.target3D;
     var object3D = this.el.object3D;
     var vector = this.vector;
 
     if (target3D) {
-      target = object3D.parent.worldToLocal(target3D.getWorldPosition());
+      object3D.parent.worldToLocal(target3D.getWorldPosition(target));
       if (this.el.getObject3D('camera')) {
         // Flip the vector to -z, looking away from target for camera entities. When using
         // lookat from THREE camera objects, this is applied for you, but since the camera is
