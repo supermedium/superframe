@@ -58,6 +58,7 @@
 	    margin: {default: 1, min: 0, if: {type: ['box', 'line']}},
 	    marginColumn: {default: 1, min: 0, if: {type: ['box']}},
 	    marginRow: {default: 1, min: 0, if: {type: ['box']}},
+	    orderAttribute: {default: ''},
 	    plane: {default: 'xy'},
 	    radius: {default: 1, min: 0, if: {type: ['circle', 'cube', 'dodecahedron', 'pyramid']}},
 	    reverse: {default: false},
@@ -144,7 +145,7 @@
 	        : 'margin' in definedData
 	    );
 	    if (data.reverse) { positions.reverse(); }
-	    setPositions(children, positions);
+	    setPositions(children, positions, data.orderAttribute);
 	  },
 
 	  /**
@@ -371,8 +372,21 @@
 	 * @param {array} els - Child entities to set.
 	 * @param {array} positions - Array of coordinates.
 	 */
-	function setPositions (els, positions) {
+	function setPositions (els, positions, orderAttribute) {
 	  var i;
+	  var orderIndex;
+
+	  // Allow for controlling order explicitly since DOM order does not have as much
+	  // meaning in A-Frame.
+	  if (orderAttribute) {
+	    for (i = 0; i < els.length; i++) {
+	      orderIndex = parseInt(els[i].getAttribute(orderAttribute), 10) * 3;
+	      els[i].object3D.position.set(positions[orderIndex], positions[orderIndex + 1],
+	                                   positions[orderIndex + 2]);
+	    }
+	    return;
+	  }
+
 	  for (i = 0; i < positions.length; i += 3) {
 	    if (!els[i / 3]) { return; }
 	    els[i / 3].object3D.position.set(positions[i], positions[i + 1], positions[i + 2]);
