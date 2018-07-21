@@ -489,6 +489,7 @@ AFRAME.registerComponent('bind-for', {
     var toRemove = [];
 
     return function () {
+      var bindForKey;
       var child;
       var data = this.data;
       var el = this.el;
