@@ -1,12 +1,12 @@
 {
   "name": "aframe-layout-component",
-  "version": "5.1.0",
+  "version": "5.2.0",
   "description": "Position and layout child entities in 3D space for A-Frame",
   "main": "index.js",
   "scripts": {
     "dev": "budo index.js:dist/aframe-layout-component.min.js --port 7005 --live --open",
     "dist": "webpack index.js dist/aframe-layout-component.js && webpack -p index.js dist/aframe-layout-component.min.js",
-    "postpublish": "npm run dist",
+    "prepublish": "npm run dist",
     "test": "karma start ./tests/karma.conf.js --browsers Chrome"
   },
   "repository": {

@@ -204,7 +204,6 @@ function getCirclePositions (data, numChildren) {
     }
     pushPositionVec3(positionHelper);
   }
-  console.log(positions);
   return positions;
 }
 module.exports.getCirclePositions = getCirclePositions;
