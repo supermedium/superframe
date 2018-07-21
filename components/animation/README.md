@@ -34,6 +34,7 @@ Latest version requires A-Frame v0.8.0.
 | pauseEvents   | Comma-separated list of events to listen to trigger pause. Can be resumed with `resumeEvents`.                                                                                                                                                                                               | null          |                         |
 | resumeEvents  | Comma-separated list of events to listen to trigger resume after pausing.                                                                                                                                                                                                                    | null          |                         |
 | autoplay      | Whether or not the animation should `autoplay`. Should be specified if the animation is defined for the [`animation-timeline` component][animationtimeline].                                                                                                                                 | null          |                         |
+| enabled       | Toggle startEvents effect.                                                                                                                                                                                                                                                                   | true          |
 
 #### Multiple Animations
 

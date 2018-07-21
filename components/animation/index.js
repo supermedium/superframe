@@ -52,6 +52,7 @@ AFRAME.registerComponent('animation', {
     dur: {default: 1000},
     easing: {default: 'easeInQuad'},
     elasticity: {default: 400},
+    enabled: {default: true},
     from: {default: ''},
     loop: {
       default: 0,
@@ -102,11 +103,16 @@ AFRAME.registerComponent('animation', {
     };
   },
 
-  update: function () {
+  update: function (oldData) {
     var config = this.config;
     var data = this.data;
 
     this.animationIsPlaying = false;
+
+    if (oldData.enabled && !this.data.enabled) {
+      this.animationIsPlaying = false;
+      return;
+    }
 
     if (!data.property) { return; }
 
@@ -203,6 +209,8 @@ AFRAME.registerComponent('animation', {
    * startEvents callback.
    */
   onStartEvent: function () {
+    if (!this.data.enabled) { return; }
+
     this.updateConfig();
     if (this.animation) {
       this.animation.pause();
