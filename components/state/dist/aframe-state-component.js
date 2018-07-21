@@ -582,9 +582,12 @@ AFRAME.registerComponent('bind-for', {
       var data = this.data;
       var el = this.el;
       var i;
+      var isSimpleList;
       var list;
       var key;
+      var keyValue;
       var item;
+      var needsAddition;
 
       try {
         list = select(this.system.state, data.in);
@@ -594,15 +597,17 @@ AFRAME.registerComponent('bind-for', {
 
       keys.length = 0;
       for (i = 0; i < list.length; i++) {
-        var keyValue;
         item = list[i];
+        isSimpleList = item.constructor === String || item.constructor === Number;
 
         // If key not defined, use index (e.g., array of strings).
         keyValue = data.key ? item[data.key].toString() : i.toString();
         keys.push(keyValue);
 
+        needsAddition = isSimpleList && !el.querySelector('[data-bind-for-value="' + item + '"') || !isSimpleList && this.renderedKeys.indexOf(keyValue) === -1;
+
         // Add item.
-        if (this.renderedKeys.indexOf(keyValue) === -1) {
+        if (needsAddition) {
           el.appendChild(this.system.renderTemplate(this.template, item));
           el.children[el.children.length - 1].setAttribute('data-bind-for-key', keyValue);
           el.children[el.children.length - 1].setAttribute('data-bind-for-value', item);

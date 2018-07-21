@@ -8,6 +8,7 @@ var initialState = {
   color: 'red',
   colors: ['red', 'orange', 'yellow'],
   counter: 5,
+  difficulties: [],
   enabled: false,
   shoppingList: [
     {name: 'eggs', amount: 12},
@@ -79,11 +80,38 @@ AFRAME.registerState({
       state.colors.push('orange');
     },
 
+    colorReorderRemove: (state) => {
+      state.colors.length = 0;
+      state.colors.push('yellow');
+      state.colors.push('orange');
+    },
+
+    colorReorderAdd: (state) => {
+      state.colors.length = 0;
+      state.colors.push('yellow');
+      state.colors.push('orange');
+      state.colors.push('red');
+      state.colors.push('blue');
+      state.colors.push('green');
+    },
+
     colorReplace: (state) => {
       state.colors.length = 0;
       state.colors.push('blue');
       state.colors.push('indigo');
       state.colors.push('violet');
+    },
+
+    difficultyOne: (state) => {
+      state.difficulties.push('Expert');
+    },
+
+    difficultyTwo: (state) => {
+      state.difficulties.length = 0;
+      state.difficulties.push('Easy');
+      state.difficulties.push('Normal');
+      state.difficulties.push('Hard');
+      state.difficulties.push('Expert');
     },
 
     shoppingListAdd: (state) => {
@@ -615,6 +643,66 @@ suite('state', function () {
           assert.equal(el.children[2].dataset.bindForKey, '0');
           assert.equal(el.children[2].dataset.bindForValue, 'yellow');
           done();
+        });
+      });
+    });
+
+    test('can reorder list of strings with removals', done => {
+      el.setAttribute('bind-for', {
+        for: 'color',
+        in: 'colors',
+        template: '#colorTemplate'
+      });
+      setTimeout(() => {
+        assert.equal(el.children.length, 3);
+        el.emit('colorReorderRemove');
+        setTimeout(() => {
+          assert.equal(el.children.length, 2);
+          console.log(el.children);
+          done();
+        });
+      });
+    });
+
+    test('can reorder list of strings with additions', done => {
+      el.setAttribute('bind-for', {
+        for: 'color',
+        in: 'colors',
+        template: '#colorTemplate'
+      });
+      setTimeout(() => {
+        assert.equal(el.children.length, 3);
+        el.emit('colorReorderAdd');
+        setTimeout(() => {
+          assert.equal(el.children.length, 5);
+          done();
+        });
+      });
+    });
+
+    test('can reorder list of strings (2)', done => {
+      var template = document.createElement('template');
+      template.innerHTML = '<a-entity data-difficulty="{{ difficulty }}"></a-entity>';
+      el.appendChild(template);
+      setTimeout(() => {
+        el.setAttribute('bind-for', {
+          for: 'difficulty',
+          in: 'difficulties'
+        });
+        setTimeout(() => {
+          el.sceneEl.emit('difficultyOne');
+          setTimeout(() => {
+            assert.equal(el.children.length, 2);
+            el.sceneEl.emit('difficultyTwo');
+            setTimeout(() => {
+              assert.equal(el.children.length, 5);
+              assert.ok(el.querySelector('[data-difficulty="Easy"][data-bind-for-key="0"]'), 'e');
+              assert.ok(el.querySelector('[data-difficulty="Normal"][data-bind-for-key="1"]'), 'n');
+              assert.ok(el.querySelector('[data-difficulty="Hard"][data-bind-for-key="2"]'), 'h');
+              assert.ok(el.querySelector('[data-difficulty="Expert"][data-bind-for-key="3"]'), 'ex');
+              done();
+            });
+          });
         });
       });
     });
