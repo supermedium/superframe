@@ -478,6 +478,7 @@ AFRAME.registerComponent('bind-for', {
     var toRemove = [];
 
     return function () {
+      var child;
       var data = this.data;
       var el = this.el;
       var i;
@@ -505,8 +506,8 @@ AFRAME.registerComponent('bind-for', {
         if (this.renderedKeys.indexOf(keyValue) === -1) {
           el.appendChild(this.system.renderTemplate(this.template, item));
           el.children[el.children.length - 1].setAttribute('data-bind-for-key', keyValue);
+          el.children[el.children.length - 1].setAttribute('data-bind-for-value', item);
           this.renderedKeys.push(keyValue);
-          continue;
         }
       }
 
@@ -522,6 +523,16 @@ AFRAME.registerComponent('bind-for', {
       }
       for (i = 0; i < toRemove.length; i++) {
         toRemove[i].parentNode.removeChild(toRemove[i]);
+      }
+
+      // Update bind-for-key indices for list of strings in case of re-order.
+      if (list.length && list[0].constructor === String) {
+        for (i = 0; i < list.length; i++) {
+          child = el.querySelector('[data-bind-for-value="' + list[i] + '"]');
+          if (child) {
+            child.setAttribute('data-bind-for-key', i.toString());
+          }
+        }
       }
 
       this.el.emit('bindforrender', null, false);

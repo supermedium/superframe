@@ -72,6 +72,13 @@ AFRAME.registerState({
       state.colors.splice(0, 1);
     },
 
+    colorReorder: (state) => {
+      state.colors.length = 0;
+      state.colors.push('yellow');
+      state.colors.push('red');
+      state.colors.push('orange');
+    },
+
     colorReplace: (state) => {
       state.colors.length = 0;
       state.colors.push('blue');
@@ -572,7 +579,7 @@ suite('state', function () {
         assert.equal(el.children.length, 3);
         el.emit('colorShift');
         setTimeout(() => {
-          assert.equal(el.children.length, 2);
+          assert.equal(el.children.length, 2, 'what');
           assert.equal(el.children[0].children[0].getAttribute('text').value, 'orange');
           assert.equal(el.children[1].children[0].getAttribute('text').value, 'yellow');
           el.emit('colorAdd');
@@ -580,6 +587,34 @@ suite('state', function () {
             assert.equal(el.children[2].children[0].getAttribute('text').value, 'green');
             done();
           });
+        });
+      });
+    });
+
+    test('can reorder list of strings', done => {
+      el.setAttribute('bind-for', {
+        for: 'color',
+        in: 'colors',
+        template: '#colorTemplate'
+      });
+      setTimeout(() => {
+        assert.equal(el.children.length, 3);
+        assert.equal(el.children[0].dataset.bindForKey, '0');
+        assert.equal(el.children[0].dataset.bindForValue, 'red');
+        assert.equal(el.children[1].dataset.bindForKey, '1');
+        assert.equal(el.children[1].dataset.bindForValue, 'orange');
+        assert.equal(el.children[2].dataset.bindForKey, '2');
+        assert.equal(el.children[2].dataset.bindForValue, 'yellow');
+        el.emit('colorReorder');
+        setTimeout(() => {
+          assert.equal(el.children.length, 3);
+          assert.equal(el.children[0].dataset.bindForKey, '1');
+          assert.equal(el.children[0].dataset.bindForValue, 'red');
+          assert.equal(el.children[1].dataset.bindForKey, '2');
+          assert.equal(el.children[1].dataset.bindForValue, 'orange');
+          assert.equal(el.children[2].dataset.bindForKey, '0');
+          assert.equal(el.children[2].dataset.bindForValue, 'yellow');
+          done();
         });
       });
     });
