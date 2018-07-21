@@ -310,12 +310,23 @@ AFRAME.registerComponent('bind', {
     var propertyName;
     var stateSelector;
     var state;
+    var tempNode;
     var value;
 
     if (!el.parentNode) { return; }
     if (this.isNamespacedBind) { clearObject(this.updateObj); }
 
     state = this.system.state;
+
+    // Update bind-for-key if necessary if simple list of strings.
+    // Sort of a hack.
+    if (this.bindFor && !this.bindFor.key) {
+      tempNode = el;
+      while (tempNode.parentNode && tempNode.parentNode !== this.bindForEl) {
+        if (tempNode.parentNode) { tempNode = tempNode.parentNode; }
+      }
+      this.bindForKey = parseInt(tempNode.dataset.bindForKey, 10);
+    }
 
     // Single-property bind.
     if (typeof this.data !== TYPE_OBJECT) {
@@ -499,21 +510,19 @@ AFRAME.registerComponent('bind-for', {
       keys.length = 0;
       for (i = 0; i < list.length; i++) {
         item = list[i];
-        isSimpleList = item.constructor === String || item.constructor === Number;
 
         // If key not defined, use index (e.g., array of strings).
-        keyValue = data.key ? item[data.key].toString() : i.toString();
+        bindForKey = data.key ? item[data.key].toString() : i.toString();
+        keyValue = data.key ? item[data.key].toString() : item.toString();
         keys.push(keyValue);
 
-        needsAddition = (
-          (isSimpleList && !el.querySelector('[data-bind-for-value="' + item + '"')) ||
-          (!isSimpleList && this.renderedKeys.indexOf(keyValue) === -1));
-
         // Add item.
-        if (needsAddition) {
+        if (this.renderedKeys.indexOf(keyValue) === -1) {
           el.appendChild(this.system.renderTemplate(this.template, item));
-          el.children[el.children.length - 1].setAttribute('data-bind-for-key', keyValue);
-          el.children[el.children.length - 1].setAttribute('data-bind-for-value', item);
+          el.children[el.children.length - 1].setAttribute('data-bind-for-key', bindForKey);
+          if (!data.key) {
+            el.children[el.children.length - 1].setAttribute('data-bind-for-value', item);
+          }
           this.renderedKeys.push(keyValue);
         }
       }
@@ -522,7 +531,9 @@ AFRAME.registerComponent('bind-for', {
       toRemove.length = 0;
       for (i = 0; i < el.children.length; i++) {
         if (el.children[i].tagName === 'TEMPLATE') { continue; }
-        key = el.children[i].getAttribute('data-bind-for-key');
+        key = data.key ?
+          el.children[i].getAttribute('data-bind-for-key') :
+          el.children[i].getAttribute('data-bind-for-value');
         if (keys.indexOf(key) === -1) {
           toRemove.push(el.children[i]);
           this.renderedKeys.splice(this.renderedKeys.indexOf(key), 1);

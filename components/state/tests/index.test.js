@@ -608,6 +608,7 @@ suite('state', function () {
         el.emit('colorShift');
         setTimeout(() => {
           assert.equal(el.children.length, 2, 'what');
+          console.log(el.children);
           assert.equal(el.children[0].children[0].getAttribute('text').value, 'orange');
           assert.equal(el.children[1].children[0].getAttribute('text').value, 'yellow');
           el.emit('colorAdd');
