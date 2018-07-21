@@ -320,7 +320,7 @@ AFRAME.registerComponent('bind', {
 
     // Update bind-for-key if necessary if simple list of strings.
     // Sort of a hack.
-    if (this.bindFor && !this.bindFor.key) {
+    if (this.bindFor && this.bindForKey !== undefined && !this.bindFor.key) {
       tempNode = el;
       while (tempNode.parentNode && tempNode.parentNode !== this.bindForEl) {
         if (tempNode.parentNode) { tempNode = tempNode.parentNode; }
@@ -657,7 +657,7 @@ function selectProperty (state, selector, bindFor, bindForKey) {
   }
 
   // Select from array (bind-for).
-  if (bindFor) {
+  if (bindFor && selector.startsWith(bindFor.for)) {
     // Simple array.
     if (!bindFor.key) { return value[bindForKey]; }
     // Array of objects.

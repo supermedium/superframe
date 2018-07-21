@@ -421,7 +421,7 @@ AFRAME.registerComponent('bind', {
 
     // Update bind-for-key if necessary if simple list of strings.
     // Sort of a hack.
-    if (this.bindFor && !this.bindFor.key) {
+    if (this.bindFor && this.bindForKey !== undefined && !this.bindFor.key) {
       tempNode = el;
       while (tempNode.parentNode && tempNode.parentNode !== this.bindForEl) {
         if (tempNode.parentNode) {
@@ -453,6 +453,9 @@ AFRAME.registerComponent('bind', {
       stateSelector = this.data[propertyName].trim();
       try {
         value = select(state, stateSelector, this.bindFor, this.bindForKey);
+        if (el.classList.contains('difficultyBackground')) {
+          console.log(stateSelector, value, this.bindForKey);
+        }
         if (this.bindFor && value === undefined) {
           return;
         }
@@ -758,7 +761,7 @@ function selectProperty(state, selector, bindFor, bindForKey) {
   }
 
   // Select from array (bind-for).
-  if (bindFor) {
+  if (bindFor && selector.startsWith(bindFor.for)) {
     // Simple array.
     if (!bindFor.key) {
       return value[bindForKey];
