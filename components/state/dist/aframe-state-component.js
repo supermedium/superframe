@@ -344,6 +344,7 @@ AFRAME.registerComponent('bind', {
   init: function init() {
     var bindForEl;
     var bindForName;
+    var componentId;
     var data = this.data;
     var key;
 
@@ -352,7 +353,10 @@ AFRAME.registerComponent('bind', {
     this.system = this.el.sceneEl.systems.state;
 
     // Whether we are binding by namespace (e.g., bind__foo="prop1: true").
-    this.isNamespacedBind = this.id && this.id in AFRAME.components && !AFRAME.components[this.id].isSingleProp || this.id in AFRAME.systems;
+    if (this.id) {
+      componentId = split(this.id, '__')[0];
+    }
+    this.isNamespacedBind = this.id && componentId in AFRAME.components && !AFRAME.components[componentId].isSingleProp || componentId in AFRAME.systems;
 
     this.lastData = {};
     this.updateObj = {};

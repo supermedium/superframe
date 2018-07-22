@@ -374,6 +374,35 @@ suite('state', function () {
       delete AFRAME.components.bar;
     });
 
+    test('binds multiple component with double underscore in ID in namespace', done => {
+      // Components.
+      AFRAME.registerComponent('bar', {
+        schema: {
+          barEnabled: {default: false}
+        },
+
+        multiple: true,
+      });
+
+      // Bind.
+      el.setAttribute('bind__bar__foo', 'barEnabled: enabled');
+
+      setTimeout(() => {
+        // Assert initial state bind values.
+        assert.equal(el.getAttribute('bar__foo').barEnabled, false);
+
+        // Dispatch action.
+        el.emit('fooEnable');
+
+        setTimeout(() => {
+          assert.equal(el.getAttribute('bar__foo').barEnabled, true);
+          delete AFRAME.components.bar;
+          done();
+        });
+      });
+    });
+
+
     test('binds non-component attribute', done => {
       el.setAttribute('bind', 'data-enabled: enabled');
       assert.equal(el.getAttribute('data-enabled'), 'false');
