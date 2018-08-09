@@ -762,7 +762,7 @@ function selectProperty(state, selector, bindFor, bindForKey) {
   }
 
   // Select from array (bind-for).
-  if (bindFor && selector.startsWith(bindFor.for)) {
+  if (bindFor && originalSelector.startsWith(bindFor.for)) {
     // Simple array.
     if (!bindFor.key) {
       return value[bindForKey];
