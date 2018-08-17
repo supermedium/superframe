@@ -2,6 +2,7 @@
 require('aframe');
 require('../index');
 var array = require('../lib/array');
+var elFactory = require('./helpers').elFactory;
 var entityFactory = require('./helpers').entityFactory;
 
 var initialState = {
@@ -140,17 +141,10 @@ suite('state', function () {
   var system;
 
   setup(function (done) {
-    el = entityFactory();
-    setTimeout(() => {
-      if (el.sceneEl.hasLoaded) {
-        system = el.sceneEl.systems.state;
-        done();
-        return;
-      }
-      el.sceneEl.addEventListener('loaded', () => {
-        system = el.sceneEl.systems.state;
-        done();
-      });
+    elFactory().then(_el => {
+      el = _el;
+      system = el.sceneEl.systems.state;
+      done();
     });
   });
 

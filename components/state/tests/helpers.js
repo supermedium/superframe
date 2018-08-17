@@ -6,7 +6,7 @@
  *
  * @returns {object} An `<a-entity>` element.
  */
-module.exports.entityFactory = function (opts) {
+function entityFactory (opts) {
   var scene = document.createElement('a-scene');
   var assets = document.createElement('a-assets');
   var entity = document.createElement('a-entity');
@@ -24,6 +24,30 @@ module.exports.entityFactory = function (opts) {
   document.body.appendChild(scene);
   return entity;
 };
+module.exports.entityFactory = entityFactory;
+
+module.exports.elFactory = function (opts) {
+  let entity = entityFactory(opts);
+  return new Promise(resolve => {
+    if (entity.sceneEl) {
+      if (entity.sceneEl.hasLoaded) {
+        return resolve(entity);
+      }
+      entity.sceneEl.addEventListener('loaded', () => {
+        return resolve(entity);
+      });
+      return;
+    }
+    entity.addEventListener('nodeready', () => {
+      if (entity.sceneEl.hasLoaded) {
+        return resolve(entity);
+      }
+      entity.sceneEl.addEventListener('loaded', () => {
+        resolve(entity);
+      });
+    });
+  });
+}
 
 /**
  * Creates and attaches a mixin element (and an `<a-assets>` element if necessary).
