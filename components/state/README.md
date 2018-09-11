@@ -74,7 +74,7 @@ There's a `bind-toggle` component which will attach and detach a component
 entirely based on a boolean value.
 
 ```html
-<a-entity bind__raycastable="isRaycastable"></a-entity>
+<a-entity bind-toggle__raycastable="isRaycastable"></a-entity>
 ```
 
 #### Expressions
