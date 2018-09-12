@@ -122,7 +122,7 @@
 
 	    this.animationIsPlaying = true;
 	    this.time = 0;
-	    this.timeline = AFRAME.anime.timeline({
+	    this.timeline = (AFRAME.anime || AFRAME.ANIME).timeline({
 	      autoplay: false,
 	      complete: function () {
 	        self.animationIsPlaying = false;
