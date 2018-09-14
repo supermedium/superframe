@@ -1,6 +1,6 @@
 window.download = require('./lib/download');
 window.GIF = require('./lib/gif').GIF;
-var Capture = require('./lib/ccapture.js');
+var Capture = require('./lib/CCapture.js');
 
 /* global AFRAME */
 if (typeof AFRAME === 'undefined') {
