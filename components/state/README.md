@@ -119,6 +119,9 @@ AFRAME.registerState({
 });
 ```
 
+Note when updating the array in state, use array methods. Don't rewrite the
+array because the state component has wrapped the array to detect changes.
+
 We use `bind-for`. We provide `for` (the iterator variable name), `in` (pointer
 to the array in state), and `name` (name of key representing unique identifier
 between every element). Then we have a `<template>` which will be used to
