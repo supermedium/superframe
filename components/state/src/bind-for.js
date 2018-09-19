@@ -5,7 +5,7 @@ var lib = require('./lib/');
  */
 AFRAME.registerComponent('bind-for', {
   schema: {
-    for: {type: 'string'},
+    for: {type: 'string', default: 'item'},
     in: {type: 'string'},
     key: {type: 'string'},
     template: {type: 'string'},
@@ -112,6 +112,7 @@ AFRAME.registerComponent('bind-for', {
         throw new Error(`[aframe-state-component] Key '${data.in}' not found in state.` +
                         ` #${el.getAttribute('id')}[${this.attrName}]`);
       }
+
       // Calculate keys that should be active.
       keys.length = 0;
       for (i = 0; i < list.length; i++) {
@@ -156,11 +157,12 @@ AFRAME.registerComponent('bind-for', {
             takeoverEl.setAttribute('data-bind-for-active', 'true');
             takeoverEl.emit('bindforupdateinplace', item, false);
           }
+          this.renderedKeys.push(keyValue);
         } else if (keys.indexOf(bindForKey) !== -1) {
+          // Update item.
           this.el.querySelector('[data-bind-for-key="' + bindForKey + '"]')
             .emit('bindforupdateinplace', item, false);
         }
-        this.renderedKeys.push(keyValue);
       }
 
       // Update bind-for-key indices for list of strings in case of re-order.
@@ -214,7 +216,7 @@ AFRAME.registerComponent('bind-for', {
         let key = data.key ?
           el.children[i].getAttribute('data-bind-for-key') :
           el.children[i].getAttribute('data-bind-for-value');
-        if (activeKeys.indexOf(key) === -1) {
+        if (activeKeys.indexOf(key) === -1 && renderedKeys.indexOf(key) !== -1) {
           toRemove.push(el.children[i]);
           renderedKeys.splice(renderedKeys.indexOf(key), 1);
         }
@@ -255,14 +257,18 @@ AFRAME.registerComponent('bind-item', {
   multiple: true,
 
   init: function () {
-    const rootEl = this.el.closest('[data-bind-for-key]');
+    this.prevValues = {};
+
+    // Listen to root item for events.
+    const rootEl = this.rootEl = this.el.closest('[data-bind-for-key]');
     if (!rootEl) {
       throw new Error('bind-item component must be attached to entity under a bind-for item.');
     }
     rootEl.addEventListener('bindforupdateinplace', this.updateInPlace.bind(this));
-    this.prevValues = {};
-
     rootEl.addEventListener('bindfordeactivate', this.deactivate.bind(this));
+
+    // Store bind-for.
+    this.bindForEl = this.el.closest('[bind-for]');
   },
 
   update: function () {
@@ -277,9 +283,7 @@ AFRAME.registerComponent('bind-item', {
 
     for (let property in propertyMap) {
       // Get value from item.
-      let value = propertyMap[property] === 'item'
-        ? evt.detail  // Simple list.
-        : lib.select(evt.detail, propertyMap[property])
+      let value = this.select(evt.detail, propertyMap[property]);
 
       // Diff against previous value.
       if (value === this.prevValues[property]) { continue; }
@@ -289,6 +293,28 @@ AFRAME.registerComponent('bind-item', {
 
       this.prevValues[property] = value;
     }
+  },
+
+  select: function (itemData, selector) {
+    var value;
+
+    if (selector.indexOf('=') !== -1) {
+      // Interpolate.
+      let match = selector.match(/item.(\w+)/);
+      if (match) {
+        value = lib.select(itemData, match[0].replace(/item./, ''));
+        selector = selector.replace(/item.(\w+)/, "'" + value + "'");
+      }
+
+      value = lib.select(this.el.sceneEl.systems.state.state, selector);
+    } else {
+      // Get value from item.
+      value = selector === 'item'
+        ? itemData // Simple list.
+        : lib.select(itemData, selector.replace(/item./, ''));
+    }
+
+    return value;
   },
 
   deactivate: function () {
@@ -303,11 +329,11 @@ AFRAME.registerComponent('bind-item', {
       const propertySplitList = lib.split(this.data, ';');
       for (let i = 0; i < propertySplitList.length; i++) {
         let propertySplit = lib.split(propertySplitList[i], ':');
-        propertyMap[this.id + '.' + propertySplit[0].trim()] = propertySplit[1].trim().replace(/item./, '');
+        propertyMap[this.id + '.' + propertySplit[0].trim()] = propertySplit[1].trim();
       }
       return;
     }
 
-    propertyMap[this.id] = this.data.replace(/item./, '');
+    propertyMap[this.id] = this.data;
   }
 });

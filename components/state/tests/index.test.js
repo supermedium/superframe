@@ -828,7 +828,7 @@ suite('state', function () {
 
     test('renders from list of objects (in place)', done => {
       el.setAttribute('bind-for', {
-        for: 'shoppingItem',
+        for: 'item',
         in: 'shoppingList',
         template: '#shoppingItemTemplate',
         key: 'name',
@@ -844,9 +844,9 @@ suite('state', function () {
       }, 50);
     });
 
-    test('updates in place', done => {
+    test('updates in place (in place)', done => {
       el.setAttribute('bind-for', {
-        for: 'shoppingItem',
+        for: 'item',
         in: 'shoppingList',
         template: '#shoppingItemTemplate',
         key: 'name',
@@ -881,7 +881,7 @@ suite('state', function () {
 
     test('renders from list of strings (in place)', done => {
       el.setAttribute('bind-for', {
-        for: 'color',
+        for: 'item',
         in: 'colors',
         template: '#colorTemplate',
         updateInPlace: true
@@ -903,7 +903,7 @@ suite('state', function () {
 
     test('can add to list of strings (in place)', done => {
       el.setAttribute('bind-for', {
-        for: 'color',
+        for: 'item',
         in: 'colors',
         template: '#colorTemplate',
         updateInPlace: true
@@ -920,7 +920,7 @@ suite('state', function () {
 
     test('reset simple list of strings (in place)', done => {
       el.setAttribute('bind-for', {
-        for: 'color',
+        for: 'item',
         in: 'colors',
         template: '#colorTemplate',
         updateInPlace: true
@@ -940,7 +940,7 @@ suite('state', function () {
 
     test('can remove from list of strings (in place)', done => {
       el.setAttribute('bind-for', {
-        for: 'color',
+        for: 'item',
         in: 'colors',
         template: '#colorTemplate',
         updateInPlace: true
@@ -965,7 +965,7 @@ suite('state', function () {
 
     test('can reorder list of strings (in place)', done => {
       el.setAttribute('bind-for', {
-        for: 'color',
+        for: 'item',
         in: 'colors',
         template: '#colorTemplate',
         updateInPlace: true
@@ -994,7 +994,7 @@ suite('state', function () {
 
     test('can reorder list of strings with removals (in place)', done => {
       el.setAttribute('bind-for', {
-        for: 'color',
+        for: 'item',
         in: 'colors',
         template: '#colorTemplate',
         updateInPlace: true
@@ -1012,7 +1012,7 @@ suite('state', function () {
 
     test('can reorder list of strings with additions (in place)', done => {
       el.setAttribute('bind-for', {
-        for: 'color',
+        for: 'item',
         in: 'colors',
         template: '#colorTemplate',
         updateInPlace: true
@@ -1057,7 +1057,7 @@ suite('state', function () {
 
     test('renders added list item (in place)', done => {
       el.setAttribute('bind-for', {
-        for: 'shoppingItem',
+        for: 'item',
         in: 'shoppingList',
         template: '#shoppingItemTemplate',
         key: 'name',
@@ -1076,7 +1076,7 @@ suite('state', function () {
 
     test('removes items (in place)', done => {
       el.setAttribute('bind-for', {
-        for: 'shoppingItem',
+        for: 'item',
         in: 'shoppingList',
         template: '#shoppingItemTemplate',
         key: 'name',
@@ -1106,7 +1106,7 @@ suite('state', function () {
 
     test('can bind to item (in place)', done => {
       el.setAttribute('bind-for', {
-        for: 'shoppingItem',
+        for: 'item',
         in: 'shoppingList',
         template: '#shoppingItemTemplate2',
         key: 'name',
@@ -1184,24 +1184,49 @@ suite('state', function () {
 
   suite('bind-item', () => {
     setup(done => {
-      el.setAttribute('data-bind-for-key', '');
+      const template = document.createElement('template');
+      template.setAttribute('id', 'shoppingItemTemplate');
+      template.innerHTML = `<a-entity></a-entity>`;
+      el.sceneEl.appendChild(template);
+      el.setAttribute('bind-for', {
+        for: 'item',
+        in: 'shoppingList',
+        key: 'name',
+        updateInPlace: true,
+        template: '#shoppingItemTemplate'
+      });
+
+      const itemEl = document.createElement('a-entity');
+      itemEl.setAttribute('data-bind-for-key', '');
+      el.appendChild(itemEl);
+
       const childEl = document.createElement('a-entity');
-      el.appendChild(childEl);
+      itemEl.appendChild(childEl);
       el = childEl;
       setTimeout(() => { done(); });
+    });
+
+    test('handles comparisons', () => {
+      el.sceneEl.systems.state.state.activeItem = 'eggs';
+      el.setAttribute('data-bind-for-key', 'eggs');
+      el.setAttribute('bind-item__visible', 'activeItem !== item.name');
+      assert.equal(el.components['bind-item__visible'].select(
+        {name: 'eggs'}, 'activeItem !== item.name'), false);
+      assert.equal(el.components['bind-item__visible'].select(
+        {name: 'eggs'}, 'activeItem === item.name'), true);
     });
 
     test('parses multi-prop', () => {
       el.setAttribute('bind-item__material', 'color: item.color; opacity: item.values.opacity');
       const propertyMap = el.components['bind-item__material'].propertyMap;
-      assert.equal(propertyMap['material.color'], 'color');
-      assert.equal(propertyMap['material.opacity'], 'values.opacity');
+      assert.equal(propertyMap['material.color'], 'item.color');
+      assert.equal(propertyMap['material.opacity'], 'item.values.opacity');
     });
 
     test('parses data-attribute', () => {
       el.setAttribute('bind-item__data-value', 'item.foo.bar.baz');
       const propertyMap = el.components['bind-item__data-value'].propertyMap;
-      assert.equal(propertyMap['data-value'], 'foo.bar.baz');
+      assert.equal(propertyMap['data-value'], 'item.foo.bar.baz');
     });
   });
 

@@ -39,6 +39,8 @@ function select (state, selector, bindFor, bindForKey) {
     // Lookup second value.
     secondValue = tempTokenArray[i + 1].replace(QUOTE_RE, '');
     // Evaluate (equals or not equals).
+    firstValue = firstValue === undefined ? undefined : firstValue.toString()
+    secondValue = secondValue === undefined ? undefined : secondValue.toString()
     comparisonResult = tempTokenArray[i].indexOf('!') === -1
       ? firstValue === secondValue
       : firstValue !== secondValue;
@@ -96,7 +98,6 @@ function selectProperty (state, selector, bindFor, bindForKey) {
     value = value[splitted[i]];
   }
 
-  // Select from array (bind-for).
   if (bindFor && originalSelector.startsWith(bindFor.for)) {
     // Simple array.
     if (!bindFor.key) { return value[bindForKey]; }

@@ -70,7 +70,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 0);
+/******/ 	return __webpack_require__(__webpack_require__.s = 1);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -80,10 +80,256 @@ return /******/ (function(modules) { // webpackBootstrap
 "use strict";
 
 
+var AND = '&&';
+var QUOTE_RE = /'/g;
+var OR = '||';
+var COMPARISONS = ['==', '===', '!=', '!=='];
+var tempTokenArray = [];
+var tokenArray = [];
+
+/**
+ * Select value from store. Handles boolean operations, calls `selectProperty`.
+ *
+ * @param {object} state - State object.
+ * @param {string} selector - Dot-delimited store keys (e.g., game.player.health).
+ */
+function select(state, selector, bindFor, bindForKey) {
+  var comparisonResult;
+  var firstValue;
+  var i;
+  var runningBool;
+  var secondValue;
+  var tokens;
+  var value;
+
+  // If just single selector, then grab value.
+  tokens = split(selector, /\s+/);
+  if (tokens.length === 1) {
+    return selectProperty(state, selector, bindFor, bindForKey);
+  }
+
+  // Evaluate comparisons.
+  tokenArray.length = 0;
+  copyArray(tempTokenArray, tokens);
+  for (i = 0; i < tempTokenArray.length; i++) {
+    if (COMPARISONS.indexOf(tempTokenArray[i]) === -1) {
+      tokenArray.push(tempTokenArray[i]);
+      continue;
+    }
+
+    // Comparison (color === 'red').
+    // Pop previous value since that is one of comparsion value.
+    firstValue = selectProperty(state, tokenArray.pop());
+    // Lookup second value.
+    secondValue = tempTokenArray[i + 1].replace(QUOTE_RE, '');
+    // Evaluate (equals or not equals).
+    firstValue = firstValue === undefined ? undefined : firstValue.toString();
+    secondValue = secondValue === undefined ? undefined : secondValue.toString();
+    comparisonResult = tempTokenArray[i].indexOf('!') === -1 ? firstValue === secondValue : firstValue !== secondValue;
+    tokenArray.push(comparisonResult);
+    i++;
+  }
+
+  // Was single comparison.
+  if (tokenArray.length === 1) {
+    return tokenArray[0];
+  }
+
+  // If has boolean expression, evaluate.
+  runningBool = tokenArray[0].constructor === Boolean ? tokenArray[0] : selectProperty(state, tokenArray[0], bindFor, bindForKey);
+  for (i = 1; i < tokenArray.length; i += 2) {
+    if (tokenArray[i] !== OR && tokenArray[i] !== AND) {
+      continue;
+    }
+    // Check if was evaluated comparison (bool) or a selector (string).
+    tokenArray[i + 1] = tokenArray[i + 1].constructor === Boolean ? tokenArray[i + 1] : selectProperty(state, tokenArray[i + 1]);
+
+    // Evaluate boolean.
+    if (tokenArray[i] === OR) {
+      runningBool = runningBool || tokenArray[i + 1];
+    } else if (tokenArray[i] === AND) {
+      runningBool = runningBool && tokenArray[i + 1];
+    }
+  }
+  return runningBool;
+}
+module.exports.select = select;
+
+/**
+ * Does actual selecting and walking of state.
+ */
+function selectProperty(state, selector, bindFor, bindForKey) {
+  var i;
+  var originalSelector;
+  var splitted;
+  var value;
+
+  // If bindFor, select the array. Then later, we filter the array.
+  if (bindFor && selector.startsWith(bindFor.for)) {
+    originalSelector = selector;
+    selector = bindFor.in;
+  }
+
+  // Walk.
+  value = state;
+  splitted = split(stripNot(selector), '.');
+  for (i = 0; i < splitted.length; i++) {
+    if (i < splitted.length - 1 && !(splitted[i] in value)) {
+      console.error('[state] Not found:', splitted, splitted[i]);
+    }
+    value = value[splitted[i]];
+  }
+
+  if (bindFor && originalSelector.startsWith(bindFor.for)) {
+    // Simple array.
+    if (!bindFor.key) {
+      return value[bindForKey];
+    }
+    // Array of objects.
+    for (i = 0; i < value.length; i++) {
+      if (value[i][bindFor.key] !== bindForKey) {
+        continue;
+      }
+      value = selectProperty(value[i], originalSelector.replace(bindFor.for + '.', ''));
+      break;
+    }
+  }
+
+  // Boolean.
+  if (selector[0] === '!' && selector[1] === '!') {
+    return !!value;
+  }
+  if (selector[0] === '!') {
+    return !value;
+  }
+  return value;
+}
+module.exports.selectProperty = selectProperty;
+
+function clearObject(obj) {
+  for (var key in obj) {
+    delete obj[key];
+  }
+}
+module.exports.clearObject = clearObject;
+
+/**
+ * Helper to compose object of handlers, merging functions handling same action.
+ */
+function composeHandlers() {
+  var actionName;
+  var i;
+  var inputHandlers = arguments;
+  var outputHandlers;
+
+  outputHandlers = {};
+  for (i = 0; i < inputHandlers.length; i++) {
+    for (actionName in inputHandlers[i]) {
+      if (actionName in outputHandlers) {
+        // Initial compose/merge functions into arrays.
+        if (outputHandlers[actionName].constructor === Array) {
+          outputHandlers[actionName].push(inputHandlers[i][actionName]);
+        } else {
+          outputHandlers[actionName] = [outputHandlers[actionName], inputHandlers[i][actionName]];
+        }
+      } else {
+        outputHandlers[actionName] = inputHandlers[i][actionName];
+      }
+    }
+  }
+
+  // Compose functions specified via array.
+  for (actionName in outputHandlers) {
+    if (outputHandlers[actionName].constructor === Array) {
+      outputHandlers[actionName] = composeFunctions.apply(this, outputHandlers[actionName]);
+    }
+  }
+
+  return outputHandlers;
+}
+module.exports.composeHandlers = composeHandlers;
+
+function composeFunctions() {
+  var functions = arguments;
+  return function () {
+    var i;
+    for (i = 0; i < functions.length; i++) {
+      functions[i].apply(this, arguments);
+    }
+  };
+}
+module.exports.composeFunctions = composeFunctions;
+
+var NO_WATCH_TOKENS = ['||', '&&', '!=', '!==', '==', '==='];
+function parseKeysToWatch(keys, str) {
+  var i;
+  var tokens;
+  tokens = str.split(/\s+/);
+  for (i = 0; i < tokens.length; i++) {
+    if (NO_WATCH_TOKENS.indexOf(tokens[i]) === -1 && !tokens[i].startsWith("'") && keys.indexOf(tokens[i]) === -1) {
+      keys.push(parseKeyToWatch(tokens[i]));
+    }
+  }
+}
+module.exports.parseKeysToWatch = parseKeysToWatch;
+
+function parseKeyToWatch(str) {
+  var dotIndex;
+  str = stripNot(str.trim());
+  dotIndex = str.indexOf('.');
+  if (dotIndex === -1) {
+    return str;
+  }
+  return str.substring(0, str.indexOf('.'));
+}
+
+function stripNot(str) {
+  if (str.indexOf('!!') === 0) {
+    return str.replace('!!', '');
+  } else if (str.indexOf('!') === 0) {
+    return str.replace('!', '');
+  }
+  return str;
+}
+
+/**
+ * Cached split.
+ */
+var SPLIT_CACHE = {};
+function split(str, delimiter) {
+  if (!SPLIT_CACHE[delimiter]) {
+    SPLIT_CACHE[delimiter] = {};
+  }
+  if (SPLIT_CACHE[delimiter][str]) {
+    return SPLIT_CACHE[delimiter][str];
+  }
+  SPLIT_CACHE[delimiter][str] = str.split(delimiter);
+  return SPLIT_CACHE[delimiter][str];
+}
+module.exports.split = split;
+
+function copyArray(dest, src) {
+  var i;
+  dest.length = 0;
+  for (i = 0; i < src.length; i++) {
+    dest[i] = src[i];
+  }
+}
+module.exports.copyArray = copyArray;
+
+/***/ }),
+/* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-var diff = __webpack_require__(1);
-var wrapArray = __webpack_require__(2).wrapArray;
+__webpack_require__(2);
+var diff = __webpack_require__(3);
+var lib = __webpack_require__(0);
+var wrapArray = __webpack_require__(4).wrapArray;
 
 // Singleton state definition.
 var State = {
@@ -145,6 +391,8 @@ AFRAME.registerSystem('state', {
     var i;
     var key;
     var subscription;
+
+    console.log(actionName);
 
     // Modify state.
     State.handlers[actionName](this.state, payload);
@@ -284,7 +532,7 @@ AFRAME.registerSystem('state', {
 
       str = template;
       while (match = interpRegex.exec(template)) {
-        str = str.replace(match[0], (typeof data === 'undefined' ? 'undefined' : _typeof(data)) === TYPE_OBJECT ? select(data, match[2]) || '' : data);
+        str = str.replace(match[0], (typeof data === 'undefined' ? 'undefined' : _typeof(data)) === TYPE_OBJECT ? lib.select(data, match[2]) || '' : data);
       }
 
       // Return as string.
@@ -297,7 +545,7 @@ AFRAME.registerSystem('state', {
     };
   }(),
 
-  select: select
+  select: lib.select
 });
 
 /**
@@ -330,9 +578,9 @@ AFRAME.registerComponent('bind', {
 
       // Parse style-like object as keys to values.
       data = {};
-      properties = split(value, ';');
+      properties = lib.split(value, ';');
       for (i = 0; i < properties.length; i++) {
-        pair = split(properties[i].trim(), ':');
+        pair = lib.split(properties[i].trim(), ':');
         data[pair[0]] = pair[1].trim();
       }
       return data;
@@ -354,7 +602,7 @@ AFRAME.registerComponent('bind', {
 
     // Whether we are binding by namespace (e.g., bind__foo="prop1: true").
     if (this.id) {
-      componentId = split(this.id, '__')[0];
+      componentId = lib.split(this.id, '__')[0];
     }
     this.isNamespacedBind = this.id && componentId in AFRAME.components && !AFRAME.components[componentId].isSingleProp || componentId in AFRAME.systems;
 
@@ -376,10 +624,10 @@ AFRAME.registerComponent('bind', {
     // Index `keysToWatch` to only update state on relevant changes.
     this.keysToWatch.length = 0;
     if (typeof data === 'string') {
-      parseKeysToWatch(this.keysToWatch, data);
+      lib.parseKeysToWatch(this.keysToWatch, data);
     } else {
       for (key in data) {
-        parseKeysToWatch(this.keysToWatch, data[key]);
+        lib.parseKeysToWatch(this.keysToWatch, data[key]);
       }
     }
 
@@ -418,7 +666,7 @@ AFRAME.registerComponent('bind', {
       return;
     }
     if (this.isNamespacedBind) {
-      clearObject(this.updateObj);
+      lib.clearObject(this.updateObj);
     }
 
     state = this.system.state;
@@ -438,7 +686,7 @@ AFRAME.registerComponent('bind', {
     // Single-property bind.
     if (_typeof(this.data) !== TYPE_OBJECT) {
       try {
-        value = select(state, this.data, this.bindFor, this.bindForKey);
+        value = lib.select(state, this.data, this.bindFor, this.bindForKey);
       } catch (e) {
         throw new Error('[aframe-state-component] Key \'' + this.data + '\' not found in state.' + (' #' + this.el.getAttribute('id') + '[' + this.attrName + ']'));
       }
@@ -456,7 +704,7 @@ AFRAME.registerComponent('bind', {
       // Pointer to a value in the state (e.g., `player.health`).
       stateSelector = this.data[propertyName].trim();
       try {
-        value = select(state, stateSelector, this.bindFor, this.bindForKey);
+        value = lib.select(state, stateSelector, this.bindFor, this.bindForKey);
         if (this.bindFor && value === undefined) {
           return;
         }
@@ -525,7 +773,7 @@ AFRAME.registerComponent('bind-toggle', {
 
   update: function update() {
     this.keysToWatch.length = 0;
-    parseKeysToWatch(this.keysToWatch, this.data);
+    lib.parseKeysToWatch(this.keysToWatch, this.data);
   },
 
   /**
@@ -539,7 +787,7 @@ AFRAME.registerComponent('bind-toggle', {
     state = this.system.state;
 
     try {
-      value = select(state, this.data);
+      value = lib.select(state, this.data);
     } catch (e) {
       throw new Error('[aframe-state-component] Key \'' + this.data + '\' not found in state.' + (' #' + this.el.getAttribute('id') + '[' + this.attrName + ']'));
     }
@@ -556,15 +804,31 @@ AFRAME.registerComponent('bind-toggle', {
   }
 });
 
+module.exports = {
+  composeFunctions: lib.composeFunctions,
+  composeHandlers: lib.composeHandlers,
+  select: lib.select
+};
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var lib = __webpack_require__(0);
+
 /**
  * Render array from state.
  */
 AFRAME.registerComponent('bind-for', {
   schema: {
-    for: { type: 'string' },
+    for: { type: 'string', default: 'item' },
     in: { type: 'string' },
     key: { type: 'string' },
-    template: { type: 'string' }
+    template: { type: 'string' },
+    updateInPlace: { default: false }
   },
 
   init: function init() {
@@ -578,7 +842,7 @@ AFRAME.registerComponent('bind-for', {
   },
 
   update: function update() {
-    this.keysToWatch[0] = split(this.data.in, '.')[0];
+    this.keysToWatch[0] = lib.split(this.data.in, '.')[0];
     if (this.el.children[0] && this.el.children[0].tagName === 'TEMPLATE') {
       this.template = this.el.children[0].innerHTML.trim();
     } else {
@@ -588,65 +852,46 @@ AFRAME.registerComponent('bind-for', {
   },
 
   /**
-   * Handle state update.
+   * When items are swapped out, the old ones are removed, and new ones are added. All
+   * entities will be reinitialized.
    */
-  onStateUpdate: function () {
+  onStateUpdateNaive: function () {
     var keys = [];
-    var toRemove = [];
 
     return function () {
-      var bindForKey;
       var child;
       var data = this.data;
       var el = this.el;
       var i;
-      var isSimpleList;
       var list;
       var key;
       var keyValue;
-      var item;
-      var needsAddition;
 
       try {
-        list = select(this.system.state, data.in);
+        list = lib.select(this.system.state, data.in);
       } catch (e) {
         throw new Error('[aframe-state-component] Key \'' + data.in + '\' not found in state.' + (' #' + el.getAttribute('id') + '[' + this.attrName + ']'));
       }
 
       keys.length = 0;
       for (i = 0; i < list.length; i++) {
-        item = list[i];
+        var item = list[i];
 
         // If key not defined, use index (e.g., array of strings).
-        bindForKey = data.key ? item[data.key].toString() : i.toString();
         keyValue = data.key ? item[data.key].toString() : item.toString();
         keys.push(keyValue);
 
         // Add item.
         if (this.renderedKeys.indexOf(keyValue) === -1) {
-          el.appendChild(this.system.renderTemplate(this.template, item));
-          el.children[el.children.length - 1].setAttribute('data-bind-for-key', bindForKey);
-          if (!data.key) {
-            el.children[el.children.length - 1].setAttribute('data-bind-for-value', item);
-          }
+          el.appendChild(this.generateFromTemplate(item, i));
           this.renderedKeys.push(keyValue);
         }
       }
 
-      // Remove items.
-      toRemove.length = 0;
-      for (i = 0; i < el.children.length; i++) {
-        if (el.children[i].tagName === 'TEMPLATE') {
-          continue;
-        }
-        key = data.key ? el.children[i].getAttribute('data-bind-for-key') : el.children[i].getAttribute('data-bind-for-value');
-        if (keys.indexOf(key) === -1) {
-          toRemove.push(el.children[i]);
-          this.renderedKeys.splice(this.renderedKeys.indexOf(key), 1);
-        }
-      }
-      for (i = 0; i < toRemove.length; i++) {
-        toRemove[i].parentNode.removeChild(toRemove[i]);
+      // Remove items by removing entities.
+      var toRemoveEls = this.getElsToRemove(keys, this.renderedKeys);
+      for (i = 0; i < toRemoveEls.length; i++) {
+        toRemoveEls[i].parentNode.removeChild(toRemoveEls[i]);
       }
 
       // Update bind-for-key indices for list of strings in case of re-order.
@@ -661,241 +906,265 @@ AFRAME.registerComponent('bind-for', {
 
       this.el.emit('bindforrender', null, false);
     };
-  }()
+  }(),
+
+  /**
+   * When items are swapped out, this algorithm will update component values in-place using
+   * bind-item.
+   */
+  onStateUpdateInPlace: function () {
+    var keys = [];
+
+    return function () {
+      var _this = this;
+
+      var child;
+      var data = this.data;
+      var el = this.el;
+      var i;
+      var list;
+      var key;
+      var keyValue;
+
+      try {
+        list = lib.select(this.system.state, data.in);
+      } catch (e) {
+        throw new Error('[aframe-state-component] Key \'' + data.in + '\' not found in state.' + (' #' + el.getAttribute('id') + '[' + this.attrName + ']'));
+      }
+
+      // Calculate keys that should be active.
+      keys.length = 0;
+      for (i = 0; i < list.length; i++) {
+        var item = list[i];
+        keyValue = data.key ? item[data.key].toString() : item.toString();
+        keys.push(keyValue);
+      }
+
+      // Remove items by pooling. Do before adding.
+      var toRemoveEls = this.getElsToRemove(keys, this.renderedKeys);
+      for (var _i = 0; _i < toRemoveEls.length; _i++) {
+        toRemoveEls[_i].object3D.visible = false;
+        toRemoveEls[_i].setAttribute('data-bind-for-active', 'false');
+        toRemoveEls[_i].removeAttribute('data-bind-for-key');
+        toRemoveEls[_i].removeAttribute('data-bind-for-value');
+        toRemoveEls[_i].emit('bindfordeactivate', null, false);
+        toRemoveEls[_i].pause();
+      }
+
+      var _loop = function _loop() {
+        var item = list[i];
+
+        var bindForKey = _this.getBindForKey(item, i);
+        keyValue = data.key ? item[data.key].toString() : item.toString();
+
+        // Add item.
+        if (_this.renderedKeys.indexOf(keyValue) === -1) {
+          if (!el.querySelector(':scope > [data-bind-for-active="false"]')) {
+            // No items available in pool. Generate new entity.
+            var newEl = _this.generateFromTemplate(item, i);
+            newEl.addEventListener('loaded', function () {
+              newEl.emit('bindforupdateinplace', item, false);
+            });
+            el.appendChild(newEl);
+          } else {
+            // Take over inactive item.
+            var takeoverEl = el.querySelector('[data-bind-for-active="false"]');
+            takeoverEl.setAttribute('data-bind-for-key', bindForKey);
+            takeoverEl.setAttribute('data-bind-for-value', keyValue);
+            takeoverEl.object3D.visible = true;
+            takeoverEl.play();
+            takeoverEl.setAttribute('data-bind-for-active', 'true');
+            takeoverEl.emit('bindforupdateinplace', item, false);
+          }
+          _this.renderedKeys.push(keyValue);
+        } else if (keys.indexOf(bindForKey) !== -1) {
+          // Update item.
+          _this.el.querySelector('[data-bind-for-key="' + bindForKey + '"]').emit('bindforupdateinplace', item, false);
+        }
+      };
+
+      for (i = 0; i < list.length; i++) {
+        _loop();
+      }
+
+      // Update bind-for-key indices for list of strings in case of re-order.
+      if (list.length && list[0].constructor === String) {
+        for (i = 0; i < list.length; i++) {
+          child = el.querySelector('[data-bind-for-value="' + list[i] + '"]');
+          if (child) {
+            child.setAttribute('data-bind-for-key', i.toString());
+          }
+        }
+      }
+
+      this.el.emit('bindforrender', null, false);
+    };
+  }(),
+
+  /**
+   * Generate entity from template.
+   */
+  generateFromTemplate: function generateFromTemplate(item, i) {
+    var data = this.data;
+
+    this.el.appendChild(this.system.renderTemplate(this.template, item));
+    var newEl = this.el.children[this.el.children.length - 1];;
+
+    var bindForKey = this.getBindForKey(item, i);
+    newEl.setAttribute('data-bind-for-key', bindForKey);
+    if (!data.key) {
+      newEl.setAttribute('data-bind-for-value', item);
+    }
+
+    // Keep track of pooled and non-pooled entities if updating in place.
+    newEl.setAttribute('data-bind-for-active', 'true');
+    return newEl;
+  },
+
+  /**
+   * Get entities marked for removal.
+   *
+   * @param {array} activeKeys - List of key values that should be active.
+   * @param {array} renderedKeys - List of key values currently rendered.
+   */
+  getElsToRemove: function () {
+    var toRemove = [];
+
+    return function (activeKeys, renderedKeys) {
+      var data = this.data;
+      var el = this.el;
+
+      toRemove.length = 0;
+      for (var i = 0; i < el.children.length; i++) {
+        if (el.children[i].tagName === 'TEMPLATE') {
+          continue;
+        }
+        var key = data.key ? el.children[i].getAttribute('data-bind-for-key') : el.children[i].getAttribute('data-bind-for-value');
+        if (activeKeys.indexOf(key) === -1) {
+          toRemove.push(el.children[i]);
+          renderedKeys.splice(renderedKeys.indexOf(key), 1);
+        }
+      }
+      return toRemove;
+    };
+  }(),
+
+  /**
+   * Get value to use as the data-bind-for-key.
+   * For items, will be value specified by `bind-for.key`.
+   * For simple list, will be the index.
+   */
+  getBindForKey: function getBindForKey(item, i) {
+    return this.data.key ? item[this.data.key].toString() : i.toString();
+  },
+
+  /**
+   * Handle state update.
+   */
+  onStateUpdate: function onStateUpdate() {
+    if (this.data.updateInPlace) {
+      this.onStateUpdateInPlace();
+    } else {
+      this.onStateUpdateNaive();
+    }
+  }
 });
 
-var AND = '&&';
-var QUOTE_RE = /'/g;
-var OR = '||';
-var COMPARISONS = ['==', '===', '!=', '!=='];
-var tempTokenArray = [];
-var tokenArray = [];
-
 /**
- * Select value from store. Handles boolean operations, calls `selectProperty`.
- *
- * @param {object} state - State object.
- * @param {string} selector - Dot-delimited store keys (e.g., game.player.health).
+ * Handle parsing and update in-place updates under bind-for.
  */
-function select(state, selector, bindFor, bindForKey) {
-  var comparisonResult;
-  var firstValue;
-  var i;
-  var runningBool;
-  var secondValue;
-  var tokens;
-  var value;
+AFRAME.registerComponent('bind-item', {
+  schema: {
+    type: 'string'
+  },
 
-  // If just single selector, then grab value.
-  tokens = split(selector, /\s+/);
-  if (tokens.length === 1) {
-    return selectProperty(state, selector, bindFor, bindForKey);
-  }
+  multiple: true,
 
-  // Evaluate comparisons.
-  tokenArray.length = 0;
-  copyArray(tempTokenArray, tokens);
-  for (i = 0; i < tempTokenArray.length; i++) {
-    if (COMPARISONS.indexOf(tempTokenArray[i]) === -1) {
-      tokenArray.push(tempTokenArray[i]);
-      continue;
+  init: function init() {
+    this.prevValues = {};
+
+    // Listen to root item for events.
+    var rootEl = this.rootEl = this.el.closest('[data-bind-for-key]');
+    if (!rootEl) {
+      throw new Error('bind-item component must be attached to entity under a bind-for item.');
     }
+    rootEl.addEventListener('bindforupdateinplace', this.updateInPlace.bind(this));
+    rootEl.addEventListener('bindfordeactivate', this.deactivate.bind(this));
 
-    // Comparison (color === 'red').
-    // Pop previous value since that is one of comparsion value.
-    firstValue = selectProperty(state, tokenArray.pop());
-    // Lookup second value.
-    secondValue = tempTokenArray[i + 1].replace(QUOTE_RE, '');
-    // Evaluate (equals or not equals).
-    comparisonResult = tempTokenArray[i].indexOf('!') === -1 ? firstValue === secondValue : firstValue !== secondValue;
-    tokenArray.push(comparisonResult);
-    i++;
-  }
+    // Store bind-for.
+    this.bindForEl = this.el.closest('[bind-for]');
+  },
 
-  // Was single comparison.
-  if (tokenArray.length === 1) {
-    return tokenArray[0];
-  }
+  update: function update() {
+    this.parse();
+  },
 
-  // If has boolean expression, evaluate.
-  runningBool = tokenArray[0].constructor === Boolean ? tokenArray[0] : selectProperty(state, tokenArray[0], bindFor, bindForKey);
-  for (i = 1; i < tokenArray.length; i += 2) {
-    if (tokenArray[i] !== OR && tokenArray[i] !== AND) {
-      continue;
-    }
-    // Check if was evaluated comparison (bool) or a selector (string).
-    tokenArray[i + 1] = tokenArray[i + 1].constructor === Boolean ? tokenArray[i + 1] : selectProperty(state, tokenArray[i + 1]);
+  /**
+   * Run with bind-for tells to via event `bindforupdateinplace`, passing item data.
+   */
+  updateInPlace: function updateInPlace(evt) {
+    var propertyMap = this.propertyMap;
 
-    // Evaluate boolean.
-    if (tokenArray[i] === OR) {
-      runningBool = runningBool || tokenArray[i + 1];
-    } else if (tokenArray[i] === AND) {
-      runningBool = runningBool && tokenArray[i + 1];
-    }
-  }
-  return runningBool;
-}
+    for (var property in propertyMap) {
+      // Get value from item.
+      var value = this.select(evt.detail, propertyMap[property]);
 
-/**
- * Does actual selecting and walking of state.
- */
-function selectProperty(state, selector, bindFor, bindForKey) {
-  var i;
-  var originalSelector;
-  var splitted;
-  var value;
-
-  // If bindFor, select the array. Then later, we filter the array.
-  if (bindFor && selector.startsWith(bindFor.for)) {
-    originalSelector = selector;
-    selector = bindFor.in;
-  }
-
-  // Walk.
-  value = state;
-  splitted = split(stripNot(selector), '.');
-  for (i = 0; i < splitted.length; i++) {
-    if (i < splitted.length - 1 && !(splitted[i] in value)) {
-      console.error('[state] Not found:', splitted, splitted[i]);
-    }
-    value = value[splitted[i]];
-  }
-
-  // Select from array (bind-for).
-  if (bindFor && originalSelector.startsWith(bindFor.for)) {
-    // Simple array.
-    if (!bindFor.key) {
-      return value[bindForKey];
-    }
-    // Array of objects.
-    for (i = 0; i < value.length; i++) {
-      if (value[i][bindFor.key] !== bindForKey) {
+      // Diff against previous value.
+      if (value === this.prevValues[property]) {
         continue;
       }
-      value = selectProperty(value[i], originalSelector.replace(bindFor.for + '.', ''));
-      break;
+
+      // Update.
+      AFRAME.utils.entity.setComponentProperty(this.el, property, value);
+
+      this.prevValues[property] = value;
     }
-  }
+  },
 
-  // Boolean.
-  if (selector[0] === '!' && selector[1] === '!') {
-    return !!value;
-  }
-  if (selector[0] === '!') {
-    return !value;
-  }
-  return value;
-}
+  select: function select(itemData, selector) {
+    var value;
 
-function clearObject(obj) {
-  for (var key in obj) {
-    delete obj[key];
-  }
-}
-
-/**
- * Helper to compose object of handlers, merging functions handling same action.
- */
-function composeHandlers() {
-  var actionName;
-  var i;
-  var inputHandlers = arguments;
-  var outputHandlers;
-
-  outputHandlers = {};
-  for (i = 0; i < inputHandlers.length; i++) {
-    for (actionName in inputHandlers[i]) {
-      if (actionName in outputHandlers) {
-        // Initial compose/merge functions into arrays.
-        if (outputHandlers[actionName].constructor === Array) {
-          outputHandlers[actionName].push(inputHandlers[i][actionName]);
-        } else {
-          outputHandlers[actionName] = [outputHandlers[actionName], inputHandlers[i][actionName]];
-        }
-      } else {
-        outputHandlers[actionName] = inputHandlers[i][actionName];
+    if (selector.indexOf('=') !== -1) {
+      // Interpolate.
+      var match = selector.match(/item.(\w+)/);
+      if (match) {
+        value = lib.select(itemData, match[0].replace(/item./, ''));
+        selector = selector.replace(/item.(\w+)/, "'" + value + "'");
       }
+
+      value = lib.select(this.el.sceneEl.systems.state.state, selector);
+    } else {
+      // Get value from item.
+      value = selector === 'item' ? itemData // Simple list.
+      : lib.select(itemData, selector.replace(/item./, ''));
     }
-  }
 
-  // Compose functions specified via array.
-  for (actionName in outputHandlers) {
-    if (outputHandlers[actionName].constructor === Array) {
-      outputHandlers[actionName] = composeFunctions.apply(this, outputHandlers[actionName]);
+    return value;
+  },
+
+  deactivate: function deactivate() {
+    this.prevValues = {};
+  },
+
+  parse: function parse() {
+    var propertyMap = this.propertyMap = {};
+
+    // Different parsing for multi-prop components.
+    if (this.id in AFRAME.components && !AFRAME.components[this.id].isSingleProp) {
+      var propertySplitList = lib.split(this.data, ';');
+      for (var i = 0; i < propertySplitList.length; i++) {
+        var propertySplit = lib.split(propertySplitList[i], ':');
+        propertyMap[this.id + '.' + propertySplit[0].trim()] = propertySplit[1].trim();
+      }
+      return;
     }
-  }
 
-  return outputHandlers;
-}
-module.exports.composeHandlers = composeHandlers;
-
-function composeFunctions() {
-  var functions = arguments;
-  return function () {
-    var i;
-    for (i = 0; i < functions.length; i++) {
-      functions[i].apply(this, arguments);
-    }
-  };
-}
-module.exports.composeFunctions = composeFunctions;
-
-var NO_WATCH_TOKENS = ['||', '&&', '!=', '!==', '==', '==='];
-function parseKeysToWatch(keys, str) {
-  var i;
-  var tokens;
-  tokens = str.split(/\s+/);
-  for (i = 0; i < tokens.length; i++) {
-    if (NO_WATCH_TOKENS.indexOf(tokens[i]) === -1 && !tokens[i].startsWith("'") && keys.indexOf(tokens[i]) === -1) {
-      keys.push(parseKeyToWatch(tokens[i]));
-    }
+    propertyMap[this.id] = this.data;
   }
-}
-
-function parseKeyToWatch(str) {
-  var dotIndex;
-  str = stripNot(str.trim());
-  dotIndex = str.indexOf('.');
-  if (dotIndex === -1) {
-    return str;
-  }
-  return str.substring(0, str.indexOf('.'));
-}
-
-function stripNot(str) {
-  if (str.indexOf('!!') === 0) {
-    return str.replace('!!', '');
-  } else if (str.indexOf('!') === 0) {
-    return str.replace('!', '');
-  }
-  return str;
-}
-
-/**
- * Cached split.
- */
-var SPLIT_CACHE = {};
-function split(str, delimiter) {
-  if (!SPLIT_CACHE[delimiter]) {
-    SPLIT_CACHE[delimiter] = {};
-  }
-  if (SPLIT_CACHE[delimiter][str]) {
-    return SPLIT_CACHE[delimiter][str];
-  }
-  SPLIT_CACHE[delimiter][str] = str.split(delimiter);
-  return SPLIT_CACHE[delimiter][str];
-}
-
-function copyArray(dest, src) {
-  var i;
-  dest.length = 0;
-  for (i = 0; i < src.length; i++) {
-    dest[i] = src[i];
-  }
-}
+});
 
 /***/ }),
-/* 1 */
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -961,7 +1230,7 @@ module.exports = function () {
 }();
 
 /***/ }),
-/* 2 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
