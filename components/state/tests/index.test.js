@@ -126,6 +126,13 @@ AFRAME.registerState({
     shoppingListUpdate: (state, payload) => {
       state.shoppingList.find(item => item.name === payload.name).amount = payload.amount;
       state.shoppingList.__dirty = true;
+    },
+
+    shoppingListReplace: (state) => {
+      state.shoppingList.length = 0;
+      state.shoppingList.push({name: 'bread', amount: 1});
+      state.shoppingList.push({name: 'cheese', amount: 2});
+      state.shoppingList.push({name: 'corn', amount: 3});
     }
   },
 
@@ -512,7 +519,7 @@ suite('state', function () {
     });
   });
 
-  suite('bind-for', () => {
+  suite('bind-for (naive)', () => {
     setup(() => {
       var template;
       template = document.createElement('template');
@@ -561,7 +568,7 @@ suite('state', function () {
         assert.equal(el.children[1].getAttribute('text').value, 'milk');
         assert.equal(el.children[1].dataset.amount, 2);
         done();
-      });
+      }, 50);
     });
 
     test('renders from list of strings', done => {
@@ -631,7 +638,6 @@ suite('state', function () {
         el.emit('colorShift');
         setTimeout(() => {
           assert.equal(el.children.length, 2, 'what');
-          console.log(el.children);
           assert.equal(el.children[0].children[0].getAttribute('text').value, 'orange');
           assert.equal(el.children[1].children[0].getAttribute('text').value, 'yellow');
           el.emit('colorAdd');
@@ -682,7 +688,6 @@ suite('state', function () {
         el.emit('colorReorderRemove');
         setTimeout(() => {
           assert.equal(el.children.length, 2);
-          console.log(el.children);
           done();
         });
       });
@@ -784,6 +789,342 @@ suite('state', function () {
     });
   });
 
+  suite('bind-for (in place)', () => {
+    setup(() => {
+      var template;
+      template = document.createElement('template');
+      template.setAttribute('id', 'shoppingItemTemplate');
+      template.innerHTML = `
+        <a-entity class="shoppingItem"
+                  bind-item__text="value: item.name"
+                  bind-item__data-amount="item.amount"></a-entity>
+      `;
+      el.sceneEl.appendChild(template);
+
+      template = document.createElement('template');
+      template.setAttribute('id', 'shoppingItemTemplate2');
+      template.innerHTML = `
+        <a-entity class="shoppingItem"
+                  bind-item__text="value: item.amount"
+                  bind-item__data-type="item.name"></a-entity>
+      `;
+      el.sceneEl.appendChild(template);
+
+      template = document.createElement('template');
+      template.setAttribute('id', 'colorTemplate');
+      template.innerHTML = `
+        <a-entity>
+          <a-entity class="color" bind-item__text="value: item" bind-item__data-color="item"></a-entity>
+        </a-entity>
+      `;
+      el.sceneEl.appendChild(template);
+    });
+
+    teardown(() => {
+      while (el.children.length !== 0) {
+        el.removeChild(el.children[0]);
+      }
+    });
+
+    test('renders from list of objects (in place)', done => {
+      el.setAttribute('bind-for', {
+        for: 'shoppingItem',
+        in: 'shoppingList',
+        template: '#shoppingItemTemplate',
+        key: 'name',
+        updateInPlace: true
+      });
+      setTimeout(() => {
+        assert.ok(el.children.length, 2);
+        assert.equal(el.children[0].getAttribute('text').value, 'eggs');
+        assert.equal(el.children[0].dataset.amount, 12);
+        assert.equal(el.children[1].getAttribute('text').value, 'milk');
+        assert.equal(el.children[1].dataset.amount, 2);
+        done();
+      }, 50);
+    });
+
+    test('updates in place', done => {
+      el.setAttribute('bind-for', {
+        for: 'shoppingItem',
+        in: 'shoppingList',
+        template: '#shoppingItemTemplate',
+        key: 'name',
+        updateInPlace: true
+      });
+      setTimeout(() => {
+        assert.ok(el.children.length, 2);
+        el.emit('shoppingListReplace');
+        setTimeout(() => {
+          assert.ok(el.children.length, 3);
+          assert.equal(el.children[0].getAttribute('data-bind-for-key'), 'bread');
+          assert.equal(el.children[0].getAttribute('data-bind-for-active'), 'true');;
+          assert.equal(el.children[0].getAttribute('text').value, 'bread');
+          assert.equal(el.children[0].dataset.amount, 1);
+          assert.ok(el.children[0].isPlaying);
+
+          assert.equal(el.children[1].getAttribute('data-bind-for-key'), 'cheese');
+          assert.equal(el.children[1].getAttribute('data-bind-for-active'), 'true');;
+          assert.equal(el.children[1].getAttribute('text').value, 'cheese');
+          assert.equal(el.children[1].dataset.amount, 2);
+          assert.ok(el.children[1].isPlaying);
+
+          assert.equal(el.children[2].getAttribute('data-bind-for-key'), 'corn');
+          assert.equal(el.children[2].getAttribute('data-bind-for-active'), 'true');;
+          assert.equal(el.children[2].getAttribute('text').value, 'corn');
+          assert.equal(el.children[2].dataset.amount, 3);
+          assert.ok(el.children[2].isPlaying);
+          done();
+        }, 50);
+      }, 50);
+    });
+
+    test('renders from list of strings (in place)', done => {
+      el.setAttribute('bind-for', {
+        for: 'color',
+        in: 'colors',
+        template: '#colorTemplate',
+        updateInPlace: true
+      });
+      setTimeout(() => {
+        assert.equal(el.children.length, 3);
+        assert.equal(el.children[0].getAttribute('data-bind-for-key'), '0');
+        assert.equal(el.children[1].getAttribute('data-bind-for-key'), '1');
+        assert.equal(el.children[2].getAttribute('data-bind-for-key'), '2');
+        assert.equal(el.children[0].children[0].getAttribute('text').value, 'red');
+        assert.equal(el.children[1].children[0].getAttribute('text').value, 'orange');
+        assert.equal(el.children[2].children[0].getAttribute('text').value, 'yellow');
+        assert.equal(el.children[0].children[0].dataset.color, 'red');
+        assert.equal(el.children[1].children[0].dataset.color, 'orange');
+        assert.equal(el.children[2].children[0].dataset.color, 'yellow');
+        done();
+      });
+    });
+
+    test('can add to list of strings (in place)', done => {
+      el.setAttribute('bind-for', {
+        for: 'color',
+        in: 'colors',
+        template: '#colorTemplate',
+        updateInPlace: true
+      });
+      setTimeout(() => {
+        assert.equal(el.children.length, 3);
+        el.emit('colorAdd');
+        setTimeout(() => {
+          assert.equal(el.children.length, 4);
+          done();
+        });
+      });
+    });
+
+    test('reset simple list of strings (in place)', done => {
+      el.setAttribute('bind-for', {
+        for: 'color',
+        in: 'colors',
+        template: '#colorTemplate',
+        updateInPlace: true
+      });
+      setTimeout(() => {
+        assert.equal(el.children.length, 3);
+        el.emit('colorReplace');
+        setTimeout(() => {
+          assert.equal(el.children.length, 3);
+          assert.equal(el.children[0].children[0].getAttribute('text').value, 'blue');
+          assert.equal(el.children[1].children[0].getAttribute('text').value, 'indigo');
+          assert.equal(el.children[2].children[0].getAttribute('text').value, 'violet');
+          done();
+        });
+      });
+    });
+
+    test('can remove from list of strings (in place)', done => {
+      el.setAttribute('bind-for', {
+        for: 'color',
+        in: 'colors',
+        template: '#colorTemplate',
+        updateInPlace: true
+      });
+      setTimeout(() => {
+        assert.equal(el.children.length, 3);
+        el.emit('colorShift');
+        setTimeout(() => {
+          assert.equal(el.children.length, 3);
+          assert.equal(el.children[0].getAttribute('data-bind-for-active'), 'false');
+          assert.equal(el.children[1].children[0].getAttribute('text').value, 'orange');
+          assert.equal(el.children[2].children[0].getAttribute('text').value, 'yellow');
+          el.emit('colorAdd');
+          setTimeout(() => {
+            assert.equal(el.children[0].getAttribute('data-bind-for-active'), 'true');
+            assert.equal(el.children[0].children[0].getAttribute('text').value, 'green');
+            done();
+          });
+        });
+      });
+    });
+
+    test('can reorder list of strings (in place)', done => {
+      el.setAttribute('bind-for', {
+        for: 'color',
+        in: 'colors',
+        template: '#colorTemplate',
+        updateInPlace: true
+      });
+      setTimeout(() => {
+        assert.equal(el.children.length, 3);
+        assert.equal(el.children[0].dataset.bindForKey, '0');
+        assert.equal(el.children[0].dataset.bindForValue, 'red');
+        assert.equal(el.children[1].dataset.bindForKey, '1');
+        assert.equal(el.children[1].dataset.bindForValue, 'orange');
+        assert.equal(el.children[2].dataset.bindForKey, '2');
+        assert.equal(el.children[2].dataset.bindForValue, 'yellow');
+        el.emit('colorReorder');
+        setTimeout(() => {
+          assert.equal(el.children.length, 3);
+          assert.equal(el.children[0].dataset.bindForKey, '1');
+          assert.equal(el.children[0].dataset.bindForValue, 'red');
+          assert.equal(el.children[1].dataset.bindForKey, '2');
+          assert.equal(el.children[1].dataset.bindForValue, 'orange');
+          assert.equal(el.children[2].dataset.bindForKey, '0');
+          assert.equal(el.children[2].dataset.bindForValue, 'yellow');
+          done();
+        });
+      });
+    });
+
+    test('can reorder list of strings with removals (in place)', done => {
+      el.setAttribute('bind-for', {
+        for: 'color',
+        in: 'colors',
+        template: '#colorTemplate',
+        updateInPlace: true
+      });
+      setTimeout(() => {
+        assert.equal(el.children.length, 3);
+        el.emit('colorReorderRemove');
+        setTimeout(() => {
+          assert.equal(el.children.length, 3);
+          assert.equal(el.querySelectorAll('[data-bind-for-active="false"]').length, 1);
+          done();
+        });
+      });
+    });
+
+    test('can reorder list of strings with additions (in place)', done => {
+      el.setAttribute('bind-for', {
+        for: 'color',
+        in: 'colors',
+        template: '#colorTemplate',
+        updateInPlace: true
+      });
+      setTimeout(() => {
+        assert.equal(el.children.length, 3);
+        el.emit('colorReorderAdd');
+        setTimeout(() => {
+          assert.equal(el.children.length, 5);
+          done();
+        });
+      });
+    });
+
+    test('can reorder list of strings (2) (in place)', done => {
+      var template = document.createElement('template');
+      template.innerHTML = '<a-entity data-difficulty="{{ difficulty }}"></a-entity>';
+      el.appendChild(template);
+      setTimeout(() => {
+        el.setAttribute('bind-for', {
+          for: 'difficulty',
+          in: 'difficulties',
+          updateInPlace: true
+        });
+        setTimeout(() => {
+          el.sceneEl.emit('difficultyOne');
+          setTimeout(() => {
+            assert.equal(el.children.length, 2);
+            el.sceneEl.emit('difficultyTwo');
+            setTimeout(() => {
+              assert.equal(el.children.length, 5);
+              assert.ok(el.querySelector('[data-difficulty="Easy"][data-bind-for-key="0"]'), 'e');
+              assert.ok(el.querySelector('[data-difficulty="Normal"][data-bind-for-key="1"]'), 'n');
+              assert.ok(el.querySelector('[data-difficulty="Hard"][data-bind-for-key="2"]'), 'h');
+              assert.ok(el.querySelector('[data-difficulty="Expert"][data-bind-for-key="3"]'), 'ex');
+              done();
+            });
+          });
+        });
+      });
+    });
+
+    test('renders added list item (in place)', done => {
+      el.setAttribute('bind-for', {
+        for: 'shoppingItem',
+        in: 'shoppingList',
+        template: '#shoppingItemTemplate',
+        key: 'name',
+        updateInPlace: true
+      });
+      setTimeout(() => {
+        el.sceneEl.emit('shoppingListAdd');
+        setTimeout(() => {
+          assert.ok(el.children.length, 3);
+          assert.equal(el.children[2].getAttribute('text').value, 'bananas');
+          assert.equal(el.children[2].dataset.amount, 6);
+          done();
+        });
+      });
+    });
+
+    test('removes items (in place)', done => {
+      el.setAttribute('bind-for', {
+        for: 'shoppingItem',
+        in: 'shoppingList',
+        template: '#shoppingItemTemplate',
+        key: 'name',
+        updateInPlace: true
+      });
+
+      assert.equal(el.children[0].getAttribute('data-bind-for-active'), 'true');
+      assert.equal(el.children[1].getAttribute('data-bind-for-active'), 'true');
+
+      setTimeout(() => {
+        el.sceneEl.emit('shoppingListRemove');
+
+        setTimeout(() => {
+          assert.equal(el.children.length, 2);
+
+          const inactive = el.querySelector('[data-bind-for-active="false"]');
+          assert.ok(!inactive.isPlaying);
+
+          const active = el.children[0] === inactive ? el.children[1] : el.children[0];
+          assert.equal(active.getAttribute('data-bind-for-active'), 'true');
+          assert.equal(active.getAttribute('text').value, 'milk');
+
+          done();
+        });
+      });
+    });
+
+    test('can bind to item (in place)', done => {
+      el.setAttribute('bind-for', {
+        for: 'shoppingItem',
+        in: 'shoppingList',
+        template: '#shoppingItemTemplate2',
+        key: 'name',
+        updateInPlace: true
+      });
+      setTimeout(() => {
+        var milkEl;
+        milkEl = el.querySelector('[data-bind-for-key="milk"]');
+        assert.equal(milkEl.getAttribute('text').value, '2');
+        el.sceneEl.emit('shoppingListUpdate', {name: 'milk', amount: 20});
+        setTimeout(() => {
+          assert.equal(milkEl.getAttribute('text').value, '20');
+          done();
+        });
+      });
+    });
+  });
+
   suite('select', () => {
     test('grabs value', () => {
       assert.equal(system.select({foo: 5}, 'foo'), 5);
@@ -839,6 +1180,29 @@ suite('state', function () {
     assert.shallowDeepEqual(
       el.components['bind__foo'].keysToWatch,
       ['foo', 'bar']);
+  });
+
+  suite('bind-item', () => {
+    setup(done => {
+      el.setAttribute('data-bind-for-key', '');
+      const childEl = document.createElement('a-entity');
+      el.appendChild(childEl);
+      el = childEl;
+      setTimeout(() => { done(); });
+    });
+
+    test('parses multi-prop', () => {
+      el.setAttribute('bind-item__material', 'color: item.color; opacity: item.values.opacity');
+      const propertyMap = el.components['bind-item__material'].propertyMap;
+      assert.equal(propertyMap['material.color'], 'color');
+      assert.equal(propertyMap['material.opacity'], 'values.opacity');
+    });
+
+    test('parses data-attribute', () => {
+      el.setAttribute('bind-item__data-value', 'item.foo.bar.baz');
+      const propertyMap = el.components['bind-item__data-value'].propertyMap;
+      assert.equal(propertyMap['data-value'], 'foo.bar.baz');
+    });
   });
 
   test('renderTemplate', () => {
