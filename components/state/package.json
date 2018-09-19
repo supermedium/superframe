@@ -5,7 +5,7 @@
   "main": "dist/aframe-state-component.js",
   "unpkg": "dist/aframe-state-component.min.js",
   "scripts": {
-    "dev": "budo index.js:dist/aframe-state-component.min.js --port 7000 --live --open",
+    "dev": "budo src/index.js:dist/aframe-state-component.min.js --port 7000 --live --open",
     "dist": "webpack && NODE_ENV=production webpack",
     "prepublish": "npm run dist",
     "test": "karma start ./tests/karma.conf.js --browsers Firefox",

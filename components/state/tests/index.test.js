@@ -1,7 +1,7 @@
 /* global assert, setup, suite, test */
 require('aframe');
-require('../index');
-var array = require('../lib/array');
+require('../src/index');
+var array = require('../src/lib/array');
 var elFactory = require('./helpers').elFactory;
 var entityFactory = require('./helpers').entityFactory;
 
