@@ -141,7 +141,7 @@ AFRAME.registerComponent('animation', {
 
   pause: function () {
     this.paused = true;
-    this.pausedWasPlaying = true;
+    this.pausedWasPlaying = this.animationIsPlaying;
     this.pauseAnimation();
     this.removeEventListeners();
   },
