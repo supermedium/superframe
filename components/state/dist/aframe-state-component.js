@@ -1040,7 +1040,7 @@ AFRAME.registerComponent('bind-for', {
           continue;
         }
         var key = data.key ? el.children[i].getAttribute('data-bind-for-key') : el.children[i].getAttribute('data-bind-for-value');
-        if (activeKeys.indexOf(key) === -1) {
+        if (activeKeys.indexOf(key) === -1 && renderedKeys.indexOf(key) !== -1) {
           toRemove.push(el.children[i]);
           renderedKeys.splice(renderedKeys.indexOf(key), 1);
         }
