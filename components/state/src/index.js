@@ -62,8 +62,6 @@ AFRAME.registerSystem('state', {
     var key;
     var subscription;
 
-    console.log(actionName);
-
     // Modify state.
     State.handlers[actionName](this.state, payload);
 

@@ -123,8 +123,8 @@ function select(state, selector, bindFor, bindForKey) {
     // Lookup second value.
     secondValue = tempTokenArray[i + 1].replace(QUOTE_RE, '');
     // Evaluate (equals or not equals).
-    firstValue = firstValue === undefined ? undefined : firstValue.toString();
-    secondValue = secondValue === undefined ? undefined : secondValue.toString();
+    firstValue = firstValue === undefined ? 'undefined' : firstValue.toString();
+    secondValue = secondValue === undefined ? 'undefined' : secondValue.toString();
     comparisonResult = tempTokenArray[i].indexOf('!') === -1 ? firstValue === secondValue : firstValue !== secondValue;
     tokenArray.push(comparisonResult);
     i++;
@@ -1084,6 +1084,8 @@ AFRAME.registerComponent('bind-item', {
   multiple: true,
 
   init: function init() {
+    this.itemData = null;
+    this.keysToWatch = [];
     this.prevValues = {};
 
     // Listen to root item for events.
@@ -1094,12 +1096,11 @@ AFRAME.registerComponent('bind-item', {
     rootEl.addEventListener('bindforupdateinplace', this.updateInPlace.bind(this));
     rootEl.addEventListener('bindfordeactivate', this.deactivate.bind(this));
 
-    // Store bind-for.
-    this.bindForEl = this.el.closest('[bind-for]');
+    this.el.sceneEl.systems.state.subscribe(this);
   },
 
   update: function update() {
-    this.parse();
+    this.parseSelector();
   },
 
   /**
@@ -1107,10 +1108,13 @@ AFRAME.registerComponent('bind-item', {
    */
   updateInPlace: function updateInPlace(evt) {
     var propertyMap = this.propertyMap;
+    if (evt) {
+      this.itemData = evt.detail;
+    }
 
     for (var property in propertyMap) {
       // Get value from item.
-      var value = this.select(evt.detail, propertyMap[property]);
+      var value = this.select(this.itemData, propertyMap[property]);
 
       // Diff against previous value.
       if (value === this.prevValues[property]) {
@@ -1122,6 +1126,10 @@ AFRAME.registerComponent('bind-item', {
 
       this.prevValues[property] = value;
     }
+  },
+
+  onStateUpdate: function onStateUpdate() {
+    this.updateInPlace();
   },
 
   select: function select(itemData, selector) {
@@ -1149,20 +1157,25 @@ AFRAME.registerComponent('bind-item', {
     this.prevValues = {};
   },
 
-  parse: function parse() {
+  parseSelector: function parseSelector() {
     var propertyMap = this.propertyMap = {};
+    this.keysToWatch.length = 0;
+
+    var componentName = lib.split(this.id, '__')[0];
 
     // Different parsing for multi-prop components.
-    if (this.id in AFRAME.components && !AFRAME.components[this.id].isSingleProp) {
+    if (componentName in AFRAME.components && !AFRAME.components[componentName].isSingleProp) {
       var propertySplitList = lib.split(this.data, ';');
       for (var i = 0; i < propertySplitList.length; i++) {
         var propertySplit = lib.split(propertySplitList[i], ':');
         propertyMap[this.id + '.' + propertySplit[0].trim()] = propertySplit[1].trim();
+        lib.parseKeysToWatch(this.keysToWatch, propertySplit[1].trim());
       }
       return;
     }
 
     propertyMap[this.id] = this.data;
+    lib.parseKeysToWatch(this.keysToWatch, this.data);
   }
 });
 

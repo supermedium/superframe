@@ -260,6 +260,8 @@ AFRAME.registerComponent('bind-item', {
   multiple: true,
 
   init: function () {
+    this.itemData = null;
+    this.keysToWatch = [];
     this.prevValues = {};
 
     // Listen to root item for events.
@@ -270,12 +272,11 @@ AFRAME.registerComponent('bind-item', {
     rootEl.addEventListener('bindforupdateinplace', this.updateInPlace.bind(this));
     rootEl.addEventListener('bindfordeactivate', this.deactivate.bind(this));
 
-    // Store bind-for.
-    this.bindForEl = this.el.closest('[bind-for]');
+    this.el.sceneEl.systems.state.subscribe(this);
   },
 
   update: function () {
-    this.parse();
+    this.parseSelector();
   },
 
   /**
@@ -283,10 +284,12 @@ AFRAME.registerComponent('bind-item', {
    */
   updateInPlace: function (evt) {
     const propertyMap = this.propertyMap;
+    if (evt) { this.itemData = evt.detail; }
+
 
     for (let property in propertyMap) {
       // Get value from item.
-      let value = this.select(evt.detail, propertyMap[property]);
+      let value = this.select(this.itemData, propertyMap[property]);
 
       // Diff against previous value.
       if (value === this.prevValues[property]) { continue; }
@@ -296,6 +299,10 @@ AFRAME.registerComponent('bind-item', {
 
       this.prevValues[property] = value;
     }
+  },
+
+  onStateUpdate: function () {
+    this.updateInPlace();
   },
 
   select: function (itemData, selector) {
@@ -324,19 +331,24 @@ AFRAME.registerComponent('bind-item', {
     this.prevValues = {};
   },
 
-  parse: function () {
+  parseSelector: function () {
     const propertyMap = this.propertyMap = {};
+    this.keysToWatch.length = 0;
+
+    const componentName = lib.split(this.id, '__')[0];
 
     // Different parsing for multi-prop components.
-    if (this.id in AFRAME.components && !AFRAME.components[this.id].isSingleProp) {
+    if (componentName in AFRAME.components && !AFRAME.components[componentName].isSingleProp) {
       const propertySplitList = lib.split(this.data, ';');
       for (let i = 0; i < propertySplitList.length; i++) {
         let propertySplit = lib.split(propertySplitList[i], ':');
         propertyMap[this.id + '.' + propertySplit[0].trim()] = propertySplit[1].trim();
+        lib.parseKeysToWatch(this.keysToWatch, propertySplit[1].trim());
       }
       return;
     }
 
     propertyMap[this.id] = this.data;
+    lib.parseKeysToWatch(this.keysToWatch, this.data);
   }
 });

@@ -1217,10 +1217,16 @@ suite('state', function () {
     });
 
     test('parses multi-prop', () => {
+      var propertyMap;
+
       el.setAttribute('bind-item__material', 'color: item.color; opacity: item.values.opacity');
-      const propertyMap = el.components['bind-item__material'].propertyMap;
+      propertyMap = el.components['bind-item__material'].propertyMap;
       assert.equal(propertyMap['material.color'], 'item.color');
       assert.equal(propertyMap['material.opacity'], 'item.values.opacity');
+
+      el.setAttribute('bind-item__text', 'value: foo.bar !== bar.foo');
+      propertyMap = el.components['bind-item__text'].propertyMap;
+      assert.equal(propertyMap['text.value'], 'foo.bar !== bar.foo');
     });
 
     test('parses data-attribute', () => {
