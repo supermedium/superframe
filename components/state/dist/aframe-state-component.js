@@ -819,6 +819,9 @@ module.exports = {
 
 var lib = __webpack_require__(0);
 
+var ITEM_PREFIX_RE = /item./;
+var ITEM_SELECTOR_RE = /item.(\w+)/;
+
 /**
  * Render array from state.
  */
@@ -1126,17 +1129,17 @@ AFRAME.registerComponent('bind-item', {
 
     if (selector.indexOf('=') !== -1) {
       // Interpolate.
-      var match = selector.match(/item.(\w+)/);
+      var match = selector.match(ITEM_SELECTOR_RE);
       if (match) {
-        value = lib.select(itemData, match[0].replace(/item./, ''));
-        selector = selector.replace(/item.(\w+)/, "'" + value + "'");
+        value = lib.select(itemData, match[0].replace(ITEM_PREFIX_RE, ''));
+        selector = selector.replace(ITEM_SELECTOR_RE, "'" + value + "'");
       }
 
       value = lib.select(this.el.sceneEl.systems.state.state, selector);
     } else {
       // Get value from item.
       value = selector === 'item' ? itemData // Simple list.
-      : lib.select(itemData, selector.replace(/item./, ''));
+      : lib.select(itemData, selector.replace(ITEM_PREFIX_RE, ''));
     }
 
     return value;
