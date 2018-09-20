@@ -8,6 +8,7 @@ const ITEM_SELECTOR_RE = /item.(\w+)/;
  */
 AFRAME.registerComponent('bind-for', {
   schema: {
+    delay: {default: 0},
     for: {type: 'string', default: 'item'},
     in: {type: 'string'},
     key: {type: 'string'},
@@ -46,13 +47,12 @@ AFRAME.registerComponent('bind-for', {
    * entities will be reinitialized.
    */
   onStateUpdateNaive: (function () {
-    var keys = [];
+    var activeKeys = [];
 
     return function () {
       var child;
       var data = this.data;
       var el = this.el;
-      var i;
       var list;
       var key;
       var keyValue;
@@ -64,53 +64,77 @@ AFRAME.registerComponent('bind-for', {
                         ` #${el.getAttribute('id')}[${this.attrName}]`);
       }
 
-      keys.length = 0;
-      for (i = 0; i < list.length; i++) {
+      activeKeys.length = 0;
+      for (let i = 0; i < list.length; i++) {
         let item = list[i];
-
         // If key not defined, use index (e.g., array of strings).
-        keyValue = data.key ? item[data.key].toString() : item.toString();
-        keys.push(keyValue);
-
-        // Add item.
-        if (this.renderedKeys.indexOf(keyValue) === -1) {
-          el.appendChild(this.generateFromTemplate(item, i));
-          this.renderedKeys.push(keyValue);
-        }
+        activeKeys.push(data.key ? item[data.key].toString() : item.toString());
       }
 
       // Remove items by removing entities.
-      const toRemoveEls = this.getElsToRemove(keys, this.renderedKeys);
+      const toRemoveEls = this.getElsToRemove(activeKeys, this.renderedKeys);
       for (i = 0; i < toRemoveEls.length; i++) {
         toRemoveEls[i].parentNode.removeChild(toRemoveEls[i]);
       }
 
-      // Update bind-for-key indices for list of strings in case of re-order.
-      if (list.length && list[0].constructor === String) {
-        for (i = 0; i < list.length; i++) {
-          child = el.querySelector('[data-bind-for-value="' + list[i] + '"]');
-          if (child) {
-            child.setAttribute('data-bind-for-key', i.toString());
-          }
-        }
+      if (list.length) {
+        this.renderItems(list, activeKeys, 0);
       }
-
-      this.el.emit('bindforrender', null, false);
     };
   })(),
+
+  /**
+   * Add or update item with delay support.
+   */
+  renderItems: function (list, activeKeys, i) {
+    var data = this.data;
+    var el = this.el;
+    var itemEl;
+    const item = list[i];
+
+    // If key not defined, use index (e.g., array of strings).
+    keyValue = data.key ? item[data.key].toString() : item.toString();
+
+    if (this.renderedKeys.indexOf(keyValue) === -1) {
+      // Add.
+      itemEl = this.generateFromTemplate(item, i);
+      el.appendChild(itemEl);
+      this.renderedKeys.push(keyValue);
+    } else {
+      // Update.
+      if (list.length && list[0].constructor === String) {
+        // Update index for simple list.
+        const keyValue = data.key ? item[data.key].toString() : item.toString();
+        itemEl = el.querySelector('[data-bind-for-value="' + keyValue + '"]');
+        itemEl.setAttribute('data-bind-for-key', i);
+      } else {
+        const bindForKey = this.getBindForKey(item, i);
+        itemEl = el.querySelector('[data-bind-for-key="' + bindForKey + '"]');
+      }
+      itemEl.emit('bindforupdate', item, false);
+    }
+
+    if (!list[i + 1]) { return; }
+
+    if (this.data.delay) {
+      setTimeout(() => {
+        this.renderItems(list, activeKeys, i + 1);
+      }, this.data.delay);
+    } else {
+      this.renderItems(list, activeKeys, i + 1);
+    }
+  },
 
   /**
    * When items are swapped out, this algorithm will update component values in-place using
    * bind-item.
    */
   onStateUpdateInPlace: (function () {
-    var keys = [];
+    var activeKeys = [];
 
     return function () {
-      var child;
       var data = this.data;
       var el = this.el;
-      var i;
       var list;
       var key;
       var keyValue;
@@ -123,15 +147,15 @@ AFRAME.registerComponent('bind-for', {
       }
 
       // Calculate keys that should be active.
-      keys.length = 0;
-      for (i = 0; i < list.length; i++) {
+      activeKeys.length = 0;
+      for (let i = 0; i < list.length; i++) {
         let item = list[i];
         keyValue = data.key ? item[data.key].toString() : item.toString();
-        keys.push(keyValue);
+        activeKeys.push(keyValue);
       }
 
       // Remove items by pooling. Do before adding.
-      const toRemoveEls = this.getElsToRemove(keys, this.renderedKeys);
+      const toRemoveEls = this.getElsToRemove(activeKeys, this.renderedKeys);
       for (let i = 0; i < toRemoveEls.length; i++) {
         toRemoveEls[i].object3D.visible = false;
         toRemoveEls[i].setAttribute('data-bind-for-active', 'false');
@@ -141,52 +165,66 @@ AFRAME.registerComponent('bind-for', {
         toRemoveEls[i].pause();
       }
 
-      for (i = 0; i < list.length; i++) {
-        let item = list[i];
-
-        let bindForKey = this.getBindForKey(item, i);
-        keyValue = data.key ? item[data.key].toString() : item.toString();
-
-        // Add item.
-        if (this.renderedKeys.indexOf(keyValue) === -1) {
-          if (!el.querySelector(':scope > [data-bind-for-active="false"]')) {
-            // No items available in pool. Generate new entity.
-            const newEl = this.generateFromTemplate(item, i);
-            newEl.addEventListener('loaded', () => {
-              newEl.emit('bindforupdateinplace', item, false);
-            });
-            el.appendChild(newEl);
-          } else {
-            // Take over inactive item.
-            const takeoverEl = el.querySelector('[data-bind-for-active="false"]');
-            takeoverEl.setAttribute('data-bind-for-key', bindForKey);
-            takeoverEl.setAttribute('data-bind-for-value', keyValue);
-            takeoverEl.object3D.visible = true;
-            takeoverEl.play();
-            takeoverEl.setAttribute('data-bind-for-active', 'true');
-            takeoverEl.emit('bindforupdateinplace', item, false);
-          }
-          this.renderedKeys.push(keyValue);
-        } else if (keys.indexOf(bindForKey) !== -1) {
-          // Update item.
-          this.el.querySelector('[data-bind-for-key="' + bindForKey + '"]')
-            .emit('bindforupdateinplace', item, false);
-        }
+      if (list.length) {
+        this.renderItemsInPlace(list, activeKeys, 0);
       }
-
-      // Update bind-for-key indices for list of strings in case of re-order.
-      if (list.length && list[0].constructor === String) {
-        for (i = 0; i < list.length; i++) {
-          child = el.querySelector('[data-bind-for-value="' + list[i] + '"]');
-          if (child) {
-            child.setAttribute('data-bind-for-key', i.toString());
-          }
-        }
-      }
-
-      this.el.emit('bindforrender', null, false);
     };
   })(),
+
+  /**
+   * Add, takeover, or update item with delay support.
+   */
+  renderItemsInPlace: function (list, activeKeys, i) {
+    var data = this.data;
+    var el = this.el;
+    var itemEl;
+
+    const item = list[i];
+    const bindForKey = this.getBindForKey(item, i);
+    const keyValue = data.key ? item[data.key].toString() : item.toString();
+
+    // Add item.
+    if (this.renderedKeys.indexOf(keyValue) === -1) {
+      if (!el.querySelector(':scope > [data-bind-for-active="false"]')) {
+        // No items available in pool. Generate new entity.
+        const itemEl = this.generateFromTemplate(item, i);
+        itemEl.addEventListener('loaded', () => {
+          itemEl.emit('bindforupdateinplace', item, false);
+        });
+        el.appendChild(itemEl);
+      } else {
+        // Take over inactive item.
+        itemEl = el.querySelector('[data-bind-for-active="false"]');
+        itemEl.setAttribute('data-bind-for-key', bindForKey);
+        itemEl.setAttribute('data-bind-for-value', keyValue);
+        itemEl.object3D.visible = true;
+        itemEl.play();
+        itemEl.setAttribute('data-bind-for-active', 'true');
+        itemEl.emit('bindforupdateinplace', item, false);
+      }
+      this.renderedKeys.push(keyValue);
+    } else if (activeKeys.indexOf(keyValue) !== -1) {
+      // Update item.
+      if (list.length && list[0].constructor === String) {
+        // Update index for simple list.
+        itemEl = el.querySelector('[data-bind-for-value="' + keyValue + '"]');
+        itemEl.setAttribute('data-bind-for-key', i);
+      } else {
+        itemEl = el.querySelector('[data-bind-for-key="' + bindForKey + '"]');
+      }
+      itemEl.emit('bindforupdateinplace', item, false);
+    }
+
+    if (!list[i + 1]) { return; }
+
+    if (this.data.delay) {
+      setTimeout(() => {
+        this.renderItemsInPlace(list, activeKeys, i + 1);
+      }, this.data.delay);
+    } else {
+      this.renderItemsInPlace(list, activeKeys, i + 1);
+    }
+  },
 
   /**
    * Generate entity from template.

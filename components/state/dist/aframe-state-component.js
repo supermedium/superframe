@@ -617,6 +617,7 @@ AFRAME.registerComponent('bind', {
     // Subscribe to store and register handler to do data-binding to components.
     this.system.subscribe(this);
 
+    this.rootEl = this.el.closest('[data-bind-for-key]');
     this.onStateUpdate = this.onStateUpdate.bind(this);
   },
 
@@ -644,7 +645,7 @@ AFRAME.registerComponent('bind', {
       this.bindFor = this.bindForEl.getAttribute('bind-for');
       this.bindForKey = this.bindRootEl.getAttribute('data-bind-for-key');
       this.keysToWatch.push(this.bindFor.in);
-      this.bindForEl.addEventListener('bindforrender', this.onStateUpdate);
+      this.rootEl.addEventListener('bindforupdate', this.onStateUpdate);
     } else {
       this.bindFor = '';
       this.bindForKey = '';
@@ -750,7 +751,7 @@ AFRAME.registerComponent('bind', {
   remove: function remove() {
     this.system.unsubscribe(this);
     if (this.bindForEl) {
-      this.bindForEl.removeEventListener('bindforrender', this.onStateUpdate);
+      this.bindForEl.removeEventListener('bindforupdate', this.onStateUpdate);
     }
   }
 });
@@ -832,6 +833,7 @@ var ITEM_SELECTOR_RE = /item.(\w+)/;
  */
 AFRAME.registerComponent('bind-for', {
   schema: {
+    delay: { default: 0 },
     for: { type: 'string', default: 'item' },
     in: { type: 'string' },
     key: { type: 'string' },
@@ -855,8 +857,8 @@ AFRAME.registerComponent('bind-for', {
       this.template = document.querySelector(this.data.template).innerHTML.trim();
     }
 
-    for (var i = 0; i < this.data.pool; i++) {
-      this.el.appendChild(this.generateFromTemplate(null, i));
+    for (var _i = 0; _i < this.data.pool; _i++) {
+      this.el.appendChild(this.generateFromTemplate(null, _i));
     }
   },
 
@@ -870,13 +872,12 @@ AFRAME.registerComponent('bind-for', {
    * entities will be reinitialized.
    */
   onStateUpdateNaive: function () {
-    var keys = [];
+    var activeKeys = [];
 
     return function () {
       var child;
       var data = this.data;
       var el = this.el;
-      var i;
       var list;
       var key;
       var keyValue;
@@ -887,55 +888,81 @@ AFRAME.registerComponent('bind-for', {
         throw new Error('[aframe-state-component] Key \'' + data.in + '\' not found in state.' + (' #' + el.getAttribute('id') + '[' + this.attrName + ']'));
       }
 
-      keys.length = 0;
-      for (i = 0; i < list.length; i++) {
-        var item = list[i];
-
+      activeKeys.length = 0;
+      for (var _i2 = 0; _i2 < list.length; _i2++) {
+        var item = list[_i2];
         // If key not defined, use index (e.g., array of strings).
-        keyValue = data.key ? item[data.key].toString() : item.toString();
-        keys.push(keyValue);
-
-        // Add item.
-        if (this.renderedKeys.indexOf(keyValue) === -1) {
-          el.appendChild(this.generateFromTemplate(item, i));
-          this.renderedKeys.push(keyValue);
-        }
+        activeKeys.push(data.key ? item[data.key].toString() : item.toString());
       }
 
       // Remove items by removing entities.
-      var toRemoveEls = this.getElsToRemove(keys, this.renderedKeys);
+      var toRemoveEls = this.getElsToRemove(activeKeys, this.renderedKeys);
       for (i = 0; i < toRemoveEls.length; i++) {
         toRemoveEls[i].parentNode.removeChild(toRemoveEls[i]);
       }
 
-      // Update bind-for-key indices for list of strings in case of re-order.
-      if (list.length && list[0].constructor === String) {
-        for (i = 0; i < list.length; i++) {
-          child = el.querySelector('[data-bind-for-value="' + list[i] + '"]');
-          if (child) {
-            child.setAttribute('data-bind-for-key', i.toString());
-          }
-        }
+      if (list.length) {
+        this.renderItems(list, activeKeys, 0);
       }
-
-      this.el.emit('bindforrender', null, false);
     };
   }(),
+
+  /**
+   * Add or update item with delay support.
+   */
+  renderItems: function renderItems(list, activeKeys, i) {
+    var _this = this;
+
+    var data = this.data;
+    var el = this.el;
+    var itemEl;
+    var item = list[i];
+
+    // If key not defined, use index (e.g., array of strings).
+    keyValue = data.key ? item[data.key].toString() : item.toString();
+
+    if (this.renderedKeys.indexOf(keyValue) === -1) {
+      // Add.
+      itemEl = this.generateFromTemplate(item, i);
+      el.appendChild(itemEl);
+      this.renderedKeys.push(keyValue);
+    } else {
+      // Update.
+      if (list.length && list[0].constructor === String) {
+        // Update index for simple list.
+        var _keyValue = data.key ? item[data.key].toString() : item.toString();
+        itemEl = el.querySelector('[data-bind-for-value="' + _keyValue + '"]');
+        itemEl.setAttribute('data-bind-for-key', i);
+      } else {
+        var bindForKey = this.getBindForKey(item, i);
+        itemEl = el.querySelector('[data-bind-for-key="' + bindForKey + '"]');
+      }
+      itemEl.emit('bindforupdate', item, false);
+    }
+
+    if (!list[i + 1]) {
+      return;
+    }
+
+    if (this.data.delay) {
+      setTimeout(function () {
+        _this.renderItems(list, activeKeys, i + 1);
+      }, this.data.delay);
+    } else {
+      this.renderItems(list, activeKeys, i + 1);
+    }
+  },
 
   /**
    * When items are swapped out, this algorithm will update component values in-place using
    * bind-item.
    */
   onStateUpdateInPlace: function () {
-    var keys = [];
+    var activeKeys = [];
 
     return function () {
-      var _this = this;
-
-      var child;
       var data = this.data;
       var el = this.el;
-      var i;
       var list;
       var key;
       var keyValue;
@@ -947,73 +974,88 @@ AFRAME.registerComponent('bind-for', {
       }
 
       // Calculate keys that should be active.
-      keys.length = 0;
-      for (i = 0; i < list.length; i++) {
-        var item = list[i];
+      activeKeys.length = 0;
+      for (var _i3 = 0; _i3 < list.length; _i3++) {
+        var item = list[_i3];
         keyValue = data.key ? item[data.key].toString() : item.toString();
-        keys.push(keyValue);
+        activeKeys.push(keyValue);
       }
 
       // Remove items by pooling. Do before adding.
-      var toRemoveEls = this.getElsToRemove(keys, this.renderedKeys);
-      for (var _i = 0; _i < toRemoveEls.length; _i++) {
-        toRemoveEls[_i].object3D.visible = false;
-        toRemoveEls[_i].setAttribute('data-bind-for-active', 'false');
-        toRemoveEls[_i].removeAttribute('data-bind-for-key');
-        toRemoveEls[_i].removeAttribute('data-bind-for-value');
-        toRemoveEls[_i].emit('bindfordeactivate', null, false);
-        toRemoveEls[_i].pause();
+      var toRemoveEls = this.getElsToRemove(activeKeys, this.renderedKeys);
+      for (var _i4 = 0; _i4 < toRemoveEls.length; _i4++) {
+        toRemoveEls[_i4].object3D.visible = false;
+        toRemoveEls[_i4].setAttribute('data-bind-for-active', 'false');
+        toRemoveEls[_i4].removeAttribute('data-bind-for-key');
+        toRemoveEls[_i4].removeAttribute('data-bind-for-value');
+        toRemoveEls[_i4].emit('bindfordeactivate', null, false);
+        toRemoveEls[_i4].pause();
       }
 
-      var _loop = function _loop() {
-        var item = list[i];
-
-        var bindForKey = _this.getBindForKey(item, i);
-        keyValue = data.key ? item[data.key].toString() : item.toString();
-
-        // Add item.
-        if (_this.renderedKeys.indexOf(keyValue) === -1) {
-          if (!el.querySelector(':scope > [data-bind-for-active="false"]')) {
-            // No items available in pool. Generate new entity.
-            var newEl = _this.generateFromTemplate(item, i);
-            newEl.addEventListener('loaded', function () {
-              newEl.emit('bindforupdateinplace', item, false);
-            });
-            el.appendChild(newEl);
-          } else {
-            // Take over inactive item.
-            var takeoverEl = el.querySelector('[data-bind-for-active="false"]');
-            takeoverEl.setAttribute('data-bind-for-key', bindForKey);
-            takeoverEl.setAttribute('data-bind-for-value', keyValue);
-            takeoverEl.object3D.visible = true;
-            takeoverEl.play();
-            takeoverEl.setAttribute('data-bind-for-active', 'true');
-            takeoverEl.emit('bindforupdateinplace', item, false);
-          }
-          _this.renderedKeys.push(keyValue);
-        } else if (keys.indexOf(bindForKey) !== -1) {
-          // Update item.
-          _this.el.querySelector('[data-bind-for-key="' + bindForKey + '"]').emit('bindforupdateinplace', item, false);
-        }
-      };
-
-      for (i = 0; i < list.length; i++) {
-        _loop();
+      if (list.length) {
+        this.renderItemsInPlace(list, activeKeys, 0);
       }
-
-      // Update bind-for-key indices for list of strings in case of re-order.
-      if (list.length && list[0].constructor === String) {
-        for (i = 0; i < list.length; i++) {
-          child = el.querySelector('[data-bind-for-value="' + list[i] + '"]');
-          if (child) {
-            child.setAttribute('data-bind-for-key', i.toString());
-          }
-        }
-      }
-
-      this.el.emit('bindforrender', null, false);
     };
   }(),
+
+  /**
+   * Add, takeover, or update item with delay support.
+   */
+  renderItemsInPlace: function renderItemsInPlace(list, activeKeys, i) {
+    var _this2 = this;
+
+    var data = this.data;
+    var el = this.el;
+    var itemEl;
+
+    var item = list[i];
+    var bindForKey = this.getBindForKey(item, i);
+    var keyValue = data.key ? item[data.key].toString() : item.toString();
+
+    // Add item.
+    if (this.renderedKeys.indexOf(keyValue) === -1) {
+      if (!el.querySelector(':scope > [data-bind-for-active="false"]')) {
+        // No items available in pool. Generate new entity.
+        var _itemEl = this.generateFromTemplate(item, i);
+        _itemEl.addEventListener('loaded', function () {
+          _itemEl.emit('bindforupdateinplace', item, false);
+        });
+        el.appendChild(_itemEl);
+      } else {
+        // Take over inactive item.
+        itemEl = el.querySelector('[data-bind-for-active="false"]');
+        itemEl.setAttribute('data-bind-for-key', bindForKey);
+        itemEl.setAttribute('data-bind-for-value', keyValue);
+        itemEl.object3D.visible = true;
+        itemEl.play();
+        itemEl.setAttribute('data-bind-for-active', 'true');
+        itemEl.emit('bindforupdateinplace', item, false);
+      }
+      this.renderedKeys.push(keyValue);
+    } else if (activeKeys.indexOf(keyValue) !== -1) {
+      // Update item.
+      if (list.length && list[0].constructor === String) {
+        // Update index for simple list.
+        itemEl = el.querySelector('[data-bind-for-value="' + keyValue + '"]');
+        itemEl.setAttribute('data-bind-for-key', i);
+      } else {
+        itemEl = el.querySelector('[data-bind-for-key="' + bindForKey + '"]');
+      }
+      itemEl.emit('bindforupdateinplace', item, false);
+    }
+
+    if (!list[i + 1]) {
+      return;
+    }
+
+    if (this.data.delay) {
+      setTimeout(function () {
+        _this2.renderItemsInPlace(list, activeKeys, i + 1);
+      }, this.data.delay);
+    } else {
+      this.renderItemsInPlace(list, activeKeys, i + 1);
+    }
+  },
 
   /**
    * Generate entity from template.
@@ -1056,13 +1098,13 @@ AFRAME.registerComponent('bind-for', {
       var el = this.el;
 
       toRemove.length = 0;
-      for (var i = 0; i < el.children.length; i++) {
-        if (el.children[i].tagName === 'TEMPLATE') {
+      for (var _i5 = 0; _i5 < el.children.length; _i5++) {
+        if (el.children[_i5].tagName === 'TEMPLATE') {
           continue;
         }
-        var key = data.key ? el.children[i].getAttribute('data-bind-for-key') : el.children[i].getAttribute('data-bind-for-value');
+        var key = data.key ? el.children[_i5].getAttribute('data-bind-for-key') : el.children[_i5].getAttribute('data-bind-for-value');
         if (activeKeys.indexOf(key) === -1 && renderedKeys.indexOf(key) !== -1) {
-          toRemove.push(el.children[i]);
+          toRemove.push(el.children[_i5]);
           renderedKeys.splice(renderedKeys.indexOf(key), 1);
         }
       }
@@ -1189,8 +1231,8 @@ AFRAME.registerComponent('bind-item', {
     // Different parsing for multi-prop components.
     if (componentName in AFRAME.components && !AFRAME.components[componentName].isSingleProp) {
       var propertySplitList = lib.split(this.data, ';');
-      for (var i = 0; i < propertySplitList.length; i++) {
-        var propertySplit = lib.split(propertySplitList[i], ':');
+      for (var _i6 = 0; _i6 < propertySplitList.length; _i6++) {
+        var propertySplit = lib.split(propertySplitList[_i6], ':');
         propertyMap[this.id + '.' + propertySplit[0].trim()] = propertySplit[1].trim();
         lib.parseKeysToWatch(this.keysToWatch, propertySplit[1].trim(), true);
       }

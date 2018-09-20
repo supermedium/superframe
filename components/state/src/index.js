@@ -271,6 +271,7 @@ AFRAME.registerComponent('bind', {
     // Subscribe to store and register handler to do data-binding to components.
     this.system.subscribe(this);
 
+    this.rootEl = this.el.closest('[data-bind-for-key]');
     this.onStateUpdate = this.onStateUpdate.bind(this);
   },
 
@@ -298,7 +299,7 @@ AFRAME.registerComponent('bind', {
       this.bindFor = this.bindForEl.getAttribute('bind-for');
       this.bindForKey = this.bindRootEl.getAttribute('data-bind-for-key');
       this.keysToWatch.push(this.bindFor.in);
-      this.bindForEl.addEventListener('bindforrender', this.onStateUpdate);
+      this.rootEl.addEventListener('bindforupdate', this.onStateUpdate);
     } else {
       this.bindFor = '';
       this.bindForKey = '';
@@ -398,7 +399,7 @@ AFRAME.registerComponent('bind', {
   remove: function () {
     this.system.unsubscribe(this);
     if (this.bindForEl) {
-      this.bindForEl.removeEventListener('bindforrender', this.onStateUpdate);
+      this.bindForEl.removeEventListener('bindforupdate', this.onStateUpdate);
     }
   }
 });
