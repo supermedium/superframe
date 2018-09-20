@@ -1123,6 +1123,37 @@ suite('state', function () {
         });
       });
     });
+
+    test('can initialize pool', done => {
+      const template = document.createElement('template');
+      template.setAttribute('id', 'difficultyTemplate');
+      template.innerHTML = '<a-entity class="difficulty" bind-item__text="value: item"></a-entity>';
+      el.sceneEl.appendChild(template);
+
+      setTimeout(() => {
+        el.setAttribute('bind-for', {
+          for: 'item',
+          in: 'difficulties',
+          template: '#difficultyTemplate',
+          updateInPlace: true,
+          pool: 3
+        });
+
+        setTimeout(() => {
+          assert.equal(el.querySelectorAll('[data-bind-for-active="false"]').length, 3);
+          el.sceneEl.emit('difficultyTwo');
+
+          setTimeout(() => {
+            assert.equal(el.querySelectorAll('[data-bind-for-active="true"]').length, 4);
+            assert.ok(el.querySelector('[data-bind-for-value="Easy"]'));
+            assert.ok(el.querySelector('[data-bind-for-value="Normal"]'));
+            assert.ok(el.querySelector('[data-bind-for-value="Hard"]'));
+            assert.ok(el.querySelector('[data-bind-for-value="Expert"]'));
+            done();
+          });
+        });
+      });
+    });
   });
 
   suite('select', () => {

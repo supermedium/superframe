@@ -187,12 +187,16 @@ AFRAME.registerSystem('state', {
       var str;
 
       str = template;
-      while (match = interpRegex.exec(template)) {
-        str = str.replace(
-          match[0],
-          typeof data === TYPE_OBJECT
-            ? lib.select(data, match[2]) || ''
-            : data);
+
+      // Data will be null if initialize pool for bind-for.updateInPlace.
+      if (data) {
+        while (match = interpRegex.exec(template)) {
+          str = str.replace(
+            match[0],
+            typeof data === TYPE_OBJECT
+              ? lib.select(data, match[2]) || ''
+              : data);
+        }
       }
 
       // Return as string.

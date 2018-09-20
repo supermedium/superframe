@@ -11,6 +11,7 @@ AFRAME.registerComponent('bind-for', {
     for: {type: 'string', default: 'item'},
     in: {type: 'string'},
     key: {type: 'string'},
+    pool: {default: 0},
     template: {type: 'string'},
     updateInPlace: {default: false}
   },
@@ -23,15 +24,20 @@ AFRAME.registerComponent('bind-for', {
     this.keysToWatch = [];
     this.renderedKeys = [];  // Keys that are currently rendered.
     this.system.subscribe(this);
-  },
 
-  update: function () {
-    this.keysToWatch[0] = lib.split(this.data.in, '.')[0];
     if (this.el.children[0] && this.el.children[0].tagName === 'TEMPLATE') {
       this.template = this.el.children[0].innerHTML.trim();
     } else {
       this.template = document.querySelector(this.data.template).innerHTML.trim();
     }
+
+    for (let i = 0; i < this.data.pool; i++) {
+      this.el.appendChild(this.generateFromTemplate(null, i));
+    }
+  },
+
+  update: function () {
+    this.keysToWatch[0] = lib.split(this.data.in, '.')[0];
     this.onStateUpdate();
   },
 
@@ -191,6 +197,13 @@ AFRAME.registerComponent('bind-for', {
     this.el.appendChild(this.system.renderTemplate(this.template, item));
     const newEl = this.el.children[this.el.children.length - 1];;
 
+    // From pool.true
+    if (!item) {
+      newEl.setAttribute('data-bind-for-key', '');
+      newEl.setAttribute('data-bind-for-active', 'false');
+      return newEl;
+    }
+
     const bindForKey = this.getBindForKey(item, i);
     newEl.setAttribute('data-bind-for-key', bindForKey);
     if (!data.key) { newEl.setAttribute('data-bind-for-value', item); }
@@ -284,8 +297,10 @@ AFRAME.registerComponent('bind-item', {
    */
   updateInPlace: function (evt) {
     const propertyMap = this.propertyMap;
-    if (evt) { this.itemData = evt.detail; }
 
+    if (this.rootEl.getAttribute('data-bind-for-active') === 'false') { return; }
+
+    if (evt) { this.itemData = evt.detail; }
 
     for (let property in propertyMap) {
       // Get value from item.
@@ -343,12 +358,12 @@ AFRAME.registerComponent('bind-item', {
       for (let i = 0; i < propertySplitList.length; i++) {
         let propertySplit = lib.split(propertySplitList[i], ':');
         propertyMap[this.id + '.' + propertySplit[0].trim()] = propertySplit[1].trim();
-        lib.parseKeysToWatch(this.keysToWatch, propertySplit[1].trim());
+        lib.parseKeysToWatch(this.keysToWatch, propertySplit[1].trim(), true);
       }
       return;
     }
 
     propertyMap[this.id] = this.data;
-    lib.parseKeysToWatch(this.keysToWatch, this.data);
+    lib.parseKeysToWatch(this.keysToWatch, this.data, true);
   }
 });

@@ -168,13 +168,14 @@ function composeFunctions () {
 module.exports.composeFunctions = composeFunctions;
 
 var NO_WATCH_TOKENS = ['||', '&&', '!=', '!==', '==', '==='];
-function parseKeysToWatch (keys, str) {
+function parseKeysToWatch (keys, str, isBindItem) {
   var i;
   var tokens;
   tokens = str.split(/\s+/);
   for (i = 0; i < tokens.length; i++) {
     if (NO_WATCH_TOKENS.indexOf(tokens[i]) === -1 && !tokens[i].startsWith("'") &&
         keys.indexOf(tokens[i]) === -1) {
+      if (isBindItem && tokens[i] === 'item') { continue; }
       keys.push(parseKeyToWatch(tokens[i]));
     }
   }

@@ -261,12 +261,15 @@ function composeFunctions() {
 module.exports.composeFunctions = composeFunctions;
 
 var NO_WATCH_TOKENS = ['||', '&&', '!=', '!==', '==', '==='];
-function parseKeysToWatch(keys, str) {
+function parseKeysToWatch(keys, str, isBindItem) {
   var i;
   var tokens;
   tokens = str.split(/\s+/);
   for (i = 0; i < tokens.length; i++) {
     if (NO_WATCH_TOKENS.indexOf(tokens[i]) === -1 && !tokens[i].startsWith("'") && keys.indexOf(tokens[i]) === -1) {
+      if (isBindItem && tokens[i] === 'item') {
+        continue;
+      }
       keys.push(parseKeyToWatch(tokens[i]));
     }
   }
@@ -391,8 +394,6 @@ AFRAME.registerSystem('state', {
     var i;
     var key;
     var subscription;
-
-    console.log(actionName);
 
     // Modify state.
     State.handlers[actionName](this.state, payload);
@@ -531,8 +532,12 @@ AFRAME.registerSystem('state', {
       var str;
 
       str = template;
-      while (match = interpRegex.exec(template)) {
-        str = str.replace(match[0], (typeof data === 'undefined' ? 'undefined' : _typeof(data)) === TYPE_OBJECT ? lib.select(data, match[2]) || '' : data);
+
+      // Data will be null if initialize pool for bind-for.updateInPlace.
+      if (data) {
+        while (match = interpRegex.exec(template)) {
+          str = str.replace(match[0], (typeof data === 'undefined' ? 'undefined' : _typeof(data)) === TYPE_OBJECT ? lib.select(data, match[2]) || '' : data);
+        }
       }
 
       // Return as string.
@@ -830,6 +835,7 @@ AFRAME.registerComponent('bind-for', {
     for: { type: 'string', default: 'item' },
     in: { type: 'string' },
     key: { type: 'string' },
+    pool: { default: 0 },
     template: { type: 'string' },
     updateInPlace: { default: false }
   },
@@ -842,15 +848,20 @@ AFRAME.registerComponent('bind-for', {
     this.keysToWatch = [];
     this.renderedKeys = []; // Keys that are currently rendered.
     this.system.subscribe(this);
-  },
 
-  update: function update() {
-    this.keysToWatch[0] = lib.split(this.data.in, '.')[0];
     if (this.el.children[0] && this.el.children[0].tagName === 'TEMPLATE') {
       this.template = this.el.children[0].innerHTML.trim();
     } else {
       this.template = document.querySelector(this.data.template).innerHTML.trim();
     }
+
+    for (var i = 0; i < this.data.pool; i++) {
+      this.el.appendChild(this.generateFromTemplate(null, i));
+    }
+  },
+
+  update: function update() {
+    this.keysToWatch[0] = lib.split(this.data.in, '.')[0];
     this.onStateUpdate();
   },
 
@@ -1013,6 +1024,13 @@ AFRAME.registerComponent('bind-for', {
     this.el.appendChild(this.system.renderTemplate(this.template, item));
     var newEl = this.el.children[this.el.children.length - 1];;
 
+    // From pool.true
+    if (!item) {
+      newEl.setAttribute('data-bind-for-key', '');
+      newEl.setAttribute('data-bind-for-active', 'false');
+      return newEl;
+    }
+
     var bindForKey = this.getBindForKey(item, i);
     newEl.setAttribute('data-bind-for-key', bindForKey);
     if (!data.key) {
@@ -1108,6 +1126,11 @@ AFRAME.registerComponent('bind-item', {
    */
   updateInPlace: function updateInPlace(evt) {
     var propertyMap = this.propertyMap;
+
+    if (this.rootEl.getAttribute('data-bind-for-active') === 'false') {
+      return;
+    }
+
     if (evt) {
       this.itemData = evt.detail;
     }
@@ -1169,13 +1192,13 @@ AFRAME.registerComponent('bind-item', {
       for (var i = 0; i < propertySplitList.length; i++) {
         var propertySplit = lib.split(propertySplitList[i], ':');
         propertyMap[this.id + '.' + propertySplit[0].trim()] = propertySplit[1].trim();
-        lib.parseKeysToWatch(this.keysToWatch, propertySplit[1].trim());
+        lib.parseKeysToWatch(this.keysToWatch, propertySplit[1].trim(), true);
       }
       return;
     }
 
     propertyMap[this.id] = this.data;
-    lib.parseKeysToWatch(this.keysToWatch, this.data);
+    lib.parseKeysToWatch(this.keysToWatch, this.data, true);
   }
 });
 
