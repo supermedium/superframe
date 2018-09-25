@@ -99,6 +99,9 @@ AFRAME.registerComponent('animation', {
       complete: function () {
         self.animationIsPlaying = false;
         self.el.emit('animationcomplete', self.eventDetail);
+        if (self.id) {
+          self.el.emit('animationcomplete__' + self.id, self.eventDetail, false);
+        }
       }
     };
   },
