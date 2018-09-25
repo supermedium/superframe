@@ -825,6 +825,7 @@ module.exports = {
 
 var lib = __webpack_require__(0);
 
+var ITEM_RE = /item/;
 var ITEM_PREFIX_RE = /item./;
 var ITEM_SELECTOR_RE = /item.(\w+)/;
 
@@ -1206,8 +1207,10 @@ AFRAME.registerComponent('bind-item', {
       if (match) {
         value = lib.select(itemData, match[0].replace(ITEM_PREFIX_RE, ''));
         selector = selector.replace(ITEM_SELECTOR_RE, "'" + value + "'");
+      } else {
+        match = selector.match(ITEM_RE);
+        selector = selector.replace(ITEM_RE, "'" + itemData + "'");
       }
-
       value = lib.select(this.el.sceneEl.systems.state.state, selector);
     } else {
       // Get value from item.
