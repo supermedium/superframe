@@ -42,7 +42,7 @@
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	if (typeof AFRAME === 'undefined') {
 	  throw new Error('Component attempted to register before AFRAME was available.');
@@ -86,6 +86,9 @@
 	 */
 	AFRAME.registerComponent('audioanalyser', {
 	  schema: {
+	    beatDetectionDecay: {default: 0.99},
+	    beatDetectionMinVolume: {default: 15},
+	    beatDetectionThrottle: {default: 250},
 	    enableBeatDetection: {default: true},
 	    enableLevels: {default: true},
 	    enableWaveform: {default: true},
@@ -121,14 +124,14 @@
 	      self.analyser = analyser;
 	      self.levels = new Uint8Array(self.analyser.frequencyBinCount);
 	      self.waveform = new Uint8Array(self.analyser.fftSize);
-	      self.el.emit('audioanalyser-ready', {analyser: analyser});
+	      self.el.emit('audioanalyser-ready', analyser, false);
 	    }
 	  },
 
 	  /**
 	   * Update spectrum on each frame.
 	   */
-	  tick: function () {
+	  tick: function (t, dt) {
 	    var data = this.data;
 	    if (!this.analyser) { return; }
 
@@ -153,23 +156,19 @@
 
 	    // Beat detection.
 	    if (data.enableBeatDetection) {
-	      var BEAT_DECAY_RATE = 0.99;
-	      var BEAT_HOLD = 60;
-	      var BEAT_MIN = 0.15;  // Volume less than this is no beat.
-
 	      volume = this.volume;
 	      if (!this.beatCutOff) { this.beatCutOff = volume; }
-	      if (volume > this.beatCutOff && volume > BEAT_MIN) {
+	      if (volume > this.beatCutOff && volume > this.data.beatDetectionMinVolume) {
 	        console.log('[audioanalyser] Beat detected.');
-	        this.el.emit('audioanalyser-beat');
+	        this.el.emit('audioanalyser-beat', null, false);
 	        this.beatCutOff = volume * 1.5;
 	        this.beatTime = 0;
 	      } else {
-	        if (this.beatTime <= BEAT_HOLD) {
-	          this.beatTime++;
+	        if (this.beatTime <= this.data.beatDetectionThrottle) {
+	          this.beatTime += dt;
 	        } else {
-	          this.beatCutOff *= BEAT_DECAY_RATE;
-	          this.beatCutOff = Math.max(this.beatCutOff, BEAT_MIN);
+	          this.beatCutOff *= this.data.beatDetectionDecay;
+	          this.beatCutOff = Math.max(this.beatCutOff, this.data.beatDetectionMinVolume);
 	        }
 	      }
 	    }
@@ -177,5 +176,5 @@
 	});
 
 
-/***/ }
+/***/ })
 /******/ ]);

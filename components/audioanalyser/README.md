@@ -14,16 +14,19 @@ Not tested on mobile.
 
 ### Properties
 
-| Property              | Description                                                          | Default Value |
-| --------              | -----------                                                          | ------------- |
-| enableBeatDetection   | Whether or not to detect beats. Disable if not using.                | true          |
-| enableLevels          | Whether or not to store frequency data. Disable if not using.        | true          |
-| enableVolume          | Whether or not to calculate average volume. Disable if not using.    | true          |
-| enableWaveform        | Whether or not to store waveform data. Disable if not using.         | true          |
-| fftSize               | Frequency domain.                                                    | 2048          |
-| smoothingTimeConstant | How smooth the frequency data is returned.                           | 0.8           |
-| src                   | Selector to an audio element or path to audio file.                  | ''            |
-| unique                | Whether to share the audio instance with other visualizing entities. | false         |
+| Property               | Description                                                          | Default Value |
+| --------               | -----------                                                          | ------------- |
+| beatDetectionDecay     | How fast to decay the beat threshold.                                | 0.99          |
+| beatDetectionMinVolume | Minimum volume for beat.                                             | 15            |
+| beatDetectionThrottle  | Minimum time to to wait between beats.                               | 250           |
+| enableBeatDetection    | Whether or not to detect beats. Disable if not using.                | true          |
+| enableLevels           | Whether or not to store frequency data. Disable if not using.        | true          |
+| enableVolume           | Whether or not to calculate average volume. Disable if not using.    | true          |
+| enableWaveform         | Whether or not to store waveform data. Disable if not using.         | true          |
+| fftSize                | Frequency domain.                                                    | 2048          |
+| smoothingTimeConstant  | How smooth the frequency data is returned.                           | 0.8           |
+| src                    | Selector to an audio element or path to audio file.                  | ''            |
+| unique                 | Whether to share the audio instance with other visualizing entities. | false         |
 
 ### Members
 
