@@ -21,7 +21,7 @@ AFRAME.registerSystem('audioanalyser', {
     var audioEl = data.src;
     var src = audioEl.getAttribute('src');
 
-    if (analysers[src]) { return analysers[src]; }
+    if (!data.unique && analysers[src]) { return analysers[src]; }
 
     var source = context.createMediaElementSource(audioEl)
     source.connect(analyser);
@@ -68,11 +68,7 @@ AFRAME.registerComponent('audioanalyser', {
     if (!data.src) { return; }
 
     // Get or create AnalyserNode.
-    if (data.unique) {
-      init(system.createAnalyser(data));
-    } else {
-      init(system.getOrCreateAnalyser(data));
-    }
+    init(system.getOrCreateAnalyser(data));
 
     function init (analyser) {
       self.analyser = analyser;
