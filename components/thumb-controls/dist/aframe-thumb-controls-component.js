@@ -184,7 +184,7 @@
   });
 
   AFRAME.registerComponent('thumb-controls-debug', {
-    dependencies: ['tracked-controls'],
+    dependencies: ['thumb-controls', 'tracked-controls'],
 
     schema: {
       controllerType: {type: 'string'},
@@ -209,6 +209,7 @@
       axis = [0, 0, 0];
       axisMoveEventDetail = {axis: axis};
       el.components['tracked-controls'].axis = axis;
+      el.components['thumb-controls'].axis = axis;
 
       canvas = this.createCanvas();
 
