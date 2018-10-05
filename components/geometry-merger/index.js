@@ -1,3 +1,7 @@
+if (!THREE.BufferGeometryUtils) {
+  require('./lib/BufferGeometryUtils');
+}
+
 AFRAME.registerComponent('geometry-merger', {
   schema: {
     preserveOriginal: {default: false}
@@ -36,5 +40,27 @@ AFRAME.registerComponent('geometry-merger', {
       // Remove mesh if not preserving.
       if (!self.data.preserveOriginal) { mesh.parent.remove(mesh); }
     });
+  }
+});
+
+AFRAME.registerComponent('buffer-geometry-merger', {
+  schema: {
+    preserveOriginal: {default: false}
+  },
+
+  init: function () {
+    var geometries = [];
+
+    this.el.sceneEl.object3D.updateMatrixWorld()
+    this.el.object3D.traverse(function (mesh) {
+      if (mesh.type !== 'Mesh' || mesh.el === self.el) { return; }
+      mesh.geometry.applyMatrix(mesh.matrixWorld);
+      geometries.push(mesh.geometry.clone());
+      mesh.parent.remove(mesh);
+    });
+
+    const geometry = THREE.BufferGeometryUtils.mergeBufferGeometries(geometries);
+    this.mesh = new THREE.Mesh(geometry);
+    this.el.setObject3D('mesh', this.mesh);
   }
 });
