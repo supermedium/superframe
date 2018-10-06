@@ -143,6 +143,7 @@ AFRAME.registerComponent('bind-for', {
       try {
         list = lib.select(this.system.state, data.in);
       } catch (e) {
+        console.log(e);
         throw new Error(`[aframe-state-component] Key '${data.in}' not found in state.` +
                         ` #${el.getAttribute('id')}[${this.attrName}]`);
       }
@@ -360,27 +361,7 @@ AFRAME.registerComponent('bind-item', {
   },
 
   select: function (itemData, selector) {
-    var value;
-
-    if (selector.indexOf('=') !== -1) {
-      // Interpolate.
-      let match = selector.match(ITEM_SELECTOR_RE);
-      if (match) {
-        value = lib.select(itemData, match[0].replace(ITEM_PREFIX_RE, ''));
-        selector = selector.replace(ITEM_SELECTOR_RE, "'" + value + "'");
-      } else {
-        match = selector.match(ITEM_RE);
-        selector = selector.replace(ITEM_RE, "'" + itemData + "'");
-      }
-      value = lib.select(this.el.sceneEl.systems.state.state, selector);
-    } else {
-      // Get value from item.
-      value = selector === 'item'
-        ? itemData // Simple list.
-        : lib.select(itemData, selector.replace(ITEM_PREFIX_RE, ''));
-    }
-
-    return value;
+    return lib.select(this.el.sceneEl.systems.state.state, selector, itemData);
   },
 
   deactivate: function () {

@@ -6,13 +6,14 @@ const selectFunctions = {};
  *
  * @param {object} state - State object.
  * @param {string} selector - Dot-delimited store keys (e.g., game.player.health).
+ * @param {object} item - From bind-item.
  */
-function select (state, selector) {
+function select (state, selector, item) {
   if (!selectFunctions[selector]) {
-    selectFunctions[selector] = new Function('state',
+    selectFunctions[selector] = new Function('state', 'item',
                                              `return ${generateExpression(selector)};`);
   }
-  return selectFunctions[selector](state);
+  return selectFunctions[selector](state, item);
 }
 module.exports.select = select;
 
@@ -20,12 +21,14 @@ const DOT_NOTATION_RE = /\.([A-Za-z][\w_-]*)/g;
 const WHITESPACE_RE = /\s/g;
 const STATE_SELECTOR_RE = /([=&|!?:])([A-Za-z][\w_-]*)/g;
 const ROOT_STATE_SELECTOR_RE = /^([A-Za-z][\w_-]*)/g;
+const ITEM_RE = /state\["item"\]/g;
 const STATE_STR = 'state';
 function generateExpression (str) {
   str = str.replace(WHITESPACE_RE, '');
   str = str.replace(DOT_NOTATION_RE, '["$1"]');
   str = str.replace(ROOT_STATE_SELECTOR_RE, 'state["$1"]');
   str = str.replace(STATE_SELECTOR_RE, '$1state["$2"]');
+  str = str.replace(ITEM_RE, 'item');
   return str;
 }
 module.exports.generateExpression = generateExpression;

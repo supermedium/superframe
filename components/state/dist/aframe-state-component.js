@@ -88,12 +88,13 @@ var selectFunctions = {};
  *
  * @param {object} state - State object.
  * @param {string} selector - Dot-delimited store keys (e.g., game.player.health).
+ * @param {object} item - From bind-item.
  */
-function select(state, selector) {
+function select(state, selector, item) {
   if (!selectFunctions[selector]) {
-    selectFunctions[selector] = new Function('state', 'return ' + generateExpression(selector) + ';');
+    selectFunctions[selector] = new Function('state', 'item', 'return ' + generateExpression(selector) + ';');
   }
-  return selectFunctions[selector](state);
+  return selectFunctions[selector](state, item);
 }
 module.exports.select = select;
 
@@ -101,12 +102,14 @@ var DOT_NOTATION_RE = /\.([A-Za-z][\w_-]*)/g;
 var WHITESPACE_RE = /\s/g;
 var STATE_SELECTOR_RE = /([=&|!?:])([A-Za-z][\w_-]*)/g;
 var ROOT_STATE_SELECTOR_RE = /^([A-Za-z][\w_-]*)/g;
+var ITEM_RE = /state\["item"\]/g;
 var STATE_STR = 'state';
 function generateExpression(str) {
   str = str.replace(WHITESPACE_RE, '');
   str = str.replace(DOT_NOTATION_RE, '["$1"]');
   str = str.replace(ROOT_STATE_SELECTOR_RE, 'state["$1"]');
   str = str.replace(STATE_SELECTOR_RE, '$1state["$2"]');
+  str = str.replace(ITEM_RE, 'item');
   return str;
 }
 module.exports.generateExpression = generateExpression;
@@ -839,6 +842,7 @@ AFRAME.registerComponent('bind-for', {
       try {
         list = lib.select(this.system.state, data.in);
       } catch (e) {
+        console.log(e);
         throw new Error('[aframe-state-component] Key \'' + data.in + '\' not found in state.' + (' #' + el.getAttribute('id') + '[' + this.attrName + ']'));
       }
 
@@ -1067,26 +1071,7 @@ AFRAME.registerComponent('bind-item', {
   },
 
   select: function select(itemData, selector) {
-    var value;
-
-    if (selector.indexOf('=') !== -1) {
-      // Interpolate.
-      var match = selector.match(ITEM_SELECTOR_RE);
-      if (match) {
-        value = lib.select(itemData, match[0].replace(ITEM_PREFIX_RE, ''));
-        selector = selector.replace(ITEM_SELECTOR_RE, "'" + value + "'");
-      } else {
-        match = selector.match(ITEM_RE);
-        selector = selector.replace(ITEM_RE, "'" + itemData + "'");
-      }
-      value = lib.select(this.el.sceneEl.systems.state.state, selector);
-    } else {
-      // Get value from item.
-      value = selector === 'item' ? itemData // Simple list.
-      : lib.select(itemData, selector.replace(ITEM_PREFIX_RE, ''));
-    }
-
-    return value;
+    return lib.select(this.el.sceneEl.systems.state.state, selector, itemData);
   },
 
   deactivate: function deactivate() {

@@ -1333,4 +1333,10 @@ suite('generateExpression', function () {
     assert.equal(lib.generateExpression('foo ? bar : "qaz"'),
                  'state["foo"]?state["bar"]:"qaz"');
   });
+
+  test('preserves item selector', () => {
+    assert.equal(lib.generateExpression('item'), 'item');
+    assert.equal(lib.generateExpression('item.id'), 'item["id"]');
+    assert.equal(lib.generateExpression('item.id + item.bar'), 'item["id"]+item["bar"]');
+  });
 });
