@@ -1,4 +1,10 @@
-var uvs = [new THREE.Vector2(), new THREE.Vector2(), new THREE.Vector2(), new THREE.Vector2()];
+// For aux use.
+var uvs = [
+  new THREE.Vector2(),
+  new THREE.Vector2(),
+  new THREE.Vector2(),
+  new THREE.Vector2()
+];
 
 /**
  * 1-indexed.
@@ -13,36 +19,11 @@ AFRAME.registerComponent('atlas-uvs', {
     row: {type: 'int', default: 1}
   },
 
-  init: function () {
-    var geometry;
-    geometry = this.el.getObject3D('mesh').geometry;
-    geometry.faceVertexUvs[0][0] = [new THREE.Vector2(), new THREE.Vector2(), new THREE.Vector2()];
-    geometry.faceVertexUvs[0][1] = [new THREE.Vector2(), new THREE.Vector2(), new THREE.Vector2()];
-  },
-
   update: function () {
-    var column;
-    var columnWidth;
-    var data = this.data;
-    var geometry;
-    var row;
-    var rowHeight;
+    const data = this.data;
+    const uvs = getGridUvs(data.row - 1, data.column - 1, data.totalRows, data.totalColumns);
 
-    column = data.column - 1;
-    row = data.row - 1;
-    columnWidth = 1 / data.totalRows;
-    rowHeight = 1 / data.totalColumns;
-
-    uvs[0].set(columnWidth * column,
-               rowHeight * row + rowHeight);
-    uvs[1].set(columnWidth * column,
-               rowHeight * row);
-    uvs[2].set(columnWidth * column + columnWidth,
-               rowHeight * row);
-    uvs[3].set(columnWidth * column + columnWidth,
-               rowHeight * row + rowHeight);
-
-    geometry = this.el.getObject3D('mesh').geometry;
+    const geometry = this.el.getObject3D('mesh').geometry;
     geometry.faceVertexUvs[0][0][0].copy(uvs[0]);
     geometry.faceVertexUvs[0][0][1].copy(uvs[1]);
     geometry.faceVertexUvs[0][0][2].copy(uvs[3]);
@@ -52,3 +33,59 @@ AFRAME.registerComponent('atlas-uvs', {
     geometry.uvsNeedUpdate = true;
   }
 });
+
+AFRAME.registerComponent('dynamic-texture-atlas', {
+  schema: {
+    canvasId: {default: 'dynamicAtlas'},
+    canvasHeight: {default: 1024},
+    canvasWidth: {default: 1024},
+    numColumns: {default: 8},
+    numRows: {default: 8}
+  },
+
+  multiple: true,
+
+  init: function () {
+    const canvas = this.canvas = document.createElement('canvas');
+    canvas.id = this.data.canvasId;
+    canvas.height = this.data.canvasHeight;
+    canvas.width = this.data.canvasWidth;
+    this.ctx = canvas.getContext('2d');
+    document.body.appendChild(canvas);
+  },
+
+  drawTexture: function (image, row, column) {
+    const canvas = this.canvas;
+    const data = this.data;
+
+    if (!image.complete) {
+      image.onload = () => { this.drawTexture(image, row, column); }
+    }
+
+    const gridHeight = canvas.height / data.numRows;
+    const gridWidth = canvas.width / data.numColumns;
+
+    // image, dx, dy, dwidth, dheight
+    this.ctx.drawImage(image, gridWidth * row, gridWidth * column, gridWidth, gridHeight);
+
+    // Return UVs.
+    return getGridUvs(row, column, data.numRows, data.numColumns);
+  }
+});
+
+/**
+ * Return UVs for an texture within an atlas, given the row and column info.
+ */
+function getGridUvs (row, column, totalRows, totalColumns) {
+  const columnWidth = 1 / totalRows;
+  const rowHeight = 1 / totalColumns;
+  uvs[0].set(columnWidth * column,
+             rowHeight * row + rowHeight);
+  uvs[1].set(columnWidth * column,
+             rowHeight * row);
+  uvs[2].set(columnWidth * column + columnWidth,
+             rowHeight * row);
+  uvs[3].set(columnWidth * column + columnWidth,
+             rowHeight * row + rowHeight);
+  return uvs;
+}

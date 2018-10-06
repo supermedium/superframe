@@ -1,4 +1,14 @@
-/******/ (function(modules) { // webpackBootstrap
+(function webpackUniversalModuleDefinition(root, factory) {
+	if(typeof exports === 'object' && typeof module === 'object')
+		module.exports = factory();
+	else if(typeof define === 'function' && define.amd)
+		define([], factory);
+	else {
+		var a = factory();
+		for(var i in a) (typeof exports === 'object' ? exports : root)[i] = a[i];
+	}
+})(typeof self !== 'undefined' ? self : this, function() {
+return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
 /******/
@@ -65,8 +75,12 @@
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
+"use strict";
+
+
+// For aux use.
 var uvs = [new THREE.Vector2(), new THREE.Vector2(), new THREE.Vector2(), new THREE.Vector2()];
 
 /**
@@ -76,42 +90,17 @@ AFRAME.registerComponent('atlas-uvs', {
   dependencies: ['geometry'],
 
   schema: {
-    totalColumns: {type: 'int', default: 1},
-    totalRows: {type: 'int', default: 1},
-    column: {type: 'int', default: 1},
-    row: {type: 'int', default: 1}
+    totalColumns: { type: 'int', default: 1 },
+    totalRows: { type: 'int', default: 1 },
+    column: { type: 'int', default: 1 },
+    row: { type: 'int', default: 1 }
   },
 
-  init: function () {
-    var geometry;
-    geometry = this.el.getObject3D('mesh').geometry;
-    geometry.faceVertexUvs[0][0] = [new THREE.Vector2(), new THREE.Vector2(), new THREE.Vector2()];
-    geometry.faceVertexUvs[0][1] = [new THREE.Vector2(), new THREE.Vector2(), new THREE.Vector2()];
-  },
-
-  update: function () {
-    var column;
-    var columnWidth;
+  update: function update() {
     var data = this.data;
-    var geometry;
-    var row;
-    var rowHeight;
+    var uvs = getGridUvs(data.row - 1, data.column - 1, data.totalRows, data.totalColumns);
 
-    column = data.column - 1;
-    row = data.row - 1;
-    columnWidth = 1 / data.totalRows;
-    rowHeight = 1 / data.totalColumns;
-
-    uvs[0].set(columnWidth * column,
-               rowHeight * row + rowHeight);
-    uvs[1].set(columnWidth * column,
-               rowHeight * row);
-    uvs[2].set(columnWidth * column + columnWidth,
-               rowHeight * row);
-    uvs[3].set(columnWidth * column + columnWidth,
-               rowHeight * row + rowHeight);
-
-    geometry = this.el.getObject3D('mesh').geometry;
+    var geometry = this.el.getObject3D('mesh').geometry;
     geometry.faceVertexUvs[0][0][0].copy(uvs[0]);
     geometry.faceVertexUvs[0][0][1].copy(uvs[1]);
     geometry.faceVertexUvs[0][0][2].copy(uvs[3]);
@@ -122,6 +111,62 @@ AFRAME.registerComponent('atlas-uvs', {
   }
 });
 
+AFRAME.registerComponent('dynamic-texture-atlas', {
+  schema: {
+    canvasId: { default: 'dynamicAtlas' },
+    canvasHeight: { default: 1024 },
+    canvasWidth: { default: 1024 },
+    numColumns: { default: 8 },
+    numRows: { default: 8 }
+  },
+
+  multiple: true,
+
+  init: function init() {
+    var canvas = this.canvas = document.createElement('canvas');
+    canvas.id = this.data.canvasId;
+    canvas.height = this.data.canvasHeight;
+    canvas.width = this.data.canvasWidth;
+    this.ctx = canvas.getContext('2d');
+    document.body.appendChild(canvas);
+  },
+
+  drawTexture: function drawTexture(image, row, column) {
+    var _this = this;
+
+    var canvas = this.canvas;
+    var data = this.data;
+
+    if (!image.complete) {
+      image.onload = function () {
+        _this.drawTexture(image, row, column);
+      };
+    }
+
+    var gridHeight = canvas.height / data.numRows;
+    var gridWidth = canvas.width / data.numColumns;
+
+    // image, dx, dy, dwidth, dheight
+    this.ctx.drawImage(image, gridWidth * row, gridWidth * column, gridWidth, gridHeight);
+
+    // Return UVs.
+    return getGridUvs(row, column, data.numRows, data.numColumns);
+  }
+});
+
+/**
+ * Return UVs for an texture within an atlas, given the row and column info.
+ */
+function getGridUvs(row, column, totalRows, totalColumns) {
+  var columnWidth = 1 / totalRows;
+  var rowHeight = 1 / totalColumns;
+  uvs[0].set(columnWidth * column, rowHeight * row + rowHeight);
+  uvs[1].set(columnWidth * column, rowHeight * row);
+  uvs[2].set(columnWidth * column + columnWidth, rowHeight * row);
+  uvs[3].set(columnWidth * column + columnWidth, rowHeight * row + rowHeight);
+  return uvs;
+}
 
 /***/ })
 /******/ ]);
+});
