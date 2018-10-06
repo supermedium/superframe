@@ -80,12 +80,8 @@ return /******/ (function(modules) { // webpackBootstrap
 "use strict";
 
 
-var AND = '&&';
-var QUOTE_RE = /'/g;
-var OR = '||';
-var COMPARISONS = ['==', '===', '!=', '!=='];
-var tempTokenArray = [];
-var tokenArray = [];
+// Pre-compiled functions.
+var selectFunctions = {};
 
 /**
  * Select value from store. Handles boolean operations, calls `selectProperty`.
@@ -93,118 +89,27 @@ var tokenArray = [];
  * @param {object} state - State object.
  * @param {string} selector - Dot-delimited store keys (e.g., game.player.health).
  */
-function select(state, selector, bindFor, bindForKey) {
-  var comparisonResult;
-  var firstValue;
-  var i;
-  var runningBool;
-  var secondValue;
-  var tokens;
-  var value;
-
-  // If just single selector, then grab value.
-  tokens = split(selector, /\s+/);
-  if (tokens.length === 1) {
-    return selectProperty(state, selector, bindFor, bindForKey);
+function select(state, selector) {
+  if (!selectFunctions[selector]) {
+    selectFunctions[selector] = new Function('state', 'return ' + generateExpression(selector) + ';');
   }
-
-  // Evaluate comparisons.
-  tokenArray.length = 0;
-  copyArray(tempTokenArray, tokens);
-  for (i = 0; i < tempTokenArray.length; i++) {
-    if (COMPARISONS.indexOf(tempTokenArray[i]) === -1) {
-      tokenArray.push(tempTokenArray[i]);
-      continue;
-    }
-
-    // Comparison (color === 'red').
-    // Pop previous value since that is one of comparsion value.
-    firstValue = selectProperty(state, tokenArray.pop());
-    // Lookup second value.
-    secondValue = tempTokenArray[i + 1].replace(QUOTE_RE, '');
-    // Evaluate (equals or not equals).
-    firstValue = firstValue === undefined ? 'undefined' : firstValue.toString();
-    secondValue = secondValue === undefined ? 'undefined' : secondValue.toString();
-    comparisonResult = tempTokenArray[i].indexOf('!') === -1 ? firstValue === secondValue : firstValue !== secondValue;
-    tokenArray.push(comparisonResult);
-    i++;
-  }
-
-  // Was single comparison.
-  if (tokenArray.length === 1) {
-    return tokenArray[0];
-  }
-
-  // If has boolean expression, evaluate.
-  runningBool = tokenArray[0].constructor === Boolean ? tokenArray[0] : selectProperty(state, tokenArray[0], bindFor, bindForKey);
-  for (i = 1; i < tokenArray.length; i += 2) {
-    if (tokenArray[i] !== OR && tokenArray[i] !== AND) {
-      continue;
-    }
-    // Check if was evaluated comparison (bool) or a selector (string).
-    tokenArray[i + 1] = tokenArray[i + 1].constructor === Boolean ? tokenArray[i + 1] : selectProperty(state, tokenArray[i + 1]);
-
-    // Evaluate boolean.
-    if (tokenArray[i] === OR) {
-      runningBool = runningBool || tokenArray[i + 1];
-    } else if (tokenArray[i] === AND) {
-      runningBool = runningBool && tokenArray[i + 1];
-    }
-  }
-  return runningBool;
+  return selectFunctions[selector](state);
 }
 module.exports.select = select;
 
-/**
- * Does actual selecting and walking of state.
- */
-function selectProperty(state, selector, bindFor, bindForKey) {
-  var i;
-  var originalSelector;
-  var splitted;
-  var value;
-
-  // If bindFor, select the array. Then later, we filter the array.
-  if (bindFor && selector.startsWith(bindFor.for)) {
-    originalSelector = selector;
-    selector = bindFor.in;
-  }
-
-  // Walk.
-  value = state;
-  splitted = split(stripNot(selector), '.');
-  for (i = 0; i < splitted.length; i++) {
-    if (i < splitted.length - 1 && !(splitted[i] in value)) {
-      console.error('[state] Not found:', splitted, splitted[i]);
-    }
-    value = value[splitted[i]];
-  }
-
-  if (bindFor && originalSelector.startsWith(bindFor.for)) {
-    // Simple array.
-    if (!bindFor.key) {
-      return value[bindForKey];
-    }
-    // Array of objects.
-    for (i = 0; i < value.length; i++) {
-      if (value[i][bindFor.key] !== bindForKey) {
-        continue;
-      }
-      value = selectProperty(value[i], originalSelector.replace(bindFor.for + '.', ''));
-      break;
-    }
-  }
-
-  // Boolean.
-  if (selector[0] === '!' && selector[1] === '!') {
-    return !!value;
-  }
-  if (selector[0] === '!') {
-    return !value;
-  }
-  return value;
+var DOT_NOTATION_RE = /\.([A-Za-z][\w_-]*)/g;
+var WHITESPACE_RE = /\s/g;
+var STATE_SELECTOR_RE = /([=&|!?:])([A-Za-z][\w_-]*)/g;
+var ROOT_STATE_SELECTOR_RE = /^([A-Za-z][\w_-]*)/g;
+var STATE_STR = 'state';
+function generateExpression(str) {
+  str = str.replace(WHITESPACE_RE, '');
+  str = str.replace(DOT_NOTATION_RE, '["$1"]');
+  str = str.replace(ROOT_STATE_SELECTOR_RE, 'state["$1"]');
+  str = str.replace(STATE_SELECTOR_RE, '$1state["$2"]');
+  return str;
 }
-module.exports.selectProperty = selectProperty;
+module.exports.generateExpression = generateExpression;
 
 function clearObject(obj) {
   for (var key in obj) {
@@ -595,8 +500,6 @@ AFRAME.registerComponent('bind', {
   multiple: true,
 
   init: function init() {
-    var bindForEl;
-    var bindForName;
     var componentId;
     var data = this.data;
     var key;
@@ -617,12 +520,10 @@ AFRAME.registerComponent('bind', {
     // Subscribe to store and register handler to do data-binding to components.
     this.system.subscribe(this);
 
-    this.rootEl = this.el.closest('[data-bind-for-key]');
     this.onStateUpdate = this.onStateUpdate.bind(this);
   },
 
   update: function update() {
-    var bindForEl;
     var data = this.data;
     var key;
     var property;
@@ -637,21 +538,6 @@ AFRAME.registerComponent('bind', {
       }
     }
 
-    // Check if any properties are part of an iteration in bind-for.
-    bindForEl = this.el.closest('[bind-for]');
-    if (bindForEl && bindForEl !== this.el) {
-      this.bindForEl = bindForEl;
-      this.bindRootEl = this.el.closest('[data-bind-for-key]');
-      this.bindFor = this.bindForEl.getAttribute('bind-for');
-      this.bindForKey = this.bindRootEl.getAttribute('data-bind-for-key');
-      this.keysToWatch.push(this.bindFor.in);
-      this.rootEl.addEventListener('bindforupdate', this.onStateUpdate);
-    } else {
-      this.bindFor = '';
-      this.bindForKey = '';
-    }
-
-    // Update.
     this.onStateUpdate();
   },
 
@@ -677,22 +563,10 @@ AFRAME.registerComponent('bind', {
 
     state = this.system.state;
 
-    // Update bind-for-key if necessary if simple list of strings.
-    // Sort of a hack.
-    if (this.bindFor && this.bindForKey !== undefined && !this.bindFor.key) {
-      tempNode = el;
-      while (tempNode.parentNode && tempNode.parentNode !== this.bindForEl) {
-        if (tempNode.parentNode) {
-          tempNode = tempNode.parentNode;
-        }
-      }
-      this.bindForKey = parseInt(tempNode.dataset.bindForKey, 10);
-    }
-
     // Single-property bind.
     if (_typeof(this.data) !== TYPE_OBJECT) {
       try {
-        value = lib.select(state, this.data, this.bindFor, this.bindForKey);
+        value = lib.select(state, this.data);
       } catch (e) {
         throw new Error('[aframe-state-component] Key \'' + this.data + '\' not found in state.' + (' #' + this.el.getAttribute('id') + '[' + this.attrName + ']'));
       }
@@ -710,10 +584,7 @@ AFRAME.registerComponent('bind', {
       // Pointer to a value in the state (e.g., `player.health`).
       stateSelector = this.data[propertyName].trim();
       try {
-        value = lib.select(state, stateSelector, this.bindFor, this.bindForKey);
-        if (this.bindFor && value === undefined) {
-          return;
-        }
+        value = lib.select(state, stateSelector);
       } catch (e) {
         throw new Error('[aframe-state-component] Key \'' + stateSelector + '\' not found in state.' + (' #' + this.el.getAttribute('id') + '[' + this.attrName + ']'));
       }
@@ -750,16 +621,13 @@ AFRAME.registerComponent('bind', {
 
   remove: function remove() {
     this.system.unsubscribe(this);
-    if (this.bindForEl) {
-      this.bindForEl.removeEventListener('bindforupdate', this.onStateUpdate);
-    }
   }
 });
 
 /**
  * Toggle component attach and detach based on boolean value.
  *
- * bind__raycastable="isRaycastable""
+ * bind-toggle__raycastable="isRaycastable""
  */
 AFRAME.registerComponent('bind-toggle', {
   schema: { type: 'string' },

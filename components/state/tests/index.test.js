@@ -2,6 +2,7 @@
 require('aframe');
 require('../src/index');
 var array = require('../src/lib/array');
+var lib = require('../src/lib/');
 var elFactory = require('./helpers').elFactory;
 var entityFactory = require('./helpers').entityFactory;
 
@@ -195,7 +196,7 @@ suite('state', function () {
     });
   });
 
-  suite('bind', () => {
+  suite.only('bind', () => {
     test('binds single-property component', done => {
       el.setAttribute('bind', 'visible: enabled');
       assert.notOk(el.getAttribute('visible'));
@@ -531,18 +532,10 @@ suite('state', function () {
       el.sceneEl.appendChild(template);
 
       template = document.createElement('template');
-      template.setAttribute('id', 'shoppingItemTemplate2');
-      template.innerHTML = `
-        <a-entity class="shoppingItem" bind__text="value: shoppingItem.amount"
-                  data-type="{{ shoppingItem.name }}"></a-entity>
-      `;
-      el.sceneEl.appendChild(template);
-
-      template = document.createElement('template');
       template.setAttribute('id', 'colorTemplate');
       template.innerHTML = `
         <a-entity>
-          <a-entity class="color" bind__text="value: color" data-color="{{ color }}"></a-entity>
+          <a-entity class="color" text="value: {{ color }}" data-color="{{ color }}"></a-entity>
         </a-entity>
       `;
       el.sceneEl.appendChild(template);
@@ -766,25 +759,6 @@ suite('state', function () {
         assert.equal(el.children.length, 1);
         assert.equal(el.children[0].getAttribute('text').value, 'milk');
         done();
-      });
-    });
-
-    test('can bind to item', done => {
-      el.setAttribute('bind-for', {
-        for: 'shoppingItem',
-        in: 'shoppingList',
-        template: '#shoppingItemTemplate2',
-        key: 'name'
-      });
-      setTimeout(() => {
-        var milkEl;
-        milkEl = el.querySelector('[data-bind-for-key="milk"]');
-        assert.equal(milkEl.getAttribute('text').value, '2');
-        el.sceneEl.emit('shoppingListUpdate', {name: 'milk', amount: 20});
-        setTimeout(() => {
-          assert.equal(milkEl.getAttribute('text').value, '20');
-          done();
-        });
       });
     });
   });
@@ -1319,5 +1293,44 @@ suite('array', function () {
     arr.push(1);
     assert.equal(arr.__dirty, true);
     assert.equal(arr.length, 2);
+  });
+});
+
+suite('generateExpression', function () {
+  test('generates with basic selector', () => {
+    assert.equal(lib.generateExpression('foo'), 'state["foo"]');
+    assert.equal(lib.generateExpression('foo.bar'), 'state["foo"]["bar"]');
+    assert.equal(lib.generateExpression('foo.bar.baz'), 'state["foo"]["bar"]["baz"]');
+    assert.equal(lib.generateExpression('f1.f_2.f-3'), 'state["f1"]["f_2"]["f-3"]');
+  });
+
+  test('generates with ! and !!', () => {
+    assert.equal(lib.generateExpression('!foo'), '!state["foo"]');
+    assert.equal(lib.generateExpression('!!foo.bar'), '!!state["foo"]["bar"]');
+    assert.equal(lib.generateExpression('!foo.bar.baz'), '!state["foo"]["bar"]["baz"]');
+  });
+
+  test('generates with booleans', () => {
+    assert.equal(lib.generateExpression('foo || bar'), 'state["foo"]||state["bar"]');
+    assert.equal(lib.generateExpression('foo && bar'), 'state["foo"]&&state["bar"]');
+    assert.equal(lib.generateExpression('foo.bar || qux.qaz'),
+                 'state["foo"]["bar"]||state["qux"]["qaz"]');
+  });
+
+  test('generates with comparisons', () => {
+    assert.equal(lib.generateExpression('foo === bar'), 'state["foo"]===state["bar"]');
+    assert.equal(lib.generateExpression('foo.bar === qux.qaz'),
+                 'state["foo"]["bar"]===state["qux"]["qaz"]');
+  });
+
+  test('generates with literal comparison', () => {
+    assert.equal(lib.generateExpression('foo > 0'), 'state["foo"]>0');
+    assert.equal(lib.generateExpression('foo === 5'), 'state["foo"]===5');
+    assert.equal(lib.generateExpression('foo === "bar"'), 'state["foo"]==="bar"');
+  });
+
+  test('generates with ternaries', () => {
+    assert.equal(lib.generateExpression('foo ? bar : "qaz"'),
+                 'state["foo"]?state["bar"]:"qaz"');
   });
 });

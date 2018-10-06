@@ -1,9 +1,5 @@
-var AND = '&&';
-var QUOTE_RE = /'/g;
-var OR = '||';
-var COMPARISONS = ['==', '===', '!=', '!=='];
-var tempTokenArray = [];
-var tokenArray = [];
+// Pre-compiled functions.
+const selectFunctions = {};
 
 /**
  * Select value from store. Handles boolean operations, calls `selectProperty`.
@@ -11,110 +7,28 @@ var tokenArray = [];
  * @param {object} state - State object.
  * @param {string} selector - Dot-delimited store keys (e.g., game.player.health).
  */
-function select (state, selector, bindFor, bindForKey) {
-  var comparisonResult;
-  var firstValue;
-  var i;
-  var runningBool;
-  var secondValue;
-  var tokens;
-  var value;
-
-  // If just single selector, then grab value.
-  tokens = split(selector, /\s+/);
-  if (tokens.length === 1) { return selectProperty(state, selector, bindFor, bindForKey); }
-
-  // Evaluate comparisons.
-  tokenArray.length = 0;
-  copyArray(tempTokenArray, tokens);
-  for (i = 0; i < tempTokenArray.length; i++) {
-    if (COMPARISONS.indexOf(tempTokenArray[i]) === -1) {
-      tokenArray.push(tempTokenArray[i]);
-      continue;
-    }
-
-    // Comparison (color === 'red').
-    // Pop previous value since that is one of comparsion value.
-    firstValue = selectProperty(state, tokenArray.pop());
-    // Lookup second value.
-    secondValue = tempTokenArray[i + 1].replace(QUOTE_RE, '');
-    // Evaluate (equals or not equals).
-    firstValue = firstValue === undefined ? 'undefined' : firstValue.toString()
-    secondValue = secondValue === undefined ? 'undefined' : secondValue.toString()
-    comparisonResult = tempTokenArray[i].indexOf('!') === -1
-      ? firstValue === secondValue
-      : firstValue !== secondValue;
-    tokenArray.push(comparisonResult);
-    i++;
+function select (state, selector) {
+  if (!selectFunctions[selector]) {
+    selectFunctions[selector] = new Function('state',
+                                             `return ${generateExpression(selector)};`);
   }
-
-  // Was single comparison.
-  if (tokenArray.length === 1) { return tokenArray[0]; }
-
-  // If has boolean expression, evaluate.
-  runningBool = tokenArray[0].constructor === Boolean
-    ? tokenArray[0]
-    : selectProperty(state, tokenArray[0], bindFor, bindForKey);
-  for (i = 1; i < tokenArray.length; i += 2) {
-    if (tokenArray[i] !== OR && tokenArray[i] !== AND) { continue; }
-    // Check if was evaluated comparison (bool) or a selector (string).
-    tokenArray[i + 1] = tokenArray[i + 1].constructor === Boolean
-      ? tokenArray[i + 1]
-      : selectProperty(state, tokenArray[i + 1]);
-
-    // Evaluate boolean.
-    if (tokenArray[i] === OR) {
-      runningBool = runningBool || tokenArray[i + 1];
-    } else if (tokenArray[i] === AND) {
-      runningBool = runningBool && tokenArray[i + 1];
-    }
-  }
-  return runningBool;
+  return selectFunctions[selector](state);
 }
 module.exports.select = select;
 
-/**
- * Does actual selecting and walking of state.
- */
-function selectProperty (state, selector, bindFor, bindForKey) {
-  var i;
-  var originalSelector;
-  var splitted;
-  var value;
-
-  // If bindFor, select the array. Then later, we filter the array.
-  if (bindFor && selector.startsWith(bindFor.for)) {
-    originalSelector = selector;
-    selector = bindFor.in;
-  }
-
-  // Walk.
-  value = state;
-  splitted = split(stripNot(selector), '.');
-  for (i = 0; i < splitted.length; i++) {
-    if (i < splitted.length - 1 && !(splitted[i] in value)) {
-      console.error('[state] Not found:', splitted, splitted[i]);
-    }
-    value = value[splitted[i]];
-  }
-
-  if (bindFor && originalSelector.startsWith(bindFor.for)) {
-    // Simple array.
-    if (!bindFor.key) { return value[bindForKey]; }
-    // Array of objects.
-    for (i = 0; i < value.length; i++) {
-      if (value[i][bindFor.key] !== bindForKey) { continue; }
-      value = selectProperty(value[i], originalSelector.replace(`${bindFor.for}.`, ''));
-      break;
-    }
-  }
-
-  // Boolean.
-  if (selector[0] === '!' && selector[1] === '!') { return !!value; }
-  if (selector[0] === '!') { return !value; }
-  return value;
+const DOT_NOTATION_RE = /\.([A-Za-z][\w_-]*)/g;
+const WHITESPACE_RE = /\s/g;
+const STATE_SELECTOR_RE = /([=&|!?:])([A-Za-z][\w_-]*)/g;
+const ROOT_STATE_SELECTOR_RE = /^([A-Za-z][\w_-]*)/g;
+const STATE_STR = 'state';
+function generateExpression (str) {
+  str = str.replace(WHITESPACE_RE, '');
+  str = str.replace(DOT_NOTATION_RE, '["$1"]');
+  str = str.replace(ROOT_STATE_SELECTOR_RE, 'state["$1"]');
+  str = str.replace(STATE_SELECTOR_RE, '$1state["$2"]');
+  return str;
 }
-module.exports.selectProperty = selectProperty;
+module.exports.generateExpression = generateExpression;
 
 function clearObject (obj) { for (var key in obj) { delete obj[key]; } }
 module.exports.clearObject = clearObject;

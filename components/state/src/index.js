@@ -248,8 +248,6 @@ AFRAME.registerComponent('bind', {
   multiple: true,
 
   init: function () {
-    var bindForEl;
-    var bindForName;
     var componentId;
     var data = this.data;
     var key;
@@ -271,12 +269,10 @@ AFRAME.registerComponent('bind', {
     // Subscribe to store and register handler to do data-binding to components.
     this.system.subscribe(this);
 
-    this.rootEl = this.el.closest('[data-bind-for-key]');
     this.onStateUpdate = this.onStateUpdate.bind(this);
   },
 
   update: function () {
-    var bindForEl;
     var data = this.data;
     var key;
     var property;
@@ -291,21 +287,6 @@ AFRAME.registerComponent('bind', {
       }
     }
 
-    // Check if any properties are part of an iteration in bind-for.
-    bindForEl = this.el.closest('[bind-for]');
-    if (bindForEl && bindForEl !== this.el) {
-      this.bindForEl = bindForEl;
-      this.bindRootEl = this.el.closest('[data-bind-for-key]');
-      this.bindFor = this.bindForEl.getAttribute('bind-for');
-      this.bindForKey = this.bindRootEl.getAttribute('data-bind-for-key');
-      this.keysToWatch.push(this.bindFor.in);
-      this.rootEl.addEventListener('bindforupdate', this.onStateUpdate);
-    } else {
-      this.bindFor = '';
-      this.bindForKey = '';
-    }
-
-    // Update.
     this.onStateUpdate();
   },
 
@@ -327,20 +308,10 @@ AFRAME.registerComponent('bind', {
 
     state = this.system.state;
 
-    // Update bind-for-key if necessary if simple list of strings.
-    // Sort of a hack.
-    if (this.bindFor && this.bindForKey !== undefined && !this.bindFor.key) {
-      tempNode = el;
-      while (tempNode.parentNode && tempNode.parentNode !== this.bindForEl) {
-        if (tempNode.parentNode) { tempNode = tempNode.parentNode; }
-      }
-      this.bindForKey = parseInt(tempNode.dataset.bindForKey, 10);
-    }
-
     // Single-property bind.
     if (typeof this.data !== TYPE_OBJECT) {
       try {
-        value = lib.select(state, this.data, this.bindFor, this.bindForKey);
+        value = lib.select(state, this.data);
       } catch (e) {
         throw new Error(`[aframe-state-component] Key '${this.data}' not found in state.` +
                         ` #${this.el.getAttribute('id')}[${this.attrName}]`);
@@ -359,8 +330,7 @@ AFRAME.registerComponent('bind', {
       // Pointer to a value in the state (e.g., `player.health`).
       stateSelector = this.data[propertyName].trim();
       try {
-        value = lib.select(state, stateSelector, this.bindFor, this.bindForKey);
-        if (this.bindFor && value === undefined) { return; }
+        value = lib.select(state, stateSelector);
       } catch (e) {
         throw new Error(`[aframe-state-component] Key '${stateSelector}' not found in state.` +
                         ` #${this.el.getAttribute('id')}[${this.attrName}]`);
@@ -398,16 +368,13 @@ AFRAME.registerComponent('bind', {
 
   remove: function () {
     this.system.unsubscribe(this);
-    if (this.bindForEl) {
-      this.bindForEl.removeEventListener('bindforupdate', this.onStateUpdate);
-    }
   }
 });
 
 /**
  * Toggle component attach and detach based on boolean value.
  *
- * bind__raycastable="isRaycastable""
+ * bind-toggle__raycastable="isRaycastable""
  */
 AFRAME.registerComponent('bind-toggle', {
   schema: {type: 'string'},
