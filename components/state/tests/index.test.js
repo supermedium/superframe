@@ -1334,6 +1334,10 @@ suite('generateExpression', function () {
                  'state["foo"]?state["bar"]:"qaz"');
   });
 
+  test.only('generates with length', () => {
+    assert.equal(lib.generateExpression('a.length > 0'), 'state["a"]["length"]>0');
+  });
+
   test('preserves item selector', () => {
     assert.equal(lib.generateExpression('item'), 'item');
     assert.equal(lib.generateExpression('item.id'), 'item["id"]');

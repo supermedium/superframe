@@ -332,6 +332,7 @@ AFRAME.registerComponent('bind', {
       try {
         value = lib.select(state, stateSelector);
       } catch (e) {
+        console.log(e);
         throw new Error(`[aframe-state-component] Key '${stateSelector}' not found in state.` +
                         ` #${this.el.getAttribute('id')}[${this.attrName}]`);
       }
