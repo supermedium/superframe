@@ -19,7 +19,7 @@ module.exports.select = select;
 
 const DOT_NOTATION_RE = /\.([A-Za-z][\w_-]*)/g;
 const WHITESPACE_RE = /\s/g;
-const STATE_SELECTOR_RE = /([=&|!?:])([A-Za-z][\w_-]*)/g;
+const STATE_SELECTOR_RE = /([=&|!?:+-])([A-Za-z][\w_-]*)/g;
 const ROOT_STATE_SELECTOR_RE = /^([A-Za-z][\w_-]*)/g;
 const ITEM_RE = /state\["item"\]/g;
 const STATE_STR = 'state';
