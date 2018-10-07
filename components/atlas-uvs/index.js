@@ -22,6 +22,7 @@ AFRAME.registerComponent('atlas-uvs', {
   update: function () {
     const data = this.data;
     const uvs = getGridUvs(data.row - 1, data.column - 1, data.totalRows, data.totalColumns);
+    console.log(uvs);
 
     const geometry = this.el.getObject3D('mesh').geometry;
     geometry.faceVertexUvs[0][0][0].copy(uvs[0]);
@@ -39,6 +40,7 @@ AFRAME.registerComponent('dynamic-texture-atlas', {
     canvasId: {default: 'dynamicAtlas'},
     canvasHeight: {default: 1024},
     canvasWidth: {default: 1024},
+    debug: {default: false},
     numColumns: {default: 8},
     numRows: {default: 8}
   },
@@ -52,9 +54,16 @@ AFRAME.registerComponent('dynamic-texture-atlas', {
     canvas.width = this.data.canvasWidth;
     this.ctx = canvas.getContext('2d');
     document.body.appendChild(canvas);
+
+    if (this.data.debug) {
+      canvas.style.left = 0;
+      canvas.style.top = 0;
+      canvas.style.position = 'fixed';
+      canvas.style.zIndex = 9999999999;
+    }
   },
 
-  drawTexture: function (image, row, column) {
+  drawTexture: function (image, row, column, width, height) {
     const canvas = this.canvas;
     const data = this.data;
 
@@ -62,8 +71,8 @@ AFRAME.registerComponent('dynamic-texture-atlas', {
       image.onload = () => { this.drawTexture(image, row, column); }
     }
 
-    const gridHeight = canvas.height / data.numRows;
-    const gridWidth = canvas.width / data.numColumns;
+    const gridHeight = height || (canvas.height / data.numRows);
+    const gridWidth = width || (canvas.width / data.numColumns);
 
     // image, dx, dy, dwidth, dheight
     this.ctx.drawImage(image, gridWidth * row, gridWidth * column, gridWidth, gridHeight);
@@ -77,8 +86,9 @@ AFRAME.registerComponent('dynamic-texture-atlas', {
  * Return UVs for an texture within an atlas, given the row and column info.
  */
 function getGridUvs (row, column, totalRows, totalColumns) {
-  const columnWidth = 1 / totalRows;
-  const rowHeight = 1 / totalColumns;
+  const columnWidth = 1 / totalColumns;
+  const rowHeight = 1 / totalRows;
+
   uvs[0].set(columnWidth * column,
              rowHeight * row + rowHeight);
   uvs[1].set(columnWidth * column,

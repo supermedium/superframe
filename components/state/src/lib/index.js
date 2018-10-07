@@ -84,12 +84,12 @@ function composeFunctions () {
 }
 module.exports.composeFunctions = composeFunctions;
 
-var NO_WATCH_TOKENS = ['||', '&&', '!=', '!==', '==', '==='];
-var WHITESPACE_PLUS_RE = /s+/;
+var NO_WATCH_TOKENS = ['||', '&&', '!=', '!==', '==', '===', '>', '<', '<=', '>='];
+var WHITESPACE_PLUS_RE = /\s+/;
 function parseKeysToWatch (keys, str, isBindItem) {
   var i;
   var tokens;
-  tokens = str.split(WHITESPACE_PLUS_RE);
+  tokens = split(str, WHITESPACE_PLUS_RE);
   for (i = 0; i < tokens.length; i++) {
     if (NO_WATCH_TOKENS.indexOf(tokens[i]) === -1 && !tokens[i].startsWith("'") &&
         keys.indexOf(tokens[i]) === -1) {

@@ -168,12 +168,12 @@ function composeFunctions() {
 }
 module.exports.composeFunctions = composeFunctions;
 
-var NO_WATCH_TOKENS = ['||', '&&', '!=', '!==', '==', '==='];
-var WHITESPACE_PLUS_RE = /s+/;
+var NO_WATCH_TOKENS = ['||', '&&', '!=', '!==', '==', '===', '>', '<', '<=', '>='];
+var WHITESPACE_PLUS_RE = /\s+/;
 function parseKeysToWatch(keys, str, isBindItem) {
   var i;
   var tokens;
-  tokens = str.split(WHITESPACE_PLUS_RE);
+  tokens = split(str, WHITESPACE_PLUS_RE);
   for (i = 0; i < tokens.length; i++) {
     if (NO_WATCH_TOKENS.indexOf(tokens[i]) === -1 && !tokens[i].startsWith("'") && keys.indexOf(tokens[i]) === -1) {
       if (isBindItem && tokens[i] === 'item') {
@@ -265,6 +265,8 @@ AFRAME.registerSystem('state', {
 
     var key;
 
+    this.arrays = [];
+    this.dirtyArrays = [];
     this.diff = {};
     this.state = AFRAME.utils.clone(State.initialState);
     this.subscriptions = [];
@@ -273,6 +275,7 @@ AFRAME.registerSystem('state', {
     // Wrap array to detect dirty.
     for (key in this.state) {
       if (this.state[key] && this.state[key].constructor === Array) {
+        this.arrays.push(key);
         this.state[key].__dirty = true;
         wrapArray(this.state[key]);
       }
@@ -300,6 +303,7 @@ AFRAME.registerSystem('state', {
    * Dispatch action.
    */
   dispatch: function dispatch(actionName, payload) {
+    var dirtyArrays;
     var i;
     var key;
     var subscription;
@@ -316,6 +320,13 @@ AFRAME.registerSystem('state', {
     }
     diff(this.lastState, this.state, this.diff, State.nonBindedStateKeys);
 
+    this.dirtyArrays.length = 0;
+    for (i = 0; i < this.arrays.length; i++) {
+      if (this.state[this.arrays[i]].__dirty) {
+        this.dirtyArrays.push(this.arrays[i]);
+      }
+    }
+
     // Notify subscriptions / binders.
     for (i = 0; i < this.subscriptions.length; i++) {
       if (this.subscriptions[i].name === 'bind-for') {
@@ -324,7 +335,7 @@ AFRAME.registerSystem('state', {
           continue;
         }
       } else {
-        if (!this.shouldUpdate(this.subscriptions[i].keysToWatch, this.diff)) {
+        if (!this.shouldUpdate(this.subscriptions[i].keysToWatch, this.diff, this.dirtyArrays)) {
           continue;
         }
       }
@@ -340,7 +351,6 @@ AFRAME.registerSystem('state', {
     }
 
     // Store last state.
-    // TODO: copyState messes with the diff.
     this.copyState(this.lastState, this.state);
 
     // Emit.
@@ -389,10 +399,9 @@ AFRAME.registerSystem('state', {
   /**
    * Check if state changes were relevant to this binding. If not, don't call.
    */
-  shouldUpdate: function shouldUpdate(keysToWatch, diff) {
-    var stateKey;
-    for (stateKey in diff) {
-      if (keysToWatch.indexOf(stateKey) !== -1) {
+  shouldUpdate: function shouldUpdate(keysToWatch, diff, dirtyArrays) {
+    for (var i = 0; i < keysToWatch.length; i++) {
+      if (keysToWatch[i] in diff || dirtyArrays.indexOf(keysToWatch[i]) !== -1) {
         return true;
       }
     }

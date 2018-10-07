@@ -23,6 +23,8 @@ AFRAME.registerSystem('state', {
   init: function () {
     var key;
 
+    this.arrays = [];
+    this.dirtyArrays = [];
     this.diff = {};
     this.state = AFRAME.utils.clone(State.initialState);
     this.subscriptions = [];
@@ -31,6 +33,7 @@ AFRAME.registerSystem('state', {
     // Wrap array to detect dirty.
     for (key in this.state) {
       if (this.state[key] && this.state[key].constructor === Array) {
+        this.arrays.push(key);
         this.state[key].__dirty = true;
         wrapArray(this.state[key]);
       }
@@ -58,6 +61,7 @@ AFRAME.registerSystem('state', {
    * Dispatch action.
    */
   dispatch: function (actionName, payload) {
+    var dirtyArrays;
     var i;
     var key;
     var subscription;
@@ -72,13 +76,21 @@ AFRAME.registerSystem('state', {
     for (key in this.diff) { delete this.diff[key]; }
     diff(this.lastState, this.state, this.diff, State.nonBindedStateKeys);
 
+    this.dirtyArrays.length = 0;
+    for (i = 0; i < this.arrays.length; i++) {
+      if (this.state[this.arrays[i]].__dirty) {
+        this.dirtyArrays.push(this.arrays[i]);
+      }
+    }
+
     // Notify subscriptions / binders.
     for (i = 0; i < this.subscriptions.length; i++) {
       if (this.subscriptions[i].name === 'bind-for') {
         // For arrays and bind-for, check __dirty flag on array rather than the diff.
         if (!this.state[this.subscriptions[i].keysToWatch[0]].__dirty) { continue; }
       } else {
-        if (!this.shouldUpdate(this.subscriptions[i].keysToWatch, this.diff)) { continue; }
+        if (!this.shouldUpdate(this.subscriptions[i].keysToWatch, this.diff,
+                               this.dirtyArrays)) { continue; }
       }
 
       this.subscriptions[i].onStateUpdate();
@@ -92,7 +104,6 @@ AFRAME.registerSystem('state', {
     }
 
     // Store last state.
-    // TODO: copyState messes with the diff.
     this.copyState(this.lastState, this.state);
 
     // Emit.
@@ -139,10 +150,9 @@ AFRAME.registerSystem('state', {
   /**
    * Check if state changes were relevant to this binding. If not, don't call.
    */
-  shouldUpdate: function (keysToWatch, diff) {
-    var stateKey;
-    for (stateKey in diff) {
-      if (keysToWatch.indexOf(stateKey) !== -1) {
+  shouldUpdate: function (keysToWatch, diff, dirtyArrays) {
+    for (let i = 0; i < keysToWatch.length; i++) {
+      if (keysToWatch[i] in diff || dirtyArrays.indexOf(keysToWatch[i]) !== -1) {
         return true;
       }
     }
