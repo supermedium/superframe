@@ -9,7 +9,6 @@ const selectFunctions = {};
  * @param {object} item - From bind-item.
  */
 function select (state, selector, item) {
-  console.log(state, selector, item);
   if (!selectFunctions[selector]) {
     selectFunctions[selector] = new Function('state', 'item',
                                              `return ${generateExpression(selector)};`);
