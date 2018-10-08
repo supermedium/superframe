@@ -93,6 +93,7 @@
 
 	    el.addEventListener('child-attached', this.handleChildAttached);
 	    el.addEventListener('child-detached', this.handleChildDetached);
+	    el.addEventListener('layoutrefresh', this.update.bind(this));
 	  },
 
 	  /**
@@ -372,6 +373,7 @@
 	 * @param {array} positions - Array of coordinates.
 	 */
 	function setPositions (els, positions, orderAttribute) {
+	  var value;
 	  var i;
 	  var orderIndex;
 
@@ -379,7 +381,9 @@
 	  // meaning in A-Frame.
 	  if (orderAttribute) {
 	    for (i = 0; i < els.length; i++) {
-	      orderIndex = parseInt(els[i].getAttribute(orderAttribute), 10) * 3;
+	      value = els[i].getAttribute(orderAttribute);
+	      if (value === null || value === undefined) { continue; }
+	      orderIndex = parseInt(value, 10) * 3;
 	      els[i].object3D.position.set(positions[orderIndex], positions[orderIndex + 1],
 	                                   positions[orderIndex + 2]);
 	    }
