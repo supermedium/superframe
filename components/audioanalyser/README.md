@@ -47,8 +47,8 @@ el.components.audioanalyser.analyser;
 
 | Event Name          | Description                        |
 | --------            | -----------                        |
-| audioanalyser-beat  | Beat detected with beat detection. |
-| audioanalyser-ready | AnalyserNode initialized.          |
+| audioanalyserbeat  | Beat detected with beat detection. |
+| audioanalyserready | AnalyserNode initialized.          |
 
 ### Usage
 

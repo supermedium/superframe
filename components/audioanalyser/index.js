@@ -2,80 +2,69 @@ if (typeof AFRAME === 'undefined') {
   throw new Error('Component attempted to register before AFRAME was available.');
 }
 
-// Single audio context.
-var context;
-
-/**
- * Audio visualizer system for A-Frame. Share AnalyserNodes between components that share the
- * the `src`.
- */
-AFRAME.registerSystem('audioanalyser', {
-  init: function () {
-    this.analysers = {};
-  },
-
-  getOrCreateAnalyser: function (data) {
-    if (!context) { context = new AudioContext(); }
-    var analysers = this.analysers;
-    var analyser = context.createAnalyser();
-    var audioEl = data.src;
-    var src = audioEl.getAttribute('src');
-
-    if (!data.unique && analysers[src]) { return analysers[src]; }
-
-    var source = context.createMediaElementSource(audioEl)
-    source.connect(analyser);
-    analyser.connect(context.destination);
-    analyser.smoothingTimeConstant = data.smoothingTimeConstant;
-    analyser.fftSize = data.fftSize;
-
-    // Store.
-    analysers[src] = analyser;
-    return analysers[src];
-  }
-});
+var audioBufferCache = {};
 
 /**
  * Audio visualizer component for A-Frame using AnalyserNode.
  */
 AFRAME.registerComponent('audioanalyser', {
   schema: {
+    buffer: {default: false},
     beatDetectionDecay: {default: 0.99},
     beatDetectionMinVolume: {default: 15},
     beatDetectionThrottle: {default: 250},
+    enabled: {default: true},
     enableBeatDetection: {default: true},
     enableLevels: {default: true},
     enableWaveform: {default: true},
     enableVolume: {default: true},
     fftSize: {default: 2048},
     smoothingTimeConstant: {default: 0.8},
-    src: {type: 'selector'},
+    src: {
+      parse: function (val) {
+        if (val.constructor !== String) { return val; }
+        if (val.startsWith('#') || val.startsWith('.')) {
+          return document.querySelector(val);
+        }
+        return val;
+      }
+    },
     unique: {default: false}
   },
 
   init: function () {
-    this.analyser = null;
+    var analyser;
+    var data = this.data;
+
+    this.audioEl = null;
+    this.context = new AudioContext();
     this.levels = null;
     this.waveform = null;
     this.volume = 0;
+
+    analyser = this.analyser = this.context.createAnalyser();
+    analyser.connect(this.context.destination);
+    analyser.fftSize = data.fftSize;
+    analyser.smoothingTimeConstant = data.smoothingTimeConstant;
+    this.levels = new Uint8Array(analyser.frequencyBinCount);
+    this.waveform = new Uint8Array(analyser.fftSize);
   },
 
-  update: function () {
+  update: function (oldData) {
+    var analyser = this.analyser;
     var data = this.data;
-    var self = this;
-    var system = this.system;
+
+    // Update analyser stuff.
+    if (oldData.fftSize !== data.fftSize ||
+        oldData.smoothingTimeConstant !== data.smoothingTimeConstant) {
+      analyser.fftSize = data.fftSize;
+      analyser.smoothingTimeConstant = data.smoothingTimeConstant;
+      this.levels = new Uint8Array(analyser.frequencyBinCount);
+      this.waveform = new Uint8Array(analyser.fftSize);
+    }
 
     if (!data.src) { return; }
-
-    // Get or create AnalyserNode.
-    init(system.getOrCreateAnalyser(data));
-
-    function init (analyser) {
-      self.analyser = analyser;
-      self.levels = new Uint8Array(self.analyser.frequencyBinCount);
-      self.waveform = new Uint8Array(self.analyser.fftSize);
-      self.el.emit('audioanalyser-ready', analyser, false);
-    }
+    this.refreshSource();
   },
 
   /**
@@ -83,7 +72,8 @@ AFRAME.registerComponent('audioanalyser', {
    */
   tick: function (t, dt) {
     var data = this.data;
-    if (!this.analyser) { return; }
+
+    if (!data.enabled) { return; }
 
     // Levels (frequency).
     if (data.enableLevels || data.enableVolume) {
@@ -110,7 +100,7 @@ AFRAME.registerComponent('audioanalyser', {
       if (!this.beatCutOff) { this.beatCutOff = volume; }
       if (volume > this.beatCutOff && volume > this.data.beatDetectionMinVolume) {
         console.log('[audioanalyser] Beat detected.');
-        this.el.emit('audioanalyser-beat', null, false);
+        this.el.emit('audioanalyserbeat', null, false);
         this.beatCutOff = volume * 1.5;
         this.beatTime = 0;
       } else {
@@ -122,5 +112,79 @@ AFRAME.registerComponent('audioanalyser', {
         }
       }
     }
+  },
+
+  refreshSource: function () {
+    var analyser = this.analyser;
+    var data = this.data;
+
+    if (this.source) {
+      this.source.disconnect(analyser);
+    }
+    if (data.buffer) {
+      this.getBufferSource().then(source => {
+        this.source = source;
+        this.source.connect(analyser);
+        analyser.connect(this.context.destination);
+      });
+    } else {
+      this.source = this.getMediaSource();
+      this.source.connect(analyser);
+      analyser.connect(this.context.destination);
+    }
+  },
+
+  suspendContext: function () {
+    this.context.suspend();
+  },
+
+  resumeContext: function () {
+    this.context.resume();
+  },
+
+  /**
+   * Fetch and parse buffer to audio buffer. Resolve a source.
+   */
+  fetchAudioBuffer: function (src) {
+    return new Promise(resolve => {
+      // From cache.
+      if (audioBufferCache[src]) {
+        return resolve(audioBufferCache[src]);
+      }
+
+      // Fetch if does not exist.
+      fetch(src).then(response => {
+        return response.arrayBuffer();
+      }).then(buffer => {
+        this.context.decodeAudioData(buffer).then(audioBuffer => {
+          audioBufferCache[src] = audioBuffer;
+          resolve(audioBuffer);
+        });
+      }).catch(console.error);
+    });
+  },
+
+  getBufferSource: function () {
+    var data = this.data;
+    return this.fetchAudioBuffer(data.src).then(() => {
+      var source;
+      source = this.context.createBufferSource();
+      source.buffer = audioBufferCache[data.src];
+      this.el.emit('audioanalyserbuffersource', source, false);
+      return source;
+    }).catch(console.error);
+  },
+
+  getMediaSource: function () {
+    if (this.data.src.constructor === String) {
+      if (!this.audio) {
+        this.audio = document.createElement('audio');
+        this.audio.crossOrigin = 'anonymous';
+      }
+      this.audio.setAttribute('src', this.data.src);
+    } else {
+      this.audio = this.data.src;
+    }
+    return this.context.createMediaElementSource(this.audio)
   }
 });

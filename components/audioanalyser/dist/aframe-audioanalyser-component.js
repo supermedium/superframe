@@ -77,7 +77,10 @@
 
 	    // Store.
 	    analysers[src] = analyser;
-	    return analysers[src];
+	    return {
+	      analyser: analysers[src],
+	      source: source
+	    };
 	  }
 	});
 
@@ -114,7 +117,7 @@
 	    if (!data.src) { return; }
 
 	    // Get or create AnalyserNode.
-	    init(system.getOrCreateAnalyser(data));
+	    init(system.getOrCreateAnalyser(data).analyser);
 
 	    function init (analyser) {
 	      self.analyser = analyser;
