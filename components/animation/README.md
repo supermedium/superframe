@@ -95,26 +95,26 @@ Install and use by directly including the [browser files](dist):
 ```html
 <head>
   <title>My A-Frame Scene</title>
-  <script src="https://aframe.io/releases/0.8.0/aframe.min.js"></script>
-  <script src="https://unpkg.com/aframe-animation-component@^4.1.2/dist/aframe-animation-component.min.js"></script>
+  <script src="https://aframe.io/releases/0.8.2/aframe.min.js"></script>
+  <script src="https://unpkg.com/aframe-animation-component@^5.1.2/dist/aframe-animation-component.min.js"></script>
 </head>
 
 <body>
   <a-scene>
     <a-entity geometry="primitive: box" material="color: black"
-              animation__color="property: material.color; dir: alternate; dur: 1000;
+              animation__color="property: components.material.material.color; type: color; dir: alternate; dur: 1000;
                                 easing: easeInSine; loop: true; to: #FFF">
     </a-entity>
 
-    <a-entity geometry="primitive: box" material="color: orange"
-              animation__fadein="property: material.opacity; dur: 100;
+    <a-entity geometry="primitive: box" material="color: orange; transparent: true"
+              animation__fadein="property: components.material.material.opacity; dur: 100;
                                   easing: linear; from 0; to: 1; startEvents: fadein"
-              animation__fadeout="property: material.opacity; dur: 100;
-                                  easing: linear; from 1; to: 0; startEvents: fadeout"
+              animation__fadeout="property: components.material.material.opacity; dur: 100;
+                                  easing: linear; from 1; to: 0; startEvents: fadeout">
     </a-entity>
 
     <a-cylinder color="#F55" radius="0.1"
-                animation="property: color; dir: alternate; dur: 1000;
+                animation="property: components.material.material.color; type: color; dir: alternate; dur: 1000;
                            easing: easeInSine; loop: true; to: #5F5"
                 animation__scale="property: scale; dir: alternate; dur: 200;
                            easing: easeInSine; loop: true; to: 1.2 1 1.2"
