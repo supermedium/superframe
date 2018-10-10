@@ -107,10 +107,8 @@ Install and use by directly including the [browser files](dist):
     </a-entity>
 
     <a-entity geometry="primitive: box" material="color: orange; transparent: true"
-              animation__fadein="property: components.material.material.opacity; dur: 100;
-                                  easing: linear; from 0; to: 1; startEvents: fadein"
-              animation__fadeout="property: components.material.material.opacity; dur: 100;
-                                  easing: linear; from 1; to: 0; startEvents: fadeout">
+              animation__fadein="property: components.material.material.opacity; dur: 100; easing: linear; from: 0; to: 1; startEvents: fadein"
+              animation__fadeout="property: components.material.material.opacity; dur: 100; easing: linear; from: 1; to: 0; startEvents: fadeout">
     </a-entity>
 
     <a-cylinder color="#F55" radius="0.1"
