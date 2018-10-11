@@ -118,10 +118,7 @@ AFRAME.registerComponent('audioanalyser', {
     var analyser = this.analyser;
     var data = this.data;
 
-    if (this.source) {
-      this.source.disconnect(analyser);
-    }
-    if (data.buffer) {
+    if (data.buffer && data.src.constructor === String) {
       this.getBufferSource().then(source => {
         this.source = source;
         this.source.connect(analyser);
