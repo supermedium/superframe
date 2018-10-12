@@ -119,6 +119,7 @@ AFRAME.registerComponent('audioanalyser', {
   init: function init() {
     var analyser;
     var data = this.data;
+    var gainNode;
 
     this.audioEl = null;
     this.context = new AudioContext();
@@ -127,6 +128,8 @@ AFRAME.registerComponent('audioanalyser', {
     this.volume = 0;
 
     analyser = this.analyser = this.context.createAnalyser();
+    gainNode = this.gainNode = this.context.createGain();
+    gainNode.connect(analyser);
     analyser.connect(this.context.destination);
     analyser.fftSize = data.fftSize;
     analyser.smoothingTimeConstant = data.smoothingTimeConstant;
@@ -157,6 +160,7 @@ AFRAME.registerComponent('audioanalyser', {
    */
   tick: function tick(t, dt) {
     var data = this.data;
+    var volume;
 
     if (!data.enabled) {
       return;
@@ -212,13 +216,11 @@ AFRAME.registerComponent('audioanalyser', {
     if (data.buffer && data.src.constructor === String) {
       this.getBufferSource().then(function (source) {
         _this.source = source;
-        _this.source.connect(analyser);
-        analyser.connect(_this.context.destination);
+        _this.source.connect(_this.gainNode);
       });
     } else {
       this.source = this.getMediaSource();
-      this.source.connect(analyser);
-      analyser.connect(this.context.destination);
+      this.source.connect(this.gainNode);
     }
   },
 
