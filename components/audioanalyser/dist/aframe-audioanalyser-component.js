@@ -126,6 +126,7 @@ AFRAME.registerComponent('audioanalyser', {
     this.levels = null;
     this.waveform = null;
     this.volume = 0;
+    this.xhr = null;
 
     analyser = this.analyser = this.context.createAnalyser();
     gainNode = this.gainNode = this.context.createGain();
@@ -238,21 +239,23 @@ AFRAME.registerComponent('audioanalyser', {
   fetchAudioBuffer: function fetchAudioBuffer(src) {
     var _this2 = this;
 
-    return new Promise(function (resolve) {
-      // From cache.
-      if (audioBufferCache[src]) {
-        return resolve(audioBufferCache[src]);
-      }
+    // From cache.
+    if (audioBufferCache[src]) {
+      return Promise.resolve(audioBufferCache[src]);
+    }
 
+    return new Promise(function (resolve) {
       // Fetch if does not exist.
-      fetch(src).then(function (response) {
-        return response.arrayBuffer();
-      }).then(function (buffer) {
-        _this2.context.decodeAudioData(buffer).then(function (audioBuffer) {
+      var xhr = _this2.xhr = new XMLHttpRequest();
+      xhr.open('GET', src);
+      xhr.responseType = 'arraybuffer';
+      xhr.addEventListener('load', function () {
+        _this2.context.decodeAudioData(xhr.response).then(function (audioBuffer) {
           audioBufferCache[src] = audioBuffer;
           resolve(audioBuffer);
-        });
-      }).catch(console.error);
+        }).catch(console.error);
+      });
+      xhr.send();
     });
   },
 
