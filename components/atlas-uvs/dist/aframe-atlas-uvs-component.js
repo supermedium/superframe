@@ -116,6 +116,7 @@ AFRAME.registerComponent('dynamic-texture-atlas', {
     canvasId: { default: 'dynamicAtlas' },
     canvasHeight: { default: 1024 },
     canvasWidth: { default: 1024 },
+    debug: { default: false },
     numColumns: { default: 8 },
     numRows: { default: 8 }
   },
@@ -129,9 +130,16 @@ AFRAME.registerComponent('dynamic-texture-atlas', {
     canvas.width = this.data.canvasWidth;
     this.ctx = canvas.getContext('2d');
     document.body.appendChild(canvas);
+
+    if (this.data.debug) {
+      canvas.style.left = 0;
+      canvas.style.top = 0;
+      canvas.style.position = 'fixed';
+      canvas.style.zIndex = 9999999999;
+    }
   },
 
-  drawTexture: function drawTexture(image, row, column) {
+  drawTexture: function drawTexture(image, row, column, width, height) {
     var _this = this;
 
     var canvas = this.canvas;
@@ -143,8 +151,8 @@ AFRAME.registerComponent('dynamic-texture-atlas', {
       };
     }
 
-    var gridHeight = canvas.height / data.numRows;
-    var gridWidth = canvas.width / data.numColumns;
+    var gridHeight = height || canvas.height / data.numRows;
+    var gridWidth = width || canvas.width / data.numColumns;
 
     // image, dx, dy, dwidth, dheight
     this.ctx.drawImage(image, gridWidth * row, gridWidth * column, gridWidth, gridHeight);
@@ -158,14 +166,16 @@ AFRAME.registerComponent('dynamic-texture-atlas', {
  * Return UVs for an texture within an atlas, given the row and column info.
  */
 function getGridUvs(row, column, totalRows, totalColumns) {
-  var columnWidth = 1 / totalRows;
-  var rowHeight = 1 / totalColumns;
+  var columnWidth = 1 / totalColumns;
+  var rowHeight = 1 / totalRows;
+
   uvs[0].set(columnWidth * column, rowHeight * row + rowHeight);
   uvs[1].set(columnWidth * column, rowHeight * row);
   uvs[2].set(columnWidth * column + columnWidth, rowHeight * row);
   uvs[3].set(columnWidth * column + columnWidth, rowHeight * row + rowHeight);
   return uvs;
 }
+module.exports.getGridUvs = getGridUvs;
 
 /***/ })
 /******/ ]);

@@ -22,7 +22,6 @@ AFRAME.registerComponent('atlas-uvs', {
   update: function () {
     const data = this.data;
     const uvs = getGridUvs(data.row - 1, data.column - 1, data.totalRows, data.totalColumns);
-    console.log(uvs);
 
     const geometry = this.el.getObject3D('mesh').geometry;
     geometry.faceVertexUvs[0][0][0].copy(uvs[0]);
@@ -99,3 +98,4 @@ function getGridUvs (row, column, totalRows, totalColumns) {
              rowHeight * row + rowHeight);
   return uvs;
 }
+module.exports.getGridUvs = getGridUvs;
