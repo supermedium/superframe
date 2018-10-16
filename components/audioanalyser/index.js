@@ -148,10 +148,14 @@ AFRAME.registerComponent('audioanalyser', {
   fetchAudioBuffer: function (src) {
     // From cache.
     if (audioBufferCache[src]) {
-      return Promise.resolve(audioBufferCache[src]);
+      if (audioBufferCache[src].constructor === Promise) {
+        return audioBufferCache[src];
+      } else {
+        return Promise.resolve(audioBufferCache[src]);
+      }
     }
 
-    return new Promise(resolve => {
+    audioBufferCache[src] = new Promise(resolve => {
       // Fetch if does not exist.
       const xhr = this.xhr = new XMLHttpRequest();
       xhr.open('GET', src);
@@ -164,6 +168,7 @@ AFRAME.registerComponent('audioanalyser', {
       });
       xhr.send();
     });
+    return audioBufferCache[src];
   },
 
   getBufferSource: function () {
