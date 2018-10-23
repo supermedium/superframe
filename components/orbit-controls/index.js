@@ -1,5 +1,7 @@
 require('./lib/OrbitControls');
 
+var bind = AFRAME.utils.bind;
+
 AFRAME.registerComponent('orbit-controls', {
   dependencies: ['camera'],
 
@@ -15,7 +17,7 @@ AFRAME.registerComponent('orbit-controls', {
     enableZoom: {default: true},
     initialPosition: {type: 'vec3'},
     keyPanSpeed: {default: 7},
-    minAzimuthAngle: {type: 'number', default: Infinity},
+    minAzimuthAngle: {type: 'number', default: - Infinity},
     maxAzimuthAngle: {type: 'number', default: Infinity},
     maxDistance: {default: 1000},
     maxPolarAngle: {default: AFRAME.utils.device.isMobile() ? 90 : 120},
@@ -38,26 +40,9 @@ AFRAME.registerComponent('orbit-controls', {
 
     oldPosition = new THREE.Vector3();
 
-    el.sceneEl.addEventListener('enter-vr', () => {
-      if (!AFRAME.utils.device.checkHeadsetConnected() &&
-          !AFRAME.utils.device.isMobile()) { return; }
-      this.controls.enabled = false;
-      if (el.hasAttribute('look-controls')) {
-        el.setAttribute('look-controls', 'enabled', true);
-        oldPosition.copy(el.getObject3D('camera').position);
-        el.getObject3D('camera').position.set(0, 0, 0);
-      }
-    });
-
-    el.sceneEl.addEventListener('exit-vr', () => {
-      if (!AFRAME.utils.device.checkHeadsetConnected() &&
-          !AFRAME.utils.device.isMobile()) { return; }
-      this.controls.enabled = true;
-      el.getObject3D('camera').position.copy(oldPosition);
-      if (el.hasAttribute('look-controls')) {
-        el.setAttribute('look-controls', 'enabled', false);
-      }
-    });
+    this.bindMethods();
+    el.sceneEl.addEventListener('enter-vr', this.onEnterVR); 
+    el.sceneEl.addEventListener('exit-vr', this.onExitVR);
 
     document.body.style.cursor = 'grab';
     document.addEventListener('mousedown', () => {
@@ -69,6 +54,36 @@ AFRAME.registerComponent('orbit-controls', {
 
     this.target = new THREE.Vector3();
     el.getObject3D('camera').position.copy(this.data.initialPosition);
+  },
+
+  onEnterVR: function() {
+    var el = this.el;
+
+    if (!AFRAME.utils.device.checkHeadsetConnected() &&
+        !AFRAME.utils.device.isMobile()) { return; }
+    this.controls.enabled = false;
+    if (el.hasAttribute('look-controls')) {
+      el.setAttribute('look-controls', 'enabled', true);
+      oldPosition.copy(el.getObject3D('camera').position);
+      el.getObject3D('camera').position.set(0, 0, 0);
+    }
+  },
+
+  onExitVR: function() {
+    var el = this.el;
+
+    if (!AFRAME.utils.device.checkHeadsetConnected() &&
+        !AFRAME.utils.device.isMobile()) { return; }
+    this.controls.enabled = true;
+    el.getObject3D('camera').position.copy(oldPosition);
+    if (el.hasAttribute('look-controls')) {
+      el.setAttribute('look-controls', 'enabled', false);
+    }
+  },
+
+  bindMethods: function() {
+    this.onEnterVR = bind(this.onEnterVR, this);
+    this.onExitVR = bind(this.onExitVR, this);
   },
 
   update: function (oldData) {
@@ -106,5 +121,13 @@ AFRAME.registerComponent('orbit-controls', {
     if (controls.enabled && (controls.enableDamping || controls.autoRotate)) {
       this.controls.update();
     }
+  },
+
+  remove: function() {
+    this.controls.reset();
+    this.controls.dispose();
+
+    this.el.sceneEl.removeEventListener('enter-vr', this.onEnterVR);
+    this.el.sceneEl.removeEventListener('exit-vr', this.onExitVR);
   }
 });
