@@ -119,7 +119,6 @@
 	    var intersectedEls = this.intersectedEls;
 	    var el = this.el;
 	    var i;
-	    var mesh;
 	    var newIntersectedEls = this.newIntersectedEls;
 	    var objectEls = this.objectEls;
 	    var prevCheckTime = this.prevCheckTime;
@@ -133,20 +132,16 @@
 	    // Update check time.
 	    this.prevCheckTime = time;
 
-	    // No mesh, no collisions
-	    mesh = el.getObject3D('mesh') || el.getObject3D('text');
-	    if (!mesh) { return; }
-
 	    if (this.dirty) { this.refreshObjects(); }
 
 	    // Update the bounding box to account for rotations and position changes.
-	    boundingBox.setFromObject(mesh);
+	    boundingBox.setFromObject(el.object3D);
 	    this.boxMin.copy(boundingBox.min);
 	    this.boxMax.copy(boundingBox.max);
 	    boundingBox.getCenter(this.boxCenter);
 
 	    if (this.data.debug) {
-	      this.boxHelper.setFromObject(mesh);
+	      this.boxHelper.setFromObject(el.object3D);
 	      if (!this.boxHelper.parent) { el.sceneEl.object3D.add(this.boxHelper); }
 	    }
 
@@ -159,10 +154,10 @@
 	      if (!this.data.collideNonVisible && !objectEls[i].getAttribute('visible')) {
 	        // Remove box helper if debug flag set and has box helper.
 	        if (this.data.debug) {
-	          boxHelper = objectEls[i].getObject3D('mesh').boxHelper;
+	          boxHelper = objectEls[i].object3D.boxHelper;
 	          if (boxHelper) {
 	            el.sceneEl.object3D.remove(boxHelper);
-	            objectEls[i].getObject3D('mesh').boxHelper = null;
+	            objectEls[i].object3D.boxHelper = null;
 	          }
 	        }
 	        continue;
@@ -199,7 +194,7 @@
 	    // Calculate closest intersected entity based on centers.
 	    for (i = 0; i < intersectedEls.length; i++) {
 	      centerDifferenceVec3
-	        .copy(intersectedEls[i].getObject3D('mesh').boundingBoxCenter)
+	        .copy(intersectedEls[i].object3D.boundingBoxCenter)
 	        .sub(this.boxCenter);
 	      if (closestCenterDifference === undefined ||
 	          centerDifferenceVec3.length() < closestCenterDifference) {
@@ -236,7 +231,9 @@
 
 	    if (newIntersectedEls.length) {
 	      el.emit('hitstart', this.hitStartEventDetail);
-	    } },
+	    }
+	  },
+
 	  /**
 	   * AABB collision detection.
 	   * 3D version of https://www.youtube.com/watch?v=ghqD3e37R7E
@@ -246,29 +243,25 @@
 
 	    return function (el) {
 	      var isIntersecting;
-	      var mesh;
 	      var boxHelper;
 	      var boxMin;
 	      var boxMax;
 
-	      mesh = el.getObject3D('mesh') || el.getObject3D('text');
-	      if (!mesh) { return; }
-
-	      boundingBox.setFromObject(mesh);
+	      boundingBox.setFromObject(el.object3D);
 
 	      if (this.data.debug) {
-	        if (!mesh.boxHelper) {
-	          mesh.boxHelper = new THREE.BoxHelper(
-	            mesh, new THREE.Color(Math.random(), Math.random(), Math.random()));
-	          el.sceneEl.object3D.add(mesh.boxHelper);
+	        if (!el.object3D.boxHelper) {
+	          el.object3D.boxHelper = new THREE.BoxHelper(
+	            el.object3D, new THREE.Color(Math.random(), Math.random(), Math.random()));
+	          el.sceneEl.object3D.add(el.object3D.boxHelper);
 	        }
-	        mesh.boxHelper.setFromObject(mesh);
+	        el.object3D.boxHelper.setFromObject(el.object3D);
 	      }
 
 	      boxMin = boundingBox.min;
 	      boxMax = boundingBox.max;
-	      mesh.boundingBoxCenter = mesh.boundingBoxCenter || new THREE.Vector3();
-	      boundingBox.getCenter(mesh.boundingBoxCenter);
+	      el.object3D.boundingBoxCenter = el.object3D.boundingBoxCenter || new THREE.Vector3();
+	      boundingBox.getCenter(el.object3D.boundingBoxCenter);
 	      return (this.boxMin.x <= boxMax.x && this.boxMax.x >= boxMin.x) &&
 	             (this.boxMin.y <= boxMax.y && this.boxMax.y >= boxMin.y) &&
 	             (this.boxMin.z <= boxMax.z && this.boxMax.z >= boxMin.z);
