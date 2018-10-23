@@ -150,6 +150,8 @@
 	    // Populate intersectedEls array.
 	    intersectedEls.length = 0;
 	    for (i = 0; i < objectEls.length; i++) {
+	      if (objectEls[i] === this.el) { continue; }
+
 	      // Don't collide with non-visible if flag set.
 	      if (!this.data.collideNonVisible && !objectEls[i].getAttribute('visible')) {
 	        // Remove box helper if debug flag set and has box helper.
@@ -187,12 +189,14 @@
 
 	    // Emit events on intersected entities. Do this after the cleared events.
 	    for (i = 0; i < newIntersectedEls.length; i++) {
+	      if (newIntersectedEls[i] === this.el) { continue; }
 	      if (newIntersectedEls[i].hasAttribute('aabb-collider')) { continue; }
 	      newIntersectedEls[i].emit('hitstart');
 	    }
 
 	    // Calculate closest intersected entity based on centers.
 	    for (i = 0; i < intersectedEls.length; i++) {
+	      if (intersectedEls[i] === this.el) { continue; }
 	      centerDifferenceVec3
 	        .copy(intersectedEls[i].object3D.boundingBoxCenter)
 	        .sub(this.boxCenter);
