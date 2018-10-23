@@ -15,7 +15,7 @@ AFRAME.registerComponent('orbit-controls', {
     enableZoom: {default: true},
     initialPosition: {type: 'vec3'},
     keyPanSpeed: {default: 7},
-    minAzimuthAngle: {type: 'number', default: Infinity},
+    minAzimuthAngle: {type: 'number', default: - Infinity},
     maxAzimuthAngle: {type: 'number', default: Infinity},
     maxDistance: {default: 1000},
     maxPolarAngle: {default: AFRAME.utils.device.isMobile() ? 90 : 120},
