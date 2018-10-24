@@ -1,0 +1,69 @@
+{
+  "name": "aframe-ring-shader",
+  "version": "1.0.0",
+  "description": "A ring shader for A-Frame.",
+  "main": "src/index.js",
+  "unpkg": "dist/aframe-ring-shader.min.js",
+  "scripts": {
+    "build": "webpack",
+    "dev": "webpack-dev-server --inline --colors --progress --hot --host 0.0.0.0",
+    "dist": "npm run build && uglifyjs dist/aframe-ring-shader.js > dist/aframe-ring-shader.min.js",
+    "lint": "semistandard -v | snazzy",
+    "prepublish": "npm run dist",
+    "ghpages": "ghpages",
+    "start": "npm run dev",
+    "test": "karma start ./tests/karma.conf.js",
+    "test:firefox": "karma start ./tests/karma.conf.js --browsers Firefox",
+    "test:chrome": "karma start ./tests/karma.conf.js --browsers Chrome"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ngokevin/kframe.git"
+  },
+  "keywords": [
+    "aframe",
+    "aframe-component",
+    "aframe-vr",
+    "vr",
+    "webvr",
+    "ring-shader"
+  ],
+  "author": "Kevin Ngo <kevin@supermedium.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ngokevin/kframe/issues"
+  },
+  "homepage": "https://github.com/ngokevin/kframe#readme",
+  "dependencies": {
+    "aframe": "*",
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-preset-es2015": "^6.24.1",
+    "browserify": "^13.0.0",
+    "budo": "^8.2.2",
+    "ghpages": "^0.0.8",
+    "randomcolor": "^0.4.4",
+    "semistandard": "^8.0.0",
+    "shelljs": "^0.7.0",
+    "shx": "^0.1.1",
+    "sinon": "^1.17.5",
+    "sinon-chai": "^2.8.0",
+    "snazzy": "^4.0.0",
+    "uglify-js": "git://github.com/mishoo/UglifyJS2#harmony-v2.8.22",
+    "uglifyjs-webpack-plugin": "^0.4.6",
+    "webpack": "^3.5.5",
+    "webpack-cli": "^3.1.2",
+    "webpack-dev-server": "^2.11.3",
+    "webpack-glsl-loader": "^1.0.1"
+  },
+  "semistandard": {
+    "globals": [
+      "AFRAME",
+      "THREE"
+    ],
+    "ignore": [
+      "examples/build.js",
+      "dist/**"
+    ]
+  }
+}
