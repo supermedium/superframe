@@ -12,7 +12,7 @@ void main () {
   float r = uv.x * uv.x + uv.y * uv.y;
   float col = (1.0 - smoothstep(radiusOuter, radiusOuter + blur, r)) * smoothstep(radiusInner, radiusInner + blur, r);
   float a = smoothstep(-PI, PI, atan(uv.y, uv.x));
-  float p = 1.0 - progress;
+  float p = 1.0 - progress - blur;
   col *= smoothstep(p, p + blur, a);
   gl_FragColor = vec4(color * col, col);
 }

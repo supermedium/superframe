@@ -107,7 +107,7 @@ module.exports = "varying vec2 vUv;\n\nvoid main () {\n  vUv = uv;\n  gl_Positio
 /* 2 */
 /***/ (function(module, exports) {
 
-module.exports = "#define PI 3.14159265358979\nuniform float blur;\nuniform float progress;\nuniform float radiusInner;\nuniform float radiusOuter;\nuniform vec3 color;\n\nvarying vec2 vUv;\n\nvoid main () {\n  vec2 uv = vec2(vUv.x * 2. - 1., vUv.y * 2. - 1.);\n  float r = uv.x * uv.x + uv.y * uv.y;\n  float col = (1.0 - smoothstep(radiusOuter, radiusOuter + blur, r)) * smoothstep(radiusInner, radiusInner + blur, r);\n  float a = smoothstep(-PI, PI, atan(uv.y, uv.x));\n  float p = 1.0 - progress;\n  col *= smoothstep(p, p + blur, a);\n  gl_FragColor = vec4(color * col, col);\n}\n"
+module.exports = "#define PI 3.14159265358979\nuniform float blur;\nuniform float progress;\nuniform float radiusInner;\nuniform float radiusOuter;\nuniform vec3 color;\n\nvarying vec2 vUv;\n\nvoid main () {\n  vec2 uv = vec2(vUv.x * 2. - 1., vUv.y * 2. - 1.);\n  float r = uv.x * uv.x + uv.y * uv.y;\n  float col = (1.0 - smoothstep(radiusOuter, radiusOuter + blur, r)) * smoothstep(radiusInner, radiusInner + blur, r);\n  float a = smoothstep(-PI, PI, atan(uv.y, uv.x));\n  float p = 1.0 - progress - blur;\n  col *= smoothstep(p, p + blur, a);\n  gl_FragColor = vec4(color * col, col);\n}\n"
 
 /***/ })
 /******/ ]);
