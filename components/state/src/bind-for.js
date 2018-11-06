@@ -74,7 +74,7 @@ AFRAME.registerComponent('bind-for', {
 
       // Remove items by removing entities.
       const toRemoveEls = this.getElsToRemove(activeKeys, this.renderedKeys);
-      for (i = 0; i < toRemoveEls.length; i++) {
+      for (let i = 0; i < toRemoveEls.length; i++) {
         toRemoveEls[i].parentNode.removeChild(toRemoveEls[i]);
       }
 
