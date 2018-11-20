@@ -196,7 +196,7 @@ suite('state', function () {
     });
   });
 
-  suite.only('bind', () => {
+  suite('bind', () => {
     test('binds single-property component', done => {
       el.setAttribute('bind', 'visible: enabled');
       assert.notOk(el.getAttribute('visible'));
@@ -1311,40 +1311,48 @@ suite('generateExpression', function () {
   });
 
   test('generates with booleans', () => {
-    assert.equal(lib.generateExpression('foo || bar'), 'state["foo"]||state["bar"]');
-    assert.equal(lib.generateExpression('foo && bar'), 'state["foo"]&&state["bar"]');
+    assert.equal(lib.generateExpression('foo || bar'), 'state["foo"] || state["bar"]');
+    assert.equal(lib.generateExpression('foo && bar'), 'state["foo"] && state["bar"]');
     assert.equal(lib.generateExpression('foo.bar || qux.qaz'),
-                 'state["foo"]["bar"]||state["qux"]["qaz"]');
+                 'state["foo"]["bar"] || state["qux"]["qaz"]');
   });
 
   test('generates with comparisons', () => {
-    assert.equal(lib.generateExpression('foo === bar'), 'state["foo"]===state["bar"]');
+    assert.equal(lib.generateExpression('foo === bar'), 'state["foo"] === state["bar"]');
     assert.equal(lib.generateExpression('foo.bar === qux.qaz'),
-                 'state["foo"]["bar"]===state["qux"]["qaz"]');
+                 'state["foo"]["bar"] === state["qux"]["qaz"]');
   });
 
   test('generates with literal comparison', () => {
-    assert.equal(lib.generateExpression('foo > 0'), 'state["foo"]>0');
-    assert.equal(lib.generateExpression('foo === 5'), 'state["foo"]===5');
-    assert.equal(lib.generateExpression('foo === "bar"'), 'state["foo"]==="bar"');
+    assert.equal(lib.generateExpression('foo > 0'), 'state["foo"] > 0');
+    assert.equal(lib.generateExpression('foo === 5'), 'state["foo"] === 5');
+    assert.equal(lib.generateExpression('foo === "bar"'), 'state["foo"] === "bar"');
   });
 
   test('generates with ternaries', () => {
     assert.equal(lib.generateExpression('foo ? bar : "qaz"'),
-                 'state["foo"]?state["bar"]:"qaz"');
+                 'state["foo"] ? state["bar"] : "qaz"');
   });
 
   test('generates with length', () => {
-    assert.equal(lib.generateExpression('a.length > 0'), 'state["a"]["length"]>0');
+    assert.equal(lib.generateExpression('a.length > 0'), 'state["a"]["length"] > 0');
   });
 
   test('generates with strings', () => {
-    assert.equal(lib.generateExpression("'foo' + bar + 'qux'"), `'foo'+state["bar"]+'qux'`);
+    assert.equal(lib.generateExpression("'foo' + bar + 'qux'"), `'foo' + state["bar"] + 'qux'`);
+  });
+
+  test('generates with comparision and double null', () => {
+    assert.equal(lib.generateExpression("a || b || c && !!d.length"), `state["a"] || state["b"] || state["c"] && !!state["d"]["length"]`);
   });
 
   test('preserves item selector', () => {
     assert.equal(lib.generateExpression('item'), 'item');
     assert.equal(lib.generateExpression('item.id'), 'item["id"]');
-    assert.equal(lib.generateExpression('item.id + item.bar'), 'item["id"]+item["bar"]');
+    assert.equal(lib.generateExpression('item.id + item.bar'), 'item["id"] + item["bar"]');
+  });
+
+  test('preserves string whitespace', () => {
+    assert.equal(lib.generateExpression('foo + "a b c"'), 'state["foo"] + "a b c"');
   });
 });
