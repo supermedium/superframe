@@ -100,14 +100,14 @@ module.exports.select = select;
 
 var DOT_NOTATION_RE = /\.([A-Za-z][\w_-]*)/g;
 var WHITESPACE_RE = /\s/g;
-var STATE_SELECTOR_RE = /([=&|!?:+-])(\s*)([A-Za-z][\w_-]*)/g;
-var ROOT_STATE_SELECTOR_RE = /^([A-Za-z][\w_-]*)/g;
+var STATE_SELECTOR_RE = /([=&|!?:+-])(\s*)([\(]?)([A-Za-z][\w_-]*)/g;
+var ROOT_STATE_SELECTOR_RE = /^([\(]?)([A-Za-z][\w_-]*)/g;
 var ITEM_RE = /state\["item"\]/g;
 var STATE_STR = 'state';
 function generateExpression(str) {
   str = str.replace(DOT_NOTATION_RE, '["$1"]');
-  str = str.replace(ROOT_STATE_SELECTOR_RE, 'state["$1"]');
-  str = str.replace(STATE_SELECTOR_RE, '$1$2state["$3"]');
+  str = str.replace(ROOT_STATE_SELECTOR_RE, '$1state["$2"]');
+  str = str.replace(STATE_SELECTOR_RE, '$1$2$3state["$4"]');
   str = str.replace(ITEM_RE, 'item');
   return str;
 }
@@ -739,8 +739,8 @@ AFRAME.registerComponent('bind-for', {
       this.template = document.querySelector(this.data.template).innerHTML.trim();
     }
 
-    for (var _i = 0; _i < this.data.pool; _i++) {
-      this.el.appendChild(this.generateFromTemplate(null, _i));
+    for (var i = 0; i < this.data.pool; i++) {
+      this.el.appendChild(this.generateFromTemplate(null, i));
     }
   },
 
@@ -771,16 +771,16 @@ AFRAME.registerComponent('bind-for', {
       }
 
       activeKeys.length = 0;
-      for (var _i2 = 0; _i2 < list.length; _i2++) {
-        var item = list[_i2];
+      for (var i = 0; i < list.length; i++) {
+        var item = list[i];
         // If key not defined, use index (e.g., array of strings).
         activeKeys.push(data.key ? item[data.key].toString() : item.toString());
       }
 
       // Remove items by removing entities.
       var toRemoveEls = this.getElsToRemove(activeKeys, this.renderedKeys);
-      for (i = 0; i < toRemoveEls.length; i++) {
-        toRemoveEls[i].parentNode.removeChild(toRemoveEls[i]);
+      for (var _i = 0; _i < toRemoveEls.length; _i++) {
+        toRemoveEls[_i].parentNode.removeChild(toRemoveEls[_i]);
       }
 
       if (list.length) {
@@ -801,7 +801,7 @@ AFRAME.registerComponent('bind-for', {
     var item = list[i];
 
     // If key not defined, use index (e.g., array of strings).
-    keyValue = data.key ? item[data.key].toString() : item.toString();
+    var keyValue = data.key ? item[data.key].toString() : item.toString();
 
     if (this.renderedKeys.indexOf(keyValue) === -1) {
       // Add.
@@ -858,21 +858,21 @@ AFRAME.registerComponent('bind-for', {
 
       // Calculate keys that should be active.
       activeKeys.length = 0;
-      for (var _i3 = 0; _i3 < list.length; _i3++) {
-        var item = list[_i3];
+      for (var i = 0; i < list.length; i++) {
+        var item = list[i];
         keyValue = data.key ? item[data.key].toString() : item.toString();
         activeKeys.push(keyValue);
       }
 
       // Remove items by pooling. Do before adding.
       var toRemoveEls = this.getElsToRemove(activeKeys, this.renderedKeys);
-      for (var _i4 = 0; _i4 < toRemoveEls.length; _i4++) {
-        toRemoveEls[_i4].object3D.visible = false;
-        toRemoveEls[_i4].setAttribute('data-bind-for-active', 'false');
-        toRemoveEls[_i4].removeAttribute('data-bind-for-key');
-        toRemoveEls[_i4].removeAttribute('data-bind-for-value');
-        toRemoveEls[_i4].emit('bindfordeactivate', null, false);
-        toRemoveEls[_i4].pause();
+      for (var _i2 = 0; _i2 < toRemoveEls.length; _i2++) {
+        toRemoveEls[_i2].object3D.visible = false;
+        toRemoveEls[_i2].setAttribute('data-bind-for-active', 'false');
+        toRemoveEls[_i2].removeAttribute('data-bind-for-key');
+        toRemoveEls[_i2].removeAttribute('data-bind-for-value');
+        toRemoveEls[_i2].emit('bindfordeactivate', null, false);
+        toRemoveEls[_i2].pause();
       }
 
       if (list.length) {
@@ -981,13 +981,13 @@ AFRAME.registerComponent('bind-for', {
       var el = this.el;
 
       toRemove.length = 0;
-      for (var _i5 = 0; _i5 < el.children.length; _i5++) {
-        if (el.children[_i5].tagName === 'TEMPLATE') {
+      for (var i = 0; i < el.children.length; i++) {
+        if (el.children[i].tagName === 'TEMPLATE') {
           continue;
         }
-        var key = data.key ? el.children[_i5].getAttribute('data-bind-for-key') : el.children[_i5].getAttribute('data-bind-for-value');
+        var key = data.key ? el.children[i].getAttribute('data-bind-for-key') : el.children[i].getAttribute('data-bind-for-value');
         if (activeKeys.indexOf(key) === -1 && renderedKeys.indexOf(key) !== -1) {
-          toRemove.push(el.children[_i5]);
+          toRemove.push(el.children[i]);
           renderedKeys.splice(renderedKeys.indexOf(key), 1);
         }
       }
@@ -1097,8 +1097,8 @@ AFRAME.registerComponent('bind-item', {
     // Different parsing for multi-prop components.
     if (componentName in AFRAME.components && !AFRAME.components[componentName].isSingleProp) {
       var propertySplitList = lib.split(this.data, ';');
-      for (var _i6 = 0; _i6 < propertySplitList.length; _i6++) {
-        var propertySplit = lib.split(propertySplitList[_i6], ':');
+      for (var i = 0; i < propertySplitList.length; i++) {
+        var propertySplit = lib.split(propertySplitList[i], ':');
         propertyMap[this.id + '.' + propertySplit[0].trim()] = propertySplit[1].trim();
         lib.parseKeysToWatch(this.keysToWatch, propertySplit[1].trim(), true);
       }

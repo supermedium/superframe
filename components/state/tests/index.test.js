@@ -1355,4 +1355,10 @@ suite('generateExpression', function () {
   test('preserves string whitespace', () => {
     assert.equal(lib.generateExpression('foo + "a b c"'), 'state["foo"] + "a b c"');
   });
+
+  test('handles boolean with parens', () => {
+    assert.equal(lib.generateExpression(
+      '(a || b) && (c || d)'),
+      '(state["a"] || state["b"]) && (state["c"] || state["d"])');
+  });
 });

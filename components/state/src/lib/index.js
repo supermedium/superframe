@@ -19,14 +19,14 @@ module.exports.select = select;
 
 const DOT_NOTATION_RE = /\.([A-Za-z][\w_-]*)/g;
 const WHITESPACE_RE = /\s/g;
-const STATE_SELECTOR_RE = /([=&|!?:+-])(\s*)([A-Za-z][\w_-]*)/g;
-const ROOT_STATE_SELECTOR_RE = /^([A-Za-z][\w_-]*)/g;
+const STATE_SELECTOR_RE = /([=&|!?:+-])(\s*)([\(]?)([A-Za-z][\w_-]*)/g;
+const ROOT_STATE_SELECTOR_RE = /^([\(]?)([A-Za-z][\w_-]*)/g;
 const ITEM_RE = /state\["item"\]/g;
 const STATE_STR = 'state';
 function generateExpression (str) {
   str = str.replace(DOT_NOTATION_RE, '["$1"]');
-  str = str.replace(ROOT_STATE_SELECTOR_RE, 'state["$1"]');
-  str = str.replace(STATE_SELECTOR_RE, '$1$2state["$3"]');
+  str = str.replace(ROOT_STATE_SELECTOR_RE, '$1state["$2"]');
+  str = str.replace(STATE_SELECTOR_RE, '$1$2$3state["$4"]');
   str = str.replace(ITEM_RE, 'item');
   return str;
 }
