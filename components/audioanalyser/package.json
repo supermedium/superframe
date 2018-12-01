@@ -13,7 +13,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ngokevin/kframe.git"
+    "url": "git+https://github.com/supermedium/superframe.git"
   },
   "keywords": [
     "aframe",
@@ -26,7 +26,7 @@
   "author": "Kevin Ngo <me@ngokevin.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ngokevin/kframe/issues"
+    "url": "https://github.com/supermedium/superframe/issues"
   },
   "homepage": "https://github.com/ngokevin/tree/components/audio-analyser#readme",
   "devDependencies": {

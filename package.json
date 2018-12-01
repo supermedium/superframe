@@ -1,5 +1,5 @@
 {
-  "name": "kframe",
+  "name": "superframe",
   "version": "3.2.0",
   "description": "Kevin's collection of A-Frame components and scenes.",
   "scripts": {
@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ngokevin/kframe.git"
+    "url": "git+https://github.com/supermedium/superframe.git"
   },
   "keywords": [
     "3d",
@@ -27,12 +27,12 @@
     "vr",
     "webvr"
   ],
-  "author": "Kevin Ngo <me@ngokevin.com>",
+  "author": "Kevin Ngo <kevin@supermedium.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ngokevin/kframe/issues"
+    "url": "https://github.com/supermedium/superframe/issues"
   },
-  "homepage": "https://github.com/ngokevin/kframe#readme",
+  "homepage": "https://github.com/supermedium/superframe#readme",
   "devDependencies": {
     "browser-sync": "^2.16.0",
     "cheerio": "^0.22.0",

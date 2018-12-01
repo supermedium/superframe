@@ -7,7 +7,7 @@ A controller haptics (vibrations) component for A-Frame. Supported by
 experimental [Gamepad
 Extensions](https://w3c.github.io/gamepad/extensions.html#dom-gamepadhapticactuator). [Read about browser support](https://developer.mozilla.org/en-US/docs/Web/API/Gamepad/hapticActuators).
 
-[Demo](https://ngokevin.github.io/kframe/components/haptics/)
+[Demo](https://supermedium.com/superframe/components/haptics/)
 
 ### API
 

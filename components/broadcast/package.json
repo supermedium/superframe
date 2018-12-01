@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ngokevin/kframe.git"
+    "url": "git+https://github.com/supermedium/superframe.git"
   },
   "keywords": [
     "aframe",
@@ -24,9 +24,9 @@
   "author": "Kevin Ngo <me@ngokevin.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ngokevin/kframe/issues"
+    "url": "https://github.com/supermedium/superframe/issues"
   },
-  "homepage": "https://github.com/ngokevin/kframe/tree/components/broadcast#readme",
+  "homepage": "https://github.com/supermedium/superframe/tree/components/broadcast#readme",
   "devDependencies": {
     "aframe": "^0.2.0",
     "browserify": "^12.0.1",

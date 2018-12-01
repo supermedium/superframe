@@ -18,7 +18,7 @@ still be manipulated individually since this component keeps a `faceIndex` and
 
 Doesn't support buffer geometries *yet*.
 
-[Source code for interactive merged geometries](https://github.com/ngokevin/kframe/blob/master/components/geometry-merger/examples/basic/index.html#L10)
+[Source code for interactive merged geometries](https://github.com/supermedium/superframe/blob/master/components/geometry-merger/examples/basic/index.html#L10)
 
 ### API
 

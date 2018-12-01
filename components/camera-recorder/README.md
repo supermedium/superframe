@@ -8,7 +8,7 @@ camera using [ccapture.js](https://github.com/spite/ccapture.js/).
 
 ![](https://user-images.githubusercontent.com/674727/42717535-8f4f1896-86b6-11e8-9093-0cdeaa3c5557.gif)
 
-[Demo](https://ngokevin.github.io/kframe/components/camera-recorder/)
+[Demo](https://supermedium.com/superframe/components/camera-recorder/)
 
 ### API
 
@@ -28,7 +28,7 @@ camera using [ccapture.js](https://github.com/spite/ccapture.js/).
 | rotationTo        | Camera end rotation.                                                                        | 0 0 0                                                                 |
 | showControls      | Whether to inject buttons to control the recording (e.g., preview, record).                 | true                                                                  |
 | workers           | Number of workers used to process the GIF. Best to use the same amount of cores as the CPU. | 8                                                                     |
-| workerPath        | Path to the required worker JS file to process the GIF.                                     | https://rawgit.com/ngokevin/kframe/master/components/camera-recorder/ |
+| workerPath        | Path to the required worker JS file to process the GIF.                                     | https://rawgit.com/supermedium/superframe/master/components/camera-recorder/ |
 
 ### Converting to Video
 
@@ -42,7 +42,7 @@ size to mp4. Here is an ffmpeg command:
 #### Browser
 
 Include the worker file on a path that can be referenced. Defaults to hosted version
-at `https://rawgit.com/ngokevin/kframe/master/components/camera-recorder/gif.worker.js`.
+at `https://rawgit.com/supermedium/superframe/master/components/camera-recorder/gif.worker.js`.
 
 Install and use by directly including the [browser files](dist):
 

@@ -14,7 +14,7 @@ component wraps
 | bevelSize      |                                                               | 8                                                                                                       |
 | bevelThickness |                                                               | 12                                                                                                      |
 | curveSegments  |                                                               | 12                                                                                                      |
-| font           | Path to a typeface.json file or selector to `<a-asset-item>`. | https://rawgit.com/ngokevin/kframe/master/components/text-geometry/lib/helvetiker_regular.typeface.json |
+| font           | Path to a typeface.json file or selector to `<a-asset-item>`. | https://rawgit.com/supermedium/superframe/master/components/text-geometry/lib/helvetiker_regular.typeface.json |
 | height         |                                                               | 0.05                                                                                                    |
 | size           |                                                               | 0.5                                                                                                     |
 | style          |                                                               | normal                                                                                                  |
@@ -123,6 +123,6 @@ three.js material to the geometry:
 ```
 
 See the [Vaporwave
-Example](https://ngokevin.github.io/kframe/components/text-geometry/examples/vaporwave/)
+Example](https://supermedium.com/superframe/components/text-geometry/examples/vaporwave/)
 by [Ada Rose Edwards](https://twitter.com/lady_ada_king) for an example on applying
 materials.

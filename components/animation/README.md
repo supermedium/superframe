@@ -1,6 +1,6 @@
 ## aframe-animation-component
 
-[animationtimeline]: https://github.com/ngokevin/kframe/tree/master/components/animation-timeline
+[animationtimeline]: https://github.com/supermedium/superframe/tree/master/components/animation-timeline
 
 An animation component for [A-Frame](https://aframe.io) using
 [anime.js](https://github.com/juliangarnier/anime).

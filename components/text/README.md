@@ -1,1 +1,1 @@
-Moved to [text-geometry](https://github.com/ngokevin/kframe/tree/master/components/text-geometry/)
+Moved to [text-geometry](https://github.com/supermedium/superframe/tree/master/components/text-geometry/)
