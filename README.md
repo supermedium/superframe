@@ -1,6 +1,6 @@
 # superframe
 
-Kevin's collection of A-Frame components and scenes.
+A super collection of A-Frame components.
 
 [VIEW DEMOS](https://supermedium.com/superframe/)
 
