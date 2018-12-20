@@ -33,25 +33,13 @@ AFRAME.registerComponent('audioanalyser', {
   },
 
   init: function () {
-    var analyser;
-    var data = this.data;
-    var gainNode
-
     this.audioEl = null;
-    this.context = new AudioContext();
     this.levels = null;
     this.waveform = null;
     this.volume = 0;
     this.xhr = null;
 
-    analyser = this.analyser = this.context.createAnalyser();
-    gainNode = this.gainNode = this.context.createGain();
-    gainNode.connect(analyser);
-    analyser.connect(this.context.destination);
-    analyser.fftSize = data.fftSize;
-    analyser.smoothingTimeConstant = data.smoothingTimeConstant;
-    this.levels = new Uint8Array(analyser.frequencyBinCount);
-    this.waveform = new Uint8Array(analyser.fftSize);
+    this.initContext();
   },
 
   update: function (oldData) {
@@ -118,6 +106,22 @@ AFRAME.registerComponent('audioanalyser', {
     }
   },
 
+  initContext: function () {
+    var data = this.data;
+    var analyser;
+    var gainNode;
+
+    this.context = new (window.webkitAudioContext || window.AudioContext)();
+    analyser = this.analyser = this.context.createAnalyser();
+    gainNode = this.gainNode = this.context.createGain();
+    gainNode.connect(analyser);
+    analyser.connect(this.context.destination);
+    analyser.fftSize = data.fftSize;
+    analyser.smoothingTimeConstant = data.smoothingTimeConstant;
+    this.levels = new Uint8Array(analyser.frequencyBinCount);
+    this.waveform = new Uint8Array(analyser.fftSize);
+  },
+
   refreshSource: function () {
     var analyser = this.analyser;
     var data = this.data;
@@ -160,10 +164,15 @@ AFRAME.registerComponent('audioanalyser', {
       xhr.open('GET', src);
       xhr.responseType = 'arraybuffer';
       xhr.addEventListener('load', () => {
-        this.context.decodeAudioData(xhr.response).then(audioBuffer => {
+        // Support Webkit with callback.
+        function cb (audioBuffer) {
           audioBufferCache[src] = audioBuffer;
           resolve(audioBuffer);
-        }).catch(console.error);
+        }
+        const res = this.context.decodeAudioData(xhr.response, cb);
+        if (res && res.constructor === Promise) {
+          res.then(cb).catch(console.error);
+        }
       });
       xhr.send();
     });
