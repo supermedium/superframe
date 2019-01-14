@@ -1,6 +1,6 @@
 {
   "name": "aframe-audioanalyser-component",
-  "version": "5.3.0",
+  "version": "5.4.0",
   "description": "Audio visualizations in A-Frame using Web Audio (AnalyserNode)",
   "main": "index.js",
   "scripts": {

@@ -190,16 +190,23 @@ AFRAME.registerComponent('audioanalyser', {
     }).catch(console.error);
   },
 
-  getMediaSource: function () {
-    if (this.data.src.constructor === String) {
-      if (!this.audio) {
+  getMediaSource: (function () {
+    const nodeCache = {};
+
+    return function () {
+      const src = this.data.src.constructor === String ? this.data.src : this.data.src.src;
+      if (nodeCache[src]) { return nodeCache[src]; }
+
+      if (this.data.src.constructor === String) {
         this.audio = document.createElement('audio');
         this.audio.crossOrigin = 'anonymous';
+        this.audio.setAttribute('src', this.data.src);
+      } else {
+        this.audio = this.data.src;
       }
-      this.audio.setAttribute('src', this.data.src);
-    } else {
-      this.audio = this.data.src;
-    }
-    return this.context.createMediaElementSource(this.audio)
-  }
+      const node = this.context.createMediaElementSource(this.audio)
+      nodeCache[src] = node;
+      return node;
+    };
+  })()
 });
