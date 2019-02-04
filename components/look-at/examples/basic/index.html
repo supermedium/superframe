@@ -4,17 +4,15 @@
     <title>Basic</title>
     <meta name="description" content="Entities following and rotating to face a single animating target">
     <meta property="og:image" content="https://raw.githubusercontent.com/supermedium/superframe/master/components/look-at/examples/basic/preview.gif"></meta>
-    <script src="https://aframe.io/releases/0.8.2/aframe.min.js"></script>
-    <script src="../build.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/aframevr/aframe@959d4a5241b89e11ddfb2f629320e08807ace152/dist/aframe-master.min.js"></script>
+    <script src="../../build.js"></script>
   </head>
   <body>
     <a-scene>
-      <a-entity id="look-cam" camera="userHeight: 1.6" look-controls wasd-controls></a-entity>
       <a-entity id="container" position="0 0 -4">
         <!-- A target entity -->
-        <a-sphere id="target" color="#404040" radius="0.5">
-          <a-animation attribute="position" from="-8 6 -8" to="8 -3 -2" dur="1500"
-            repeat="indefinite" fill="forwards" direction="alternate"></a-animation>
+        <a-sphere id="target" color="#404040" radius="0.5"
+                  animation="property: position; from: -8 6 -8; to: 8 -3 -2; dur: 1500; loop: true; dir: alternate">
         </a-sphere>
 
         <!-- Entities look at the target -->
