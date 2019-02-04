@@ -112,7 +112,7 @@ Latest version requires A-Frame v0.8.0.
 The timeline component provides `<a-timeline>`, `<a-timeline-group>`, and
 `<a-timeline-animation>` to declaratively define the animation timeline.
 
-**`<a-timeline id>">`**
+**`<a-timeline id>`**
 
 Container element. Note `<a-timeline>` is just a data container. It is not an
 entity, primitive, nor does it do anything on its own. It's meant to be selected
@@ -144,7 +144,7 @@ to grab from values dynamically.
 | name      | ID of the animation component instance defined on the entity or entities. If the entity has an animation component `animation__fadein="property: material.opacity` then we would set `name="fadein"`. |
 | offset    | Optional additional time offset in milliseconds to wait for the previous animation in the timeline to finish.                                                                                         |
 
-**`<a-timeline-group [offset]">`**
+**`<a-timeline-group [offset]>`**
 
 `<a-timeline-group>` groups together `<a-timeline-animation>`s that we want to
 start at the same time. Only once every animation in the group finishes will
