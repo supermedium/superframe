@@ -1,6 +1,6 @@
 {
   "name": "aframe-entity-generator-component",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "description": "Generate a number of entities in A-Frame given a mixin",
   "main": "index.js",
   "scripts": {

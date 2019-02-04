@@ -2,7 +2,7 @@
 
 An entity generator component for [A-Frame](https://aframe.io). Given a mixin,
 generates a number of entities as children. Pairs well with [Randomizer
-Components](https://github.com/ngokevin/aframe-randomizer-components) for
+Components](https://www.npmjs.com/package/aframe-randomizer-components) for
 a large number of entities with random elements.
 
 ### Properties
@@ -16,7 +16,7 @@ a large number of entities with random elements.
 
 #### Browser Installation
 
-Install and use by directly including the [browser files](dist):
+Install and use by directly including the browser files:
 
 ```html
 <head>
