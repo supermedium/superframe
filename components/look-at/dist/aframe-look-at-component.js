@@ -135,12 +135,12 @@
 	      var vector = this.vector;
 
 	      if (target3D) {
-	        object3D.parent.worldToLocal(target3D.getWorldPosition(vec3));
+	        target3D.getWorldPosition(vec3);
 	        if (this.el.getObject3D('camera')) {
 	          // Flip the vector to -z, looking away from target for camera entities. When using
 	          // lookat from THREE camera objects, this is applied for you, but since the camera is
 	          // nested into a Object3D, we need to apply this manually.
-	          vector.subVectors(object3D.position, vec3).add(object3D.position);
+	          // vector.subVectors(object3D.position, vec3).add(object3D.position);
 	        } else {
 	          vector = vec3;
 	        }
