@@ -1,6 +1,6 @@
 {
   "name": "aframe-state-component",
-  "version": "6.4.2",
+  "version": "6.5.0",
   "description": "State management for A-Frame using single global state modified through actions. State flows down to application via declarative binding.",
   "main": "dist/aframe-state-component.js",
   "unpkg": "dist/aframe-state-component.min.js",
@@ -31,7 +31,6 @@
   },
   "homepage": "https://github.com/supermedium/superframe/tree/components/state#readme",
   "devDependencies": {
-    "aframe": "github:ngokevin/aframe#cmpiddist",
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.2",
     "babel-preset-es2015": "^6.24.1",
@@ -39,6 +38,7 @@
     "budo": "^8.2.2",
     "chai": "^3.4.1",
     "chai-shallow-deep-equal": "^1.3.0",
+    "debug": "2.x.x",
     "ghpages": "^0.0.8",
     "karma": "^0.13.15",
     "karma-browserify": "^4.4.2",
@@ -66,5 +66,8 @@
       "examples/build.js",
       "dist/**"
     ]
+  },
+  "dependencies": {
+    "debug": "^2.6.9"
   }
 }

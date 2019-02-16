@@ -301,62 +301,75 @@ AFRAME.registerSystem('state', {
   /**
    * Dispatch action.
    */
-  dispatch: function dispatch(actionName, payload) {
-    var dirtyArrays;
-    var i;
-    var key;
-    var subscription;
+  dispatch: function () {
+    var toUpdate = [];
 
-    // Modify state.
-    State.handlers[actionName](this.state, payload);
+    return function (actionName, payload) {
+      var dirtyArrays;
+      var i;
+      var key;
+      var subscription;
 
-    // Post-compute.
-    State.computeState(this.state, actionName, payload);
+      // Modify state.
+      State.handlers[actionName](this.state, payload);
 
-    // Get a diff to optimize bind updates.
-    for (key in this.diff) {
-      delete this.diff[key];
-    }
-    diff(this.lastState, this.state, this.diff, State.nonBindedStateKeys);
+      // Post-compute.
+      State.computeState(this.state, actionName, payload);
 
-    this.dirtyArrays.length = 0;
-    for (i = 0; i < this.arrays.length; i++) {
-      if (this.state[this.arrays[i]].__dirty) {
-        this.dirtyArrays.push(this.arrays[i]);
+      // Get a diff to optimize bind updates.
+      for (key in this.diff) {
+        delete this.diff[key];
       }
-    }
+      diff(this.lastState, this.state, this.diff, State.nonBindedStateKeys);
 
-    // Notify subscriptions / binders.
-    for (i = 0; i < this.subscriptions.length; i++) {
-      if (this.subscriptions[i].name === 'bind-for') {
-        // For arrays and bind-for, check __dirty flag on array rather than the diff.
-        if (!this.state[this.subscriptions[i].keysToWatch[0]].__dirty) {
-          continue;
-        }
-      } else {
-        if (!this.shouldUpdate(this.subscriptions[i].keysToWatch, this.diff, this.dirtyArrays)) {
-          continue;
+      this.dirtyArrays.length = 0;
+      for (i = 0; i < this.arrays.length; i++) {
+        if (this.state[this.arrays[i]].__dirty) {
+          this.dirtyArrays.push(this.arrays[i]);
         }
       }
 
-      this.subscriptions[i].onStateUpdate();
-    }
+      // Notify subscriptions / binders.
+      toUpdate.length = 0;
+      for (i = 0; i < this.subscriptions.length; i++) {
+        if (this.subscriptions[i].name === 'bind-for') {
+          // For arrays and bind-for, check __dirty flag on array rather than the diff.
+          if (!this.state[this.subscriptions[i].keysToWatch[0]].__dirty) {
+            continue;
+          }
+        } else {
+          if (!this.shouldUpdate(this.subscriptions[i].keysToWatch, this.diff, this.dirtyArrays)) {
+            continue;
+          }
+        }
 
-    // Unset array dirty.
-    for (key in this.state) {
-      if (this.state[key] && this.state[key].constructor === Array) {
-        this.state[key].__dirty = false;
+        // Keep track to only update subscriptions once.
+        if (toUpdate.indexOf(this.subscriptions[i]) === -1) {
+          toUpdate.push(this.subscriptions[i]);
+        }
       }
-    }
 
-    // Store last state.
-    this.copyState(this.lastState, this.state);
+      // Update subscriptions.
+      for (i = 0; i < toUpdate.length; i++) {
+        toUpdate[i].onStateUpdate();
+      }
 
-    // Emit.
-    this.eventDetail.action = actionName;
-    this.eventDetail.payload = payload;
-    this.el.emit(STATE_UPDATE_EVENT, this.eventDetail);
-  },
+      // Unset array dirty.
+      for (key in this.state) {
+        if (this.state[key] && this.state[key].constructor === Array) {
+          this.state[key].__dirty = false;
+        }
+      }
+
+      // Store last state.
+      this.copyState(this.lastState, this.state);
+
+      // Emit.
+      this.eventDetail.action = actionName;
+      this.eventDetail.payload = payload;
+      this.el.emit(STATE_UPDATE_EVENT, this.eventDetail);
+    };
+  }(),
 
   /**
    * Store last state through a deep extend, but not for arrays.
