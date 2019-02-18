@@ -59,8 +59,8 @@ Install and use by directly including the [browser files](dist):
 ```html
 <head>
   <title>Audio Visualizer</title>
-  <script src="https://aframe.io/releases/0.3.1/aframe.min.js"></script>
-  <script src="https://unpkg.com/aframe-audioanalyser-component@^3.0.3/dist/aframe-audioanalyser-component.min.js"></script>
+  <script src="https://aframe.io/releases/0.9.0/aframe.min.js"></script>
+  <script src="https://unpkg.com/aframe-audioanalyser-component@5.4.0/dist/aframe-audioanalyser-component.min.js"></script>
 </head>
 
 <body>
