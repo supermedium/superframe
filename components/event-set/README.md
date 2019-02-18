@@ -21,6 +21,7 @@ instances of the component. Alternatively, pass the event name via `_event`.
 
 | Property | Description                                           | Default Value |
 | -------- | -----------                                           | ------------- |
+| _delay   | Delay before setting (ms).                            | ''            |
 | _event   | Event name.                                           | ''            |
 | _target  | Query selector if setting property on another entity. | ''            |
 
@@ -40,7 +41,7 @@ Install and use by directly including the [browser files](dist):
 <head>
   <title>My A-Frame Scene</title>
   <script src="https://aframe.io/releases/0.9.0/aframe.min.js"></script>
-  <script src="https://unpkg.com/aframe-event-set-component@4.1.2/dist/aframe-event-set-component.min.js"></script>
+  <script src="https://unpkg.com/aframe-event-set-component@4.2.1/dist/aframe-event-set-component.min.js"></script>
 </head>
 
 <body>

@@ -103,7 +103,8 @@
 	    targetEl = target ? el.sceneEl.querySelector(target) : el;
 
 	    this.eventName = event;
-	    this.eventHandler = function handler () {
+
+	    const handler = () => {
 	      var propName;
 	      // Set attributes.
 	      for (propName in data) {
@@ -112,6 +113,13 @@
 	                                                      data[propName]);
 	      }
 	    };
+
+	    if (!isNaN(data._delay)) {
+	      // Delay.
+	      this.eventHandler = () => { setTimeout(handler, parseFloat(data._delay)); };
+	    } else {
+	      this.eventHandler = handler;
+	    }
 	  },
 
 	  addEventListener: function () {
