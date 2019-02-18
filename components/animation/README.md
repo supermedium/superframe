@@ -1,5 +1,7 @@
 ## aframe-animation-component
 
+> **The animation component is now built into A-Frame v0.9.0**.
+
 [animationtimeline]: https://github.com/supermedium/superframe/tree/master/components/animation-timeline
 
 An animation component for [A-Frame](https://aframe.io) using
