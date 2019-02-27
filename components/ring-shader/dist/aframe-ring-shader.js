@@ -88,7 +88,7 @@ AFRAME.registerShader('ring', {
 		blur: { default: 0.01, is: 'uniform' },
 		color: { type: 'color', is: 'uniform' },
 		progress: { default: 0, is: 'uniform' },
-		radiusInner: { default: 0.85, is: 'uniform' },
+		radiusInner: { default: 0.6, is: 'uniform' },
 		radiusOuter: { default: 1, is: 'uniform' }
 	},
 
@@ -107,7 +107,7 @@ module.exports = "varying vec2 vUv;\n\nvoid main () {\n  vUv = uv;\n  gl_Positio
 /* 2 */
 /***/ (function(module, exports) {
 
-module.exports = "#define PI 3.14159265358979\nuniform float blur;\nuniform float progress;\nuniform float radiusInner;\nuniform float radiusOuter;\nuniform vec3 color;\n\nvarying vec2 vUv;\n\nvoid main () {\n  vec2 uv = vec2(vUv.x * 2. - 1., vUv.y * 2. - 1.);\n  float r = uv.x * uv.x + uv.y * uv.y;\n  float col = (1.0 - smoothstep(radiusOuter, radiusOuter + blur, r)) * smoothstep(radiusInner, radiusInner + blur, r);\n  float a = smoothstep(-PI, PI, atan(uv.y, uv.x));\n  float p = 1.0 - progress - blur;\n  col *= smoothstep(p, p + blur, a);\n  gl_FragColor = vec4(color * col, col);\n}\n"
+module.exports = "#extension GL_OES_standard_derivatives : enable\n#define PI 3.14159265358979\nuniform float blur;\nuniform float progress;\nuniform float radiusInner;\nuniform float radiusOuter;\nuniform vec3 color;\n\nvarying vec2 vUv;\n\nvoid main () {\n  // make uvs go from -1 to 1\n  vec2 uv = vec2(vUv.x * 2.0 - 1.0, vUv.y * 2.0 - 1.0);\n  // calculate distance of fragment to center\n  float r = uv.x * uv.x + uv.y * uv.y;\n  // calculate antialias\n  float aa = fwidth(r);\n  // make full circle (radiusOuter - radiusInner)\n  float col = (1.0 - smoothstep(radiusOuter - aa, radiusOuter + blur + aa, r)) * smoothstep(radiusInner - aa, radiusInner + blur + aa, r);\n  // radial gradient\n  float a = smoothstep(-PI-aa, PI+aa, atan(uv.y, uv.x));\n  // progress angle\n  float p = 1.0 - progress - blur;\n  // apply progress to full circle (1 for done part, 0 for part to go)\n  col *= smoothstep(p, p + blur, a);\n  // multiply by user color\n  gl_FragColor = vec4(color * col, col);\n}\n"
 
 /***/ })
 /******/ ]);
