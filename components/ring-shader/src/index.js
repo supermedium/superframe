@@ -9,7 +9,7 @@ AFRAME.registerShader('ring', {
     blur: {default: 0.01, is: 'uniform'},
 		color: {type: 'color', is: 'uniform'},
 		progress: {default: 0, is: 'uniform'},
-		radiusInner: {default: 0.85, is: 'uniform'},
+		radiusInner: {default: 0.6, is: 'uniform'},
 		radiusOuter: {default: 1, is: 'uniform'}
 	},
 
