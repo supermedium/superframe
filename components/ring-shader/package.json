@@ -1,6 +1,6 @@
 {
   "name": "aframe-ring-shader",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "A ring shader for A-Frame.",
   "main": "dist/aframe-ring-shader.js",
   "unpkg": "dist/aframe-ring-shader.min.js",
