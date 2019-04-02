@@ -37,6 +37,42 @@ See documentation for individual components:
 - [thumb-controls](https://github.com/supermedium/superframe/tree/master/components/thumb-controls/) - An A-Frame component that provides and normalizes directional events for thumbpads and thumbsticks.
 
 
+## NPM install
+
+You can simply install any of the packages separately using `npm`.
+
+This is the list of all the package names. Juste `npm install [package-name]` to install :
+
+- aframe-aabb-collider-component
+- aframe-animation-component
+- aframe-animation-timeline-component
+- aframe-atlas-uvs-component
+- aframe-audioanalyser-component
+- aframe-broadcast-component
+- aframe-camera-recorder-component
+- aframe-debug-cursor-component
+- aframe-entity-generator-component
+- aframe-event-set-component
+- aframe-firebase-component
+- aframe-fps-counter-component
+- aframe-geometry-merger-component
+- aframe-gltf-part-component
+- aframe-haptics-component
+- aframe-layout-component
+- aframe-log-component
+- aframe-look-at-component
+- aframe-mountain-component
+- aframe-orbit-controls
+- aframe-proxy-event-component
+- aframe-randomizer-components
+- aframe-ring-shader
+- aframe-state-component
+- aframe-sun-sky
+- aframe-template-component
+- aframe-text-geometry-component
+- aframe-thumb-controls-component
+
+
 ## Local Installation
 
 Go to the folder of the component or scene you wish to develop and check out
