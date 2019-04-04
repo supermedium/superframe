@@ -9,7 +9,8 @@ AFRAME.registerComponent('proxy-event', {
     from: {type: 'string'},
     to: {type: 'string'},
     as: {type: 'string'},
-    bubbles: {default: false}
+    bubbles: {default: false},
+    delay: {default: 0, type: 'int'}
   },
 
   multiple: true,
@@ -44,12 +45,14 @@ AFRAME.registerComponent('proxy-event', {
       }
     } else {
       el.addEventListener(data.event, function (evt) {
-        var data = self.data;
-        if (!data.enabled) { return; }
-        if (!data.captureBubbles && evt.target !== el) { return; }
-        for (i = 0; i < to.length; i++) {
-          to[i].emit(data.as || data.event, evt['detail'] ? evt.detail : null, data.bubbles);
-        }
+        setTimeout(() => {
+          var data = self.data;
+          if (!data.enabled) { return; }
+          if (!data.captureBubbles && evt.target !== el) { return; }
+          for (i = 0; i < to.length; i++) {
+            to[i].emit(data.as || data.event, evt['detail'] ? evt.detail : null, data.bubbles);
+          }
+        }, data.delay);
       });
     }
   },
@@ -58,10 +61,12 @@ AFRAME.registerComponent('proxy-event', {
     var data = this.data;
     var self = this;
     fromEl.addEventListener(data.event, function (evt) {
-      var data = self.data;
-      if (!data.enabled) { return; }
-      if (!data.captureBubbles && evt.target !== fromEl) { return; }
-      self.el.emit(data.as || data.event, evt['detail'] ? evt.detail : null, false);
+      setTimeout(() => {
+        var data = self.data;
+        if (!data.enabled) { return; }
+        if (!data.captureBubbles && evt.target !== fromEl) { return; }
+        self.el.emit(data.as || data.event, evt['detail'] ? evt.detail : null, false);
+      }, data.delay);
     });
   }
 });
