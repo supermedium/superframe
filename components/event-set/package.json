@@ -1,14 +1,14 @@
 {
   "name": "aframe-event-set-component",
-  "version": "4.2.1",
+  "version": "5.0.0",
   "description": "Set properties in response to events in A-Frame",
-  "main": "index.js",
+  "main": "dist/aframe-event-set-component.js",
+  "unpkg": "dist/aframe-event-set-component.min.js",
   "scripts": {
-    "build": "browserify examples/main.js -o examples/build.js",
-    "dev": "budo examples/main.js:examples/build.js --port 8000 --live --open",
-    "dist": "webpack index.js dist/aframe-event-set-component.js && webpack -p index.js dist/aframe-event-set-component.min.js",
+    "dev": "npm run start",
+    "dist": "NODE_ENV=development webpack && NODE_ENV=production webpack",
     "lint": "semistandard -v | snazzy",
-    "start": "npm run dev",
+    "start": "webpack-dev-server --host 0.0.0.0 --progress --colors --hot-only --inline --port 7000",
     "prepublish": "npm run dist"
   },
   "repository": {
@@ -30,18 +30,45 @@
   },
   "homepage": "https://github.com/supermedium/superframe/tree/components/event-set#readme",
   "devDependencies": {
-    "aframe": "^0.7.0",
-    "browserify": "^12.0.1",
-    "budo": "^7.1.0",
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-preset-es2015": "^6.24.1",
+    "browserify": "^13.0.0",
+    "budo": "^8.2.2",
+    "chai": "^3.4.1",
+    "chai-shallow-deep-equal": "^1.3.0",
+    "debug": "2.x.x",
+    "ghpages": "^0.0.8",
+    "karma": "^0.13.15",
+    "karma-browserify": "^4.4.2",
+    "karma-chai-shallow-deep-equal": "0.0.4",
+    "karma-chrome-launcher": "2.0.0",
+    "karma-env-preprocessor": "^0.1.1",
+    "karma-firefox-launcher": "^0.1.7",
+    "karma-mocha": "^0.2.1",
+    "karma-mocha-reporter": "^1.1.3",
+    "karma-sinon-chai": "^1.1.0",
+    "mocha": "^2.3.4",
+    "randomcolor": "^0.4.4",
     "semistandard": "^8.0.0",
-    "shelljs": "^0.6.0",
+    "shelljs": "^0.7.0",
+    "shx": "^0.1.1",
+    "sinon": "^1.17.5",
+    "sinon-chai": "^2.8.0",
     "snazzy": "^4.0.0",
-    "webpack": "^1.12.9"
+    "uglify-js": "git://github.com/mishoo/UglifyJS2#harmony-v2.8.22",
+    "uglifyjs-webpack-plugin": "^0.4.6",
+    "webpack": "^4.29.5",
+    "webpack-cli": "^3.3.0",
+    "webpack-dev-server": "^3.3.1"
   },
   "semistandard": {
     "ignore": [
       "examples/build.js",
       "dist/**"
     ]
+  },
+  "dependencies": {
+    "debug": "^2.6.9"
   }
 }
