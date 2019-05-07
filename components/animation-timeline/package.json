@@ -1,6 +1,6 @@
 {
   "name": "aframe-animation-timeline-component",
-  "version": "1.6.0",
+  "version": "2.0.0",
   "description": "A timeline component to use with the A-Frame animation component.",
   "main": "index.js",
   "unpkg": "dist/aframe-animation-timeline-component.min.js",

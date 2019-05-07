@@ -190,8 +190,8 @@
 	      component.updateConfig();
 	      component.stopRelatedAnimations();
 	      config = cloneConfig(component.config);
-	      config.offset = offset + additionalOffset;
-	      this.timeline.add(config);
+	      config.target = config.targets;
+	      this.timeline.add(config, offset + additionalOffset);
 	    }
 
 	    return (config.duration || 0) + (config.delay || 0) + additionalOffset;

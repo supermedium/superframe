@@ -4,8 +4,7 @@
     <meta charset="utf-8">
     <title>A-Frame Animation Timeline Component - Bohemian</title>
     <meta name="description" content="Basic example for Animation Timeline component."></meta>
-    <script src="https://rawgit.com/ngokevin/aframe/animationbugless/dist/aframe-master.min.js"></script>
-    <script src="https://unpkg.com/aframe-animation-component@4.0.0-beta8/dist/aframe-animation-component.js"></script>
+    <script src="http://localhost:9000/dist/aframe-master.js"></script>
     <script src="../../dist/aframe-animation-timeline-component.min.js"></script>
   </head>
   <body>
@@ -61,18 +60,18 @@
         <a-mixin id="box"
           geometry="primitive: box"
           material="color: #AAA; opacity: 0"
-          animation__fadein="property: material.opacity; dur: 2000; from: 0; to: 1; autoplay: false"
+          animation__fadein="property: components.material.material.opacity; dur: 2000; from: 0; to: 1; autoplay: false"
           animation__scale="property: scale; to: 2 20 2; dur: 2000; easing: easeInOutElastic; autoplay: false"
           animation__position="property: position; to: 0 30 -3; dur: 2000; autoplay: false"
-          animation__color="property: material.color; from: #AAA; to: #222; dur: 2500; autoplay: false"
+          animation__color="property: components.material.material.color; type: color; from: #AAA; to: #222; dur: 2500; autoplay: false"
           animation__rotate="property: rotation; to: 0 360; dur: 1000; easing: easeInQuad; autoplay: false"
           scale="0.0001 0.0001 0.0001"
         ></a-mixin>
 
         <a-mixin id="text"
           text="align: center; color: #333; width: 6; opacity: 0"
-          animation__fadein="property: text.opacity; from: 0; to: 1; dur: 3000; easing: linear; autoplay: false"
-          animation__fadeout="property: text.opacity; from: 1; to: 0; dur: 3000; easing: linear; autoplay: false"
+          animation__fadein="property: components.text.material.uniforms.opacity.value; from: 0; to: 1; dur: 3000; easing: linear; autoplay: false"
+          animation__fadeout="property: components.text.material.uniforms.opacity.value; from: 1; to: 0; dur: 3000; easing: linear; autoplay: false"
           animation__togglevisible="property: visible; from: false; to: true; dur: 1; autoplay: false"
           animation__togglevisibleoff="property: visible; from: true; to: false; dur: 1; autoplay: false"
           position="0 2 -3"
@@ -81,7 +80,7 @@
 
       <a-entity id="text1" mixin="text" text="value: Is this real life?"></a-entity>
       <a-entity id="text2" mixin="text" text="value: Is this just fantasy?; opacity: 0"
-                animation__textcolor="property: text.color; from: #FAFAFA; to: #8C200E; dur: 2500; autoplay: false"></a-entity>
+                animation__textcolor="property: components.text.material.uniforms.color.value; type: color; from: #FAFAFA; to: #8C200E; dur: 2500; autoplay: false"></a-entity>
       <a-entity id="text3" mixin="text" text="value: Caught in a landslide." position="0 -10 0"
                 animation__positionin="property: position; to: 0 2 -3; dur: 2500; autoplay: false"
                 animation__positionout="property: position; from: 0 2 -3; to: -10 2 -3; dur: 3500; autoplay: false"></a-entity>
@@ -93,7 +92,7 @@
         <a-entity mixin="box" position="4 0 0"></a-entity>
       </a-entity>
 
-      <a-sky id="sky" color="#FAFAFA" animation__color="property: material.color; from: #FAFAFA; to: #111; dur: 2000; autoplay: false"></a-sky>
+      <a-sky id="sky" color="#FAFAFA" animation__color="property: components.material.material.color; type: color; from: #FAFAFA; to: #111; dur: 2000; autoplay: false"></a-sky>
     </a-scene>
 
     <!--githubcorner-->
