@@ -1361,4 +1361,36 @@ suite('generateExpression', function () {
       '(a || b) && (c || d)'),
       '(state["a"] || state["b"]) && (state["c"] || state["d"])');
   });
+
+  suite('parseKeysToWatch', () => {
+    test('parses', () => {
+      assert.shallowDeepEqual(
+        lib.parseKeysToWatch([], 'foo'),
+        ['foo']);
+    });
+
+    test('parses with boolean operators', () => {
+      assert.shallowDeepEqual(
+        lib.parseKeysToWatch([], 'foo && bar || baz'),
+        ['foo', 'bar', 'baz']);
+    });
+
+    test('parses with parens', () => {
+      assert.shallowDeepEqual(
+        lib.parseKeysToWatch([], '(foo && bar) || (baz && qux)'),
+        ['foo', 'bar', 'baz', 'qux']);
+    });
+
+    test('parses with ternary', () => {
+      assert.shallowDeepEqual(
+        lib.parseKeysToWatch([], `(foo && bar) ? '5' : '10'`),
+        ['foo', 'bar']);
+    });
+
+    test('parses with not', () => {
+      assert.shallowDeepEqual(
+        lib.parseKeysToWatch([], `!foo || !!bar`),
+        ['foo', 'bar']);
+    });
+  });
 });

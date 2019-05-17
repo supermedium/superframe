@@ -280,7 +280,10 @@ AFRAME.registerComponent('bind', {
     this.system = this.el.sceneEl.systems.state;
 
     // Whether we are binding by namespace (e.g., bind__foo="prop1: true").
-    if (this.id) { componentId = lib.split(this.id, '__')[0]; }
+    if (this.id) {
+      componentId = lib.split(this.id, '__')[0];
+    }
+
     this.isNamespacedBind =
       this.id &&
       (componentId in AFRAME.components && !AFRAME.components[componentId].isSingleProp) ||
