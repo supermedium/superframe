@@ -36,6 +36,15 @@ value can either be a number or the name of a layer defined in the system.
   <a-entity geometry="primitive: plane" material="transparent: true; opacity: 0.5" render-order="5.5"></a-entity>
 ```
 
+##### Non-Recursive
+
+The component will apply render order recursively by default. To define to be
+not recursive, set the nonrecursive ID:
+
+```html
+<a-entity render-order__nonrecursive="hud"></a-entity>
+```
+
 ### Installation
 
 #### Browser
@@ -45,8 +54,8 @@ Install and use by directly including the [browser files](dist):
 ```html
 <head>
   <title>My A-Frame Scene</title>
-  <script src="https://aframe.io/releases/0.9.2/aframe.min.js"></script>
-  <script src="https://unpkg.com/aframe-render-order-component@1.0.0/dist/aframe-render-order-component.min.js"></script>
+  <script src="https://aframe.io/releases/0.9.0/aframe.min.js"></script>
+  <script src="https://unpkg.com/aframe-render-order-component@1.1.0/dist/aframe-render-order-component.min.js"></script>
 </head>
 
 <body>

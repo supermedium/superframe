@@ -16,15 +16,23 @@ AFRAME.registerSystem('render-order', {
 AFRAME.registerComponent('render-order', {
   schema: {type: 'string'},
 
+  multiple: true,
+
   init: function () {
     this.set = this.set.bind(this);
     this.el.addEventListener('object3dset', evt => {
-      evt.detail.object.traverse(this.set);
+      if (this.id !== 'nonrecursive') {
+        evt.detail.object.traverse(this.set);
+      }
     });
   },
 
   update: function () {
-    this.el.object3D.traverse(this.set);
+    if (this.id === 'nonrecursive') {
+      this.set(this.el.object3D);
+    } else {
+      this.el.object3D.traverse(this.set);
+    }
   },
 
   set: function (node) {

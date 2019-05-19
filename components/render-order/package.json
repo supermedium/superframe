@@ -1,6 +1,6 @@
 {
   "name": "aframe-render-order-component",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A component that enables sorting and manually defining render order for transparent objects.",
   "main": "index.js",
   "unpkg": "dist/aframe-render-order-component.min.js",
