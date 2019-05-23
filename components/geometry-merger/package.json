@@ -1,6 +1,6 @@
 {
   "name": "aframe-geometry-merger-component",
-  "version": "2.0.0-beta1",
+  "version": "2.0.0",
   "description": "An A-Frame component to merge geometries to reduce draw calls.",
   "main": "index.js",
   "unpkg": "dist/aframe-geometry-merger-component.min.js",
