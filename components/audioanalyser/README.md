@@ -19,6 +19,7 @@ Not tested on mobile.
 | beatDetectionDecay     | How fast to decay the beat threshold.                                | 0.99          |
 | beatDetectionMinVolume | Minimum volume for beat.                                             | 15            |
 | beatDetectionThrottle  | Minimum time to to wait between beats.                               | 250           |
+| cache                  | Whether or not to cache audio buffers.                               | false         |
 | enableBeatDetection    | Whether or not to detect beats. Disable if not using.                | true          |
 | enableLevels           | Whether or not to store frequency data. Disable if not using.        | true          |
 | enableVolume           | Whether or not to calculate average volume. Disable if not using.    | true          |

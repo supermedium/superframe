@@ -13,6 +13,7 @@ AFRAME.registerComponent('audioanalyser', {
     beatDetectionDecay: {default: 0.99},
     beatDetectionMinVolume: {default: 15},
     beatDetectionThrottle: {default: 250},
+    cache: {default: false},
     enabled: {default: true},
     enableBeatDetection: {default: true},
     enableLevels: {default: true},
@@ -158,6 +159,12 @@ AFRAME.registerComponent('audioanalyser', {
       }
     }
 
+    if (!this.data.cache) {
+      Object.keys(audioBufferCache).forEach(function (src) {
+        delete audioBufferCache[src];
+      });
+    }
+
     audioBufferCache[src] = new Promise(resolve => {
       // Fetch if does not exist.
       const xhr = this.xhr = new XMLHttpRequest();
@@ -205,7 +212,8 @@ AFRAME.registerComponent('audioanalyser', {
         this.audio = this.data.src;
       }
       const node = this.context.createMediaElementSource(this.audio)
-      nodeCache[src] = node;
+
+      if (this.data.cache) { nodeCache[src] = node; }
       return node;
     };
   })()
