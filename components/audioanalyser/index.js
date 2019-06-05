@@ -213,7 +213,7 @@ AFRAME.registerComponent('audioanalyser', {
       }
       const node = this.context.createMediaElementSource(this.audio)
 
-      if (this.data.cache) { nodeCache[src] = node; }
+      nodeCache[src] = node;
       return node;
     };
   })()
