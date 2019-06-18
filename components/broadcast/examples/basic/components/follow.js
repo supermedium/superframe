@@ -1,11 +1,12 @@
 AFRAME.registerComponent('follow', {
-  schema: {type: 'selector'},
-
+  schema: {
+    target: {type: 'selector'},
+  },
   init: function () {
     var el = this.el;
-    this.data.addEventListener('componentchanged', function (evt) {
-      if (evt.detail.name !== 'position') { return; }
-      el.setAttribute('position', evt.detail.newData);
-    });
+  },
+  tick: function () {
+    var targetPosition = this.data.target.object3D.position;
+    this.el.setAttribute("position", targetPosition);
   }
 });
