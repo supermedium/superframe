@@ -8,10 +8,13 @@ if (typeof AFRAME === 'undefined') {
 }
 
 AFRAME.registerSystem('broadcast', {
+  schema: {
+    url: {type: 'string', default: 'http://localhost:12000'},
+    interval: {type: 'number', default: 10}
+  },
   init: function () {
-    var sceneEl = this.sceneEl;
-    var url = sceneEl.getAttribute('broadcast').url;
-
+    var sceneEl = this.el.sceneEl;
+    var url = this.data.url;
     if (!url) { return; }
 
     this.socket = io(url);
@@ -50,14 +53,14 @@ AFRAME.registerSystem('broadcast', {
         id: el.getAttribute('id'),
         parentId: el.parentNode.getAttribute('id'),
         components: sendComponents.map(function getAttribute (componentName) {
-          return [componentName, el.getComputedAttribute(componentName)];
+          return [componentName, el.getAttribute(componentName)];
         })
       };
     });
   },
 
   tick: function (time, dt) {
-    if (time - this.time < 10) { return; }
+    if (time - this.time < this.data.interval) { return; }
     this.time = time;
 
     this.socket.emit('broadcast', this.sendQueue.map(function call (getSend) {
