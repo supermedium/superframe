@@ -69,6 +69,12 @@
 	      info('Connected', url);
 	    });
 
+	    this.sendQueue = [];
+	    this.helperQuaternionReceive = new THREE.Quaternion();
+	    this.helperQuaternionSend = new THREE.Quaternion();
+
+	    var that = this;
+
 	    this.socket.on('broadcast', function (data) {
 	      data.forEach(function syncState (entity) {
 	        var el = sceneEl.querySelector('#' + entity.id);
@@ -81,25 +87,33 @@
 	        }
 
 	        entity.components.forEach(function setAttribute (component) {
-	          el.setAttribute(component[0], component[1]);
+	          if (component[0] === "rotation") {
+	            that.helperQuaternionReceive.fromArray(component[1]);
+	            el.object3D.setRotationFromQuaternion(that.helperQuaternionReceive);
+	          } else {
+	            el.setAttribute(component[0], component[1]);
+	          };
 	        });
 	      });
 	    });
-
-	    this.sendQueue = [];
 	  },
 
 	  addSend: function (el, sendComponents) {
 	    if (!el.getAttribute('id')) {
 	      el.setAttribute('id', guid());
 	    }
-
+	    var that = this;
 	    this.sendQueue.push(function send () {
 	      return {
 	        id: el.getAttribute('id'),
 	        parentId: el.parentNode.getAttribute('id'),
 	        components: sendComponents.map(function getAttribute (componentName) {
-	          return [componentName, el.getAttribute(componentName)];
+	          if (componentName === "rotation") {
+	            that.helperQuaternionSend.copy(el.object3D.quaternion);
+	            return [componentName, that.helperQuaternionSend.toArray()];
+	          } else {
+	            return [componentName, el.getAttribute(componentName)];
+	          };
 	        })
 	      };
 	    });
