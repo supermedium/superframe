@@ -47,7 +47,7 @@ node index.js
 From the / directory:
 ```
 npm install
-npm start
+npm run dev
 ```
 
 The WebSocket server will default to PORT 12000.
