@@ -1,6 +1,6 @@
 {
   "name": "aframe-broadcast-component",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Multi-user in A-Frame using raw websockets",
   "main": "index.js",
   "scripts": {
@@ -28,7 +28,7 @@
   },
   "homepage": "https://github.com/supermedium/superframe/tree/components/broadcast#readme",
   "devDependencies": {
-    "aframe": "^0.2.0",
+    "aframe": "^0.9.2",
     "browserify": "^12.0.1",
     "budo": "^7.1.0",
     "shelljs": "^0.6.0",

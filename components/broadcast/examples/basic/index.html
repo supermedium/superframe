@@ -7,14 +7,14 @@
     <script src="components/follow.js"></script>
   </head>
   <body>
-    <a-scene broadcast="url: http://ngokevin.com:12000">
+    <a-scene broadcast="url: http://localhost:12000">
       <a-entity camera look-controls wasd-controls
                 broadcast="send: geometry, material, position, rotation"
                 geometry="primitive: box; depth: 0.3; height: 0.3; width: 0.3"
                 material="color: #222"
                 position="0 1.8 5"></a-entity>
 
-      <a-entity broadcast="send: position" follow="[camera]">
+      <a-entity broadcast="send: position" follow="target: [camera]">
         <a-entity broadcast="send: geometry, material, position"
                   geometry="primitive: cone; height: 1.5; radiusTop: 0.1; radiusBottom: 0.4"
                   material="color: #222"
