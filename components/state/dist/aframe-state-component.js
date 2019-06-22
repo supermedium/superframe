@@ -257,7 +257,7 @@ var TYPE_OBJECT = 'object';
 var WHITESPACE_REGEX = /s+/;
 
 AFRAME.registerState = function (definition) {
-  AFRAME.utils.extend(State, definition);
+  AFRAME.utils.extendDeep(State, definition);
 };
 
 AFRAME.registerSystem('state', {
