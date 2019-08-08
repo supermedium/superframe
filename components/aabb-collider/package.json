@@ -1,12 +1,13 @@
 {
   "name": "aframe-aabb-collider-component",
-  "version": "3.1.0",
+  "version": "3.2.0",
   "description": "An axis-aligned bounding box component for A-Frame.",
   "main": "index.js",
   "cdn": "dist/aframe-aabb-collider-component.min.js",
   "scripts": {
     "dev": "budo index.js:dist/aframe-aabb-collider-component.min.js --port 7000 --live --open",
-    "dist": "webpack index.js dist/aframe-aabb-collider-component.js && webpack -p index.js dist/aframe-aabb-collider-component.min.js",
+    "dist": "webpack && NODE_ENV=production webpack",
+    "dist:max": "webpack",
     "lint": "semistandard -v | snazzy",
     "prepublish": "npm run dist",
     "ghpages": "ghpages",
@@ -36,6 +37,9 @@
   "homepage": "https://github.com/supermedium/superframe#readme",
   "devDependencies": {
     "aframe": "*",
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-preset-es2015": "^6.24.1",
     "browserify": "^13.0.0",
     "budo": "^8.2.2",
     "chai": "^3.4.1",
@@ -54,11 +58,13 @@
     "randomcolor": "^0.4.4",
     "semistandard": "^8.0.0",
     "shelljs": "^0.7.0",
+    "shx": "^0.1.1",
     "sinon": "^1.17.5",
     "sinon-chai": "^2.8.0",
-    "shx": "^0.1.1",
     "snazzy": "^4.0.0",
-    "webpack": "^1.13.0"
+    "uglify-js": "git://github.com/mishoo/UglifyJS2.git#harmony-v2.8.22",
+    "uglifyjs-webpack-plugin": "^0.4.6",
+    "webpack": "^3.5.5"
   },
   "semistandard": {
     "globals": [

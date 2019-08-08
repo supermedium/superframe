@@ -6,7 +6,7 @@ if (typeof AFRAME === 'undefined') {
 
 // Configuration for the MutationObserver used to refresh the whitelist.
 // Listens for addition/removal of elements and attributes within the scene.
-var OBSERVER_CONFIG = {
+const OBSERVER_CONFIG = {
   childList: true,
   attributes: true,
   subtree: true
@@ -64,20 +64,19 @@ AFRAME.registerComponent('aabb-collider', {
   },
 
   tick: function (time) {
-    var boxHelper;
-    var boundingBox = this.boundingBox;
-    var centerDifferenceVec3 = this.centerDifferenceVec3;
-    var clearedIntersectedEls = this.clearedIntersectedEls;
-    var closestCenterDifference;
-    var newClosestEl;
-    var intersectedEls = this.intersectedEls;
-    var el = this.el;
-    var i;
-    var newIntersectedEls = this.newIntersectedEls;
-    var objectEls = this.objectEls;
-    var prevCheckTime = this.prevCheckTime;
-    var previousIntersectedEls = this.previousIntersectedEls;
-    var self = this;
+    const boundingBox = this.boundingBox;
+    const centerDifferenceVec3 = this.centerDifferenceVec3;
+    const clearedIntersectedEls = this.clearedIntersectedEls;
+    const el = this.el;
+    const intersectedEls = this.intersectedEls;
+    const newIntersectedEls = this.newIntersectedEls;
+    const objectEls = this.objectEls;
+    const prevCheckTime = this.prevCheckTime;
+    const previousIntersectedEls = this.previousIntersectedEls;
+
+    let closestCenterDifference;
+    let newClosestEl;
+    let i;
 
     if (!this.data.enabled) { return; }
 
@@ -110,7 +109,7 @@ AFRAME.registerComponent('aabb-collider', {
       if (!this.data.collideNonVisible && !objectEls[i].getAttribute('visible')) {
         // Remove box helper if debug flag set and has box helper.
         if (this.data.debug) {
-          boxHelper = objectEls[i].object3D.boxHelper;
+          const boxHelper = objectEls[i].object3D.boxHelper;
           if (boxHelper) {
             el.sceneEl.object3D.remove(boxHelper);
             objectEls[i].object3D.boxHelper = null;
@@ -197,15 +196,32 @@ AFRAME.registerComponent('aabb-collider', {
    * 3D version of https://www.youtube.com/watch?v=ghqD3e37R7E
    */
   isIntersecting: (function () {
-    var boundingBox = new THREE.Box3();
+    const boundingBox = new THREE.Box3();
 
     return function (el) {
-      var isIntersecting;
-      var boxHelper;
-      var boxMin;
-      var boxMax;
+      let box;
 
-      boundingBox.setFromObject(el.object3D);
+      // Dynamic, recalculate each tick.
+      if (el.dataset.aabbColliderDynamic) {
+        // Box.
+        boundingBox.setFromObject(el.object3D);
+        box = boundingBox;
+        // Center.
+        el.object3D.boundingBoxCenter = el.object3D.boundingBoxCenter || new THREE.Vector3();
+        box.getCenter(el.object3D.boundingBoxCenter);
+      }
+
+      // Static, reuse box and centers.
+      if (!el.dataset.aabbColliderDynamic) {
+        if (!el.object3D.aabbBox) {
+          // Box.
+          el.object3D.aabbBox = new THREE.Box3().setFromObject(el.object3D);
+          // Center.
+          el.object3D.boundingBoxCenter = new THREE.Vector3();
+          el.object3D.aabbBox.getCenter(el.object3D.boundingBoxCenter);
+        }
+        box = el.object3D.aabbBox;
+      }
 
       if (this.data.debug) {
         if (!el.object3D.boxHelper) {
@@ -216,10 +232,8 @@ AFRAME.registerComponent('aabb-collider', {
         el.object3D.boxHelper.setFromObject(el.object3D);
       }
 
-      boxMin = boundingBox.min;
-      boxMax = boundingBox.max;
-      el.object3D.boundingBoxCenter = el.object3D.boundingBoxCenter || new THREE.Vector3();
-      boundingBox.getCenter(el.object3D.boundingBoxCenter);
+      const boxMin = box.min;
+      const boxMax = box.max;
       return (this.boxMin.x <= boxMax.x && this.boxMax.x >= boxMin.x) &&
              (this.boxMin.y <= boxMax.y && this.boxMax.y >= boxMin.y) &&
              (this.boxMin.z <= boxMax.z && this.boxMax.z >= boxMin.z);
@@ -237,7 +251,7 @@ AFRAME.registerComponent('aabb-collider', {
    * Update list of objects to test for intersection.
    */
   refreshObjects: function () {
-    var data = this.data;
+    const data = this.data;
     // If objects not defined, intersect with everything.
     this.objectEls = data.objects
       ? this.el.sceneEl.querySelectorAll(data.objects)
@@ -247,7 +261,6 @@ AFRAME.registerComponent('aabb-collider', {
 });
 
 function copyArray (dest, source) {
-  var i;
   dest.length = 0;
-  for (i = 0; i < source.length; i++) { dest[i] = source[i]; }
+  for (let i = 0; i < source.length; i++) { dest[i] = source[i]; }
 }

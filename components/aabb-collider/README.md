@@ -18,6 +18,10 @@ For [A-Frame](https://aframe.io).
 | objects           | Selector of entities to intersection test against.            | ''            |
 | interval          | Milliseconds in between intersection checks.                  | 80            |
 
+If the target collidable object is moving, set `<a-entity
+data-aabb-collider-dynamic>` on the target. By default, collidable objects are
+presumed to be static for performance purposes.
+
 #### Events
 
 | Event           | Description                                                                                                            |
