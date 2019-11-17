@@ -25,6 +25,7 @@ For either `geometry-merger` or `buffer-geometry-merger` components:
 | Property         | Description                                                                                                                                                                                                                                               | Default Value |
 | --------         | -----------                                                                                                                                                                                                                                               | ------------- |
 | preserveOriginal | Whether to remove the now-merged child goemetry or keep in scene graph. It can be useful to keep the original child entities' geometries and set their `material="visible: false"` so that we can still interact with them with colliders and raycasters. | false         |
+| materialColors | Whether to use material colors in merged geometries for the faces of the final mesh, so that colors of the faces in this final mesh resemble the colors of the original entities when they were material colors. | true |
 
 #### Members
 

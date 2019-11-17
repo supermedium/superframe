@@ -4,7 +4,8 @@ if (!THREE.BufferGeometryUtils) {
 
 AFRAME.registerComponent('geometry-merger', {
   schema: {
-    preserveOriginal: {default: false}
+    preserveOriginal: {default: false},
+    materialColors: {default: true}
   },
 
   init: function () {
@@ -32,6 +33,14 @@ AFRAME.registerComponent('geometry-merger', {
         self.geometry.vertices.length,
         self.geometry.vertices.length + mesh.geometry.vertices.length - 1
       ];
+
+      // If material color applied to all faces, copy colors to faces
+      if (self.data.materialColors && (mesh.material.vertexColors === THREE.NoColors)) {
+        let color = mesh.material.color;
+        for ( const face of mesh.geometry.faces) {
+          face.color.set( color );
+        };
+      };
 
       // Merge. Use parent's matrix due to A-Frame's <a-entity>(Group-Mesh) hierarchy.
       mesh.parent.updateMatrix();
