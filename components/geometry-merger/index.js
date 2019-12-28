@@ -59,13 +59,20 @@ AFRAME.registerComponent('buffer-geometry-merger', {
 
   init: function () {
     var geometries = [];
+    var self = this;
 
-    this.el.sceneEl.object3D.updateMatrixWorld()
+    this.el.object3D.updateMatrixWorld()
     this.el.object3D.traverse(function (mesh) {
       if (mesh.type !== 'Mesh' || mesh.el === self.el) { return; }
-      mesh.geometry.applyMatrix(mesh.matrixWorld);
-      geometries.push(mesh.geometry.clone());
-      mesh.parent.remove(mesh);
+      var geometry = mesh.geometry.clone();
+      var currentMesh = mesh;
+      while (currentMesh !== self.el.object3D) {
+        geometry.applyMatrix(currentMesh.parent.matrix);
+        currentMesh = currentMesh.parent;
+      }
+      geometries.push(geometry);
+      // Remove mesh if not preserving.
+      if (!self.data.preserveOriginal) { mesh.parent.remove(mesh); }
     });
 
     const geometry = THREE.BufferGeometryUtils.mergeBufferGeometries(geometries);
