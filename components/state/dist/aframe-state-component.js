@@ -267,7 +267,7 @@ AFRAME.registerState = function (definition) {
 
 AFRAME.registerSystem('state', {
   init: function init() {
-    var _this = this;
+    var _this2 = this;
 
     var key;
 
@@ -297,10 +297,12 @@ AFRAME.registerSystem('state', {
     this.el.addEventListener('loaded', function () {
       var i;
       // Initial compute.
-      State.computeState(_this.state, '@@INIT');
+      for (i = 0; i < State.computeState.length; i++) {
+        State.computeState[i](_this.state, '@@INIT');
+      }
       // Initial dispatch.
-      for (i = 0; i < _this.subscriptions.length; i++) {
-        _this.subscriptions[i].onStateUpdate(_this.state);
+      for (i = 0; i < _this2.subscriptions.length; i++) {
+        _this2.subscriptions[i].onStateUpdate(_this2.state);
       }
     });
   },
@@ -451,10 +453,10 @@ AFRAME.registerSystem('state', {
     }
 
     function registerListener(actionName) {
-      var _this2 = this;
+      var _this3 = this;
 
       this.el.addEventListener(actionName, function (evt) {
-        _this2.dispatch(actionName, evt.detail);
+        _this3.dispatch(actionName, evt.detail);
       });
     }
   },

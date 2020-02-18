@@ -6,7 +6,7 @@
   "unpkg": "dist/aframe-state-component.min.js",
   "scripts": {
     "dev": "budo src/index.js:dist/aframe-state-component.min.js --port 7000 --live --open",
-    "dist": "webpack && NODE_ENV=production webpack",
+    "dist": "webpack && cross-env NODE_ENV=production webpack",
     "dist:max": "webpack",
     "prepublish": "npm run dist",
     "test": "karma start ./tests/karma.conf.js --browsers Firefox",
@@ -39,6 +39,7 @@
     "budo": "^8.2.2",
     "chai": "^3.4.1",
     "chai-shallow-deep-equal": "^1.3.0",
+    "cross-env": "7.0.0",
     "debug": "2.x.x",
     "ghpages": "^0.0.8",
     "karma": "^0.13.15",
