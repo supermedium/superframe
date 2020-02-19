@@ -53,7 +53,7 @@
 	 */
 	AFRAME.registerComponent('layout', {
 	  schema: {
-	    angle: {type: 'number', default: false, min: 0, max: 360, if: {type: ['circle']}},
+	    angle: {type: 'number', default: 0, min: 0, max: 360, if: {type: ['circle']}},
 	    columns: {default: 1, min: 0, if: {type: ['box']}},
 	    margin: {default: 1, min: 0, if: {type: ['box', 'line']}},
 	    marginColumn: {default: 1, min: 0, if: {type: ['box']}},
