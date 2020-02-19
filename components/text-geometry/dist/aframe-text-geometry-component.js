@@ -42,7 +42,7 @@
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	/**
 	 * TextGeometry component for A-Frame.
@@ -75,7 +75,12 @@
 	    var data = this.data;
 	    var el = this.el;
 
-	    var mesh = el.getOrCreateObject3D('mesh', THREE.Mesh);
+	    var object3D = el.getObject3D('mesh');
+	    if (!object3D) {
+	      this.mesh = new THREE.Mesh();
+	      el.setObject3D('mesh', this.mesh);
+		  var mesh = this.mesh;
+	    }
 	    if (data.font.constructor === String) {
 	      // Load typeface.json font.
 	      fontLoader.load(data.font, function (response) {
@@ -93,5 +98,5 @@
 	});
 
 
-/***/ }
+/***/ })
 /******/ ]);
