@@ -55,7 +55,7 @@ AFRAME.registerSystem('state', {
       var i;
       // Initial compute.
       for (i = 0; i < State.computeState.length; i++) {
-        State.computeState[i](_this.state, '@@INIT');
+        State.computeState[i](this.state, '@@INIT');
       }
       // Initial dispatch.
       for (i = 0; i < this.subscriptions.length; i++) {
