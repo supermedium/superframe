@@ -7,7 +7,7 @@ AFRAME.registerSystem('render-order', {
 
   update: function () {
     this.order = {};
-    for (i = 0; i < this.data.length; i++) {
+    for (var i = 0; i < this.data.length; i++) {
       this.order[this.data[i]] = i;
     }
   }

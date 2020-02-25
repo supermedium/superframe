@@ -4,7 +4,7 @@
  * __init.test.js is run before every test case.
  */
 window.debug = true;
-var AScene = require('aframe').AScene
+var AScene = require('aframe').AScene;
 
 navigator.getVRDisplays = function () {
   var resolvePromise = Promise.resolve();

@@ -1,5 +1,4 @@
 const path = require('path');
-const webpack = require('webpack');
 
 const PLUGINS = [];
 
@@ -11,7 +10,7 @@ module.exports = {
   mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
   output: {
     globalObject: 'this',
-    path: __dirname + '/dist',
+    path: path.join(__dirname, '/dist'),
     filename: process.env.NODE_ENV === 'production' ? 'aframe-render-order-component.min.js' : 'aframe-render-order-component.js',
     libraryTarget: 'umd'
   },
