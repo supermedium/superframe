@@ -54,7 +54,9 @@ AFRAME.registerSystem('state', {
     this.el.addEventListener('loaded', () => {
       var i;
       // Initial compute.
-      State.computeState(this.state, '@@INIT');
+      for (i = 0; i < State.computeState.length; i++) {
+        State.computeState[i](this.state, '@@INIT');
+      }
       // Initial dispatch.
       for (i = 0; i < this.subscriptions.length; i++) {
         this.subscriptions[i].onStateUpdate(this.state);
