@@ -30,6 +30,12 @@ AFRAME.registerComponent('haptics', {
 
     if (this.el.components['tracked-controls'].controller) {
       this.gamepad = this.el.components['tracked-controls'].controller;
+
+      if (this.gamepad.gamepad) {
+        // WebXR.
+        this.gamepad = this.gamepad.gamepad;
+      }
+
       if (!this.gamepad || !this.gamepad.hapticActuators ||
           !this.gamepad.hapticActuators.length) { return; }
       this.addEventListeners();
@@ -37,6 +43,12 @@ AFRAME.registerComponent('haptics', {
       this.el.addEventListener('controllerconnected', function init () {
         setTimeout(function () {
           self.gamepad = self.el.components['tracked-controls'].controller;
+
+          if (self.gamepad.gamepad) {
+            // WebXR.
+            self.gamepad = self.gamepad.gamepad;
+          }
+
           if (!self.gamepad || !self.gamepad.hapticActuators ||
               !self.gamepad.hapticActuators.length) { return; }
           self.addEventListeners();
