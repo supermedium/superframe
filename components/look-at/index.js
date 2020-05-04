@@ -89,7 +89,8 @@ AFRAME.registerComponent('look-at', {
       var vector = this.vector;
 
       if (target3D) {
-        target3D.getWorldPosition(vec3);
+        target3D.updateMatrixWorld();
+        vec3.setFromMatrixPosition(target3D.matrixWorld);
         if (this.el.getObject3D('camera')) {
           // Flip the vector to -z, looking away from target for camera entities. When using
           // lookat from THREE camera objects, this is applied for you, but since the camera is
