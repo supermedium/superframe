@@ -6,6 +6,28 @@
     <meta property="og:image" content="https://raw.githubusercontent.com/supermedium/superframe/master/components/look-at/examples/basic/preview.gif"></meta>
     <script src="https://aframe.io/releases/0.9.0/aframe.min.js"></script>
     <script src="../../dist/aframe-look-at-component.min.js"></script>
+    <script>
+      /**
+       * Use the spacebar to swap the camera to one that is looking at the target.
+       * 
+       * Probably shouldn't do it in VR.
+       */
+      AFRAME.registerComponent('toggleable-camera', {
+        init: function () {
+          document.addEventListener('keydown', AFRAME.utils.bind(this.toggleCamera, this));
+        },
+        toggleCamera: function (e) {
+          if (e.code === 'Space') {
+            if (this.el.hasAttribute('camera')) {
+              this.el.removeAttribute('camera');
+              this.el.sceneEl.querySelector('#look-cam').setAttribute('camera', 'active', true);
+            } else {
+              this.el.setAttribute('camera', { active: true });
+            }
+          }
+        }
+      })
+    </script>
   </head>
   <body>
     <a-scene>
@@ -29,13 +51,18 @@
         <a-cylinder radius="0.2" height="2" color="#7BC8A4" look-at="#target"
           position="-4 0 1"></a-cylinder>
         <a-box width="2" depth="1" height="0.25" color="#93648D" look-at="#target"
-          position="0 0 1"></a-box>
+          position="0 0 1" toggleable-camera></a-box>
         <a-box width="1" depth="2" height="0.5" color="#999" look-at="#target"
           position="4 0 1"></a-box>
 
         <!-- This entity looks at the camera. Use WASD controls to test it -->
         <a-box width="2" depth="2" height="2" color="#FFC65D" look-at="#look-cam"
           position="-6 2.5 -2"></a-box>
+
+        <!-- This entity looks at the origin. Cone rotated to point in its lookAt direction. -->
+        <a-entity position="-4 4 -8" look-at="0 0 0">
+          <a-cone height="1" color="#C388A3" radius-bottom="0.5" radius-top="0" rotation="90 0 0"></a-cone>
+        </a-entity>
       </a-entity>
 
       <a-sky color="#ECECEC"></a-sky>

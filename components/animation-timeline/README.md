@@ -207,8 +207,8 @@ Install and use by directly including the [browser files](dist):
     </a-assets>
 
     <a-entity id="welcomeText"
-              animation-timeline__fadein="property: text.opacity; from: 0; to: 1; startEvents: null"
-              animation-timeline__fadeout="property: text.opacity; from: 1; to 0; startEvents: null"
+              animation__fadein="property: text.opacity; from: 0; to: 1; startEvents: null"
+              animation__fadeout="property: text.opacity; from: 1; to 0; startEvents: null"
               text="opacity: 0; value: Welcome to the dankest timeline."
               position="0 0 -3"></a-entity>
 

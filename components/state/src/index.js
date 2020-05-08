@@ -8,7 +8,7 @@ var State = {
   initialState: {},
   nonBindedStateKeys: [],
   handlers: {},
-  computeState: function () { /* no-op */ }
+  computeState: [function () { /* no-op */ }]
 };
 
 var STATE_UPDATE_EVENT = 'stateupdate';
@@ -16,7 +16,12 @@ var TYPE_OBJECT = 'object';
 var WHITESPACE_REGEX = /s+/;
 
 AFRAME.registerState = function (definition) {
+  const computeState = State.computeState;
+  if (definition.computeState) {
+    computeState.push(definition.computeState);
+  }
   AFRAME.utils.extendDeep(State, definition);
+  State.computeState = computeState;
 }
 
 AFRAME.registerSystem('state', {
@@ -73,7 +78,9 @@ AFRAME.registerSystem('state', {
       State.handlers[actionName](this.state, payload);
 
       // Post-compute.
-      State.computeState(this.state, actionName, payload);
+      for (i = 0; i < State.computeState.length; i++) {
+        State.computeState[i](this.state, actionName, payload);
+      }
 
       // Get a diff to optimize bind updates.
       for (key in this.diff) { delete this.diff[key]; }
