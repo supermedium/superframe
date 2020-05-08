@@ -4,7 +4,8 @@ if (!THREE.BufferGeometryUtils) {
 
 AFRAME.registerComponent('geometry-merger', {
   schema: {
-    preserveOriginal: {default: false}
+    preserveOriginal: {default: false},
+    materialColors: {default: true}
   },
 
   init: function () {
@@ -33,6 +34,14 @@ AFRAME.registerComponent('geometry-merger', {
         self.geometry.vertices.length + mesh.geometry.vertices.length - 1
       ];
 
+      // If material color applied to all faces, copy colors to faces
+      if (self.data.materialColors && (mesh.material.vertexColors === THREE.NoColors)) {
+        let color = mesh.material.color;
+        for ( const face of mesh.geometry.faces) {
+          face.color.set( color );
+        };
+      };
+
       // Merge. Use parent's matrix due to A-Frame's <a-entity>(Group-Mesh) hierarchy.
       mesh.parent.updateMatrix();
       self.geometry.merge(mesh.geometry, mesh.parent.matrix);
@@ -50,13 +59,20 @@ AFRAME.registerComponent('buffer-geometry-merger', {
 
   init: function () {
     var geometries = [];
+    var self = this;
 
-    this.el.sceneEl.object3D.updateMatrixWorld()
+    this.el.object3D.updateMatrixWorld()
     this.el.object3D.traverse(function (mesh) {
       if (mesh.type !== 'Mesh' || mesh.el === self.el) { return; }
-      mesh.geometry.applyMatrix(mesh.matrixWorld);
-      geometries.push(mesh.geometry.clone());
-      mesh.parent.remove(mesh);
+      var geometry = mesh.geometry.clone();
+      var currentMesh = mesh;
+      while (currentMesh !== self.el.object3D) {
+        geometry.applyMatrix(currentMesh.parent.matrix);
+        currentMesh = currentMesh.parent;
+      }
+      geometries.push(geometry);
+      // Remove mesh if not preserving.
+      if (!self.data.preserveOriginal) { mesh.parent.remove(mesh); }
     });
 
     const geometry = THREE.BufferGeometryUtils.mergeBufferGeometries(geometries);
