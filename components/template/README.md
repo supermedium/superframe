@@ -27,7 +27,7 @@ Supports:
 ```html
 <a-scene>
   <a-assets>
-    <script id="boxesTemplate">
+    <script id="boxesTemplate" type="text/html">
       <a-box color="${box1color}" position="-1 0 -5"></a-box>
       <a-box color="${box2color}" position="0 1 -5"></a-box>
       <a-box color="${box3color}" position="1 0 -5"></a-box>
