@@ -1,6 +1,6 @@
 {
   "name": "aframe-look-at-component",
-  "version": "0.8.0",
+  "version": "1.0.0",
   "description": "Rotate an entity to face towards another entity in A-Frame",
   "main": "index.js",
   "scripts": {

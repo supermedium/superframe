@@ -63,7 +63,7 @@
 	 */
 	AFRAME.registerComponent('look-at', {
 	  schema: {
-	    default: '',
+	    default: '0 0 0',
 
 	    parse: function (value) {
 	      // A static position to look at.
@@ -85,6 +85,9 @@
 	  init: function () {
 	    this.target3D = null;
 	    this.vector = new THREE.Vector3();
+	    this.cameraListener = AFRAME.utils.bind(this.cameraListener, this);
+	    this.el.addEventListener('componentinitialized', this.cameraListener);
+	    this.el.addEventListener('componentremoved', this.cameraListener);
 	  },
 
 	  /**
@@ -94,7 +97,6 @@
 	  update: function () {
 	    var self = this;
 	    var target = self.data;
-	    var object3D = self.el.object3D;
 	    var targetEl;
 
 	    // No longer looking at anything (i.e., look-at="").
@@ -104,7 +106,7 @@
 
 	    // Look at a position.
 	    if (typeof target === 'object') {
-	      return object3D.lookAt(new THREE.Vector3(target.x, target.y, target.z));
+	      return this.lookAt(new THREE.Vector3(target.x, target.y, target.z));
 	    }
 
 	    // Assume target is a string.
@@ -129,28 +131,43 @@
 	    return function (t) {
 	      // Track target object position. Depends on parent object keeping global transforms up
 	      // to state with updateMatrixWorld(). In practice, this is handled by the renderer.
-	      var target;
 	      var target3D = this.target3D;
-	      var object3D = this.el.object3D;
-	      var vector = this.vector;
-
 	      if (target3D) {
 	        target3D.getWorldPosition(vec3);
-	        if (this.el.getObject3D('camera')) {
-	          // Flip the vector to -z, looking away from target for camera entities. When using
-	          // lookat from THREE camera objects, this is applied for you, but since the camera is
-	          // nested into a Object3D, we need to apply this manually.
-	          // vector.subVectors(object3D.position, vec3).add(object3D.position);
-	        } else {
-	          vector = vec3;
-	        }
-	        object3D.lookAt(vector);
+	        this.lookAt(vec3);
 	      }
-	    };
+	    }
 	  })(),
+
+	  remove: function () {
+	    this.el.removeEventListener('componentinitialized', this.cameraListener);
+	    this.el.removeEventListener('componentremoved', this.cameraListener);
+	  },
 
 	  beginTracking: function (targetEl) {
 	    this.target3D = targetEl.object3D;
+	  },
+
+	  cameraListener: function (e) {
+	    if (e.detail && e.detail.name === 'camera') {
+	      this.update();
+	    }
+	  },
+
+	  lookAt: function (position) {
+	    var vector = this.vector;
+	    var object3D = this.el.object3D;
+
+	    if (this.el.getObject3D('camera')) {
+	      // Flip the vector to -z, looking away from target for camera entities. When using
+	      // lookat from THREE camera objects, this is applied for you, but since the camera is
+	      // nested into a Object3D, we need to apply this manually.
+	      vector.subVectors(object3D.position, position).add(object3D.position);
+	    } else {
+	      vector.copy(position);
+	    }
+
+	    object3D.lookAt(vector);
 	  }
 	});
 
