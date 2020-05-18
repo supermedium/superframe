@@ -67,6 +67,12 @@ through the `data` property. If both are defined, they will be combined.
 If `type` is not defined and we are loading it from an external template, then
 the component will render raw HTML.
 
+### Events
+
+| Event            | Description                                                                                                                  |
+|------------------|----------------------------------------|
+| templaterendered | Emitted when the template is rendered  |
+
 ### Script Tag Type
 
 If loading from a script tag, it must have the `type` attribute defined. The
