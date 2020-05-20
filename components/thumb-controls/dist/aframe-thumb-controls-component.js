@@ -78,12 +78,16 @@
       var el = this.el;
       el.addEventListener('trackpaddown', this.onTrackpadDown);
       el.addEventListener('trackpadup', this.onTrackpadUp);
+      el.addEventListener('touchpaddown', this.onTrackpadDown);
+      el.addEventListener('touchpadup', this.onTrackpadUp);
     },
 
     pause: function () {
       var el = this.el;
       el.removeEventListener('trackpaddown', this.onTrackpadDown);
       el.removeEventListener('trackpadup', this.onTrackpadUp);
+      el.removeEventListener('touchpaddown', this.onTrackpadDown);
+      el.removeEventListener('touchpadup', this.onTrackpadUp);
     },
 
     // For pad.
@@ -124,7 +128,7 @@
         return;
       }
 
-      // Stick pulled back. Reset direciton and emit end event.
+      // Stick pulled back. Reset direction and emit end event.
       if (this.directionStick && this.getDistance() < this.data.thresholdStick) {
         el.emit(EVENTS.NULL.END, null, false);
         el.emit(EVENTS[this.directionStick].END, null, false);
@@ -137,7 +141,15 @@
      */
     getDistance: function () {
       var axis = this.axis;
-      return Math.sqrt(axis[1] * axis[1] + axis[0] * axis[0]);
+
+      // this.axis comes from the tracked-controls component, which copies it from this.controller.gamepad.axes.
+      // See https://immersive-web.github.io/webxr-gamepads-module/#xr-standard-gamepad-mapping
+      // for an explanation of gamepad.axes.
+      if (this.type === TYPE_PAD) {
+        return Math.sqrt(axis[1] * axis[1] + axis[0] * axis[0]);
+      } else {
+        return Math.sqrt(axis[3] * axis[3] + axis[2] * axis[2]);
+      }
     },
 
     /**
@@ -175,9 +187,13 @@
     getAngle: function () {
       var angle;
       var axis = this.axis;
-      var flipY;
-      flipY = this.type === TYPE_STICK ? -1 : 1;
-      angle = Math.atan2(axis[1] * flipY, axis[0]);
+
+      // See comments in getDistance() about axis.
+      if (this.type === TYPE_PAD) {
+        angle = Math.atan2(-axis[1], axis[0]);
+      } else {
+        angle = Math.atan2(-axis[3], axis[2]);
+      }
       if (angle < 0) { angle = 2 * Math.PI + angle; }
       return THREE.Math.radToDeg(angle);
     }
