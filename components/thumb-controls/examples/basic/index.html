@@ -4,13 +4,47 @@
     <meta charset="utf-8">
     <title>A-Frame Thumb Controls Component - Basic</title>
     <meta name="description" content="Basic example for Thumb Controls component."></meta>
-    <script src="https://aframe.io/releases/0.8.2/aframe.min.js"></script>
+    <script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
     <script src="../../dist/aframe-thumb-controls-component.min.js"></script>
     <script src="https://unpkg.com/aframe-environment-component@1.0.0/dist/aframe-environment-component.min.js"></script>
   </head>
   <body>
+    <script>
+      AFRAME.registerComponent('box-mover', {
+        init: function () {
+          this.box = document.querySelector('a-box')
+          this.el.addEventListener('thumbrightstart', () => { this.moveBox('x', 0.9) })
+          this.el.addEventListener('thumbrightend', () => { this.moveBox('x', 0.1) })
+          this.el.addEventListener('thumbleftstart', () => { this.moveBox('x', -0.9) })
+          this.el.addEventListener('thumbleftend', () => { this.moveBox('x', -0.1) })
+          this.el.addEventListener('thumbupstart', () => { this.moveBox('y', 0.9) })
+          this.el.addEventListener('thumbupend', () => { this.moveBox('y', 0.1) })
+          this.el.addEventListener('thumbdownstart', () => { this.moveBox('y', -0.9) })
+          this.el.addEventListener('thumbdownend', () => { this.moveBox('y', -0.1) })
+          this.el.addEventListener('thumbstart', () => { this.box.setAttribute('color', 'blue') })
+          this.el.addEventListener('thumbend', () => { this.box.setAttribute('color', 'white') })
+        },
+        moveBox: function (direction, distance) {
+          const position = this.box.getAttribute('position')
+          position[direction] += distance
+          this.box.setAttribute('position', position)
+        }
+      });
+    </script>
     <a-scene environment="preset: forest">
-      <a-entity oculus-controls="hand: right" vive-controls="hand: right" thumb-controls thumb-controls-debug="hand: right; enabled: true"></a-entity>
+      <a-entity oculus-controls="hand: right"
+                vive-controls="hand: right"
+                windows-motion-controls="hand: right"
+                box-mover
+                thumb-controls
+                ></a-entity>
+      <a-entity oculus-controls="hand: left"
+                vive-controls="hand: left"
+                windows-motion-controls="hand: left"
+                box-mover
+                thumb-controls
+                ></a-entity>
+      <a-box position="0 1 -3"></a-box>
     </a-scene>
 
     <!--githubcorner-->
