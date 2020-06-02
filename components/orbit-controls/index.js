@@ -35,13 +35,10 @@ AFRAME.registerComponent('orbit-controls', {
     var el = this.el;
     var oldPosition;
 
-    this.controls = new THREE.OrbitControls(el.getObject3D('camera'),
-                                            el.sceneEl.renderer.domElement);
-
     oldPosition = new THREE.Vector3();
 
     this.bindMethods();
-    el.sceneEl.addEventListener('enter-vr', this.onEnterVR); 
+    el.sceneEl.addEventListener('enter-vr', this.onEnterVR);
     el.sceneEl.addEventListener('exit-vr', this.onExitVR);
 
     document.body.style.cursor = 'grab';
@@ -54,6 +51,16 @@ AFRAME.registerComponent('orbit-controls', {
 
     this.target = new THREE.Vector3();
     el.getObject3D('camera').position.copy(this.data.initialPosition);
+  },
+
+  pause: function () {
+    this.controls.dispose();
+  },
+
+  play: function () {
+    const el = this.el;
+    this.controls = new THREE.OrbitControls(el.getObject3D('camera'), el.sceneEl.renderer.domElement);
+    this.update();
   },
 
   onEnterVR: function() {
@@ -89,6 +96,8 @@ AFRAME.registerComponent('orbit-controls', {
   update: function (oldData) {
     var controls = this.controls;
     var data = this.data;
+
+    if (!controls) { return; }
 
     controls.target = this.target.copy(data.target);
     controls.autoRotate = data.autoRotate;
