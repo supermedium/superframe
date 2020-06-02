@@ -1,6 +1,6 @@
 {
   "name": "aframe-thumb-controls-component",
-  "version": "1.1.0",
+  "version": "2.0.0",
   "description": "An A-Frame component that provides and normalizes directional events for thumbpads and thumbsticks.",
   "main": "index.js",
   "unpkg": "dist/aframe-thumb-controls-component.min.js",
