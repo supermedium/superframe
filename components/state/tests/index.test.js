@@ -1352,6 +1352,13 @@ suite('generateExpression', function () {
     assert.equal(lib.generateExpression('item.id + item.bar'), 'item["id"] + item["bar"]');
   });
 
+  test('preserves booleans', () => {
+    assert.equal(lib.generateExpression('true'), 'true');
+    assert.equal(lib.generateExpression('false'), 'false');
+    assert.equal(lib.generateExpression('a && true'), 'state["a"] && true');
+    assert.equal(lib.generateExpression('a && true || false'), 'state["a"] && true || false');
+  });
+
   test('preserves string whitespace', () => {
     assert.equal(lib.generateExpression('foo + "a b c"'), 'state["foo"] + "a b c"');
   });
