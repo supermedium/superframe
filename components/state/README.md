@@ -140,10 +140,10 @@ component will statically interpolate the variable. We are moving to
 `updateInPlace: true` which will be more performant and caches entities:
 
 ```html
-<a-entity bind-for="for: shoppingItem; in: shoppingList; key: name; updateInPlace: true">
+<a-entity bind-for="for: item; in: shoppingList; key: name; updateInPlace: true">
   <template>
-    <a-entity bind-item__text="value: shoppingItem.name"
-              bind-item__data-amount="shoppingItem.amount"></a-entity>
+    <a-entity bind-item__text="value: item.name"
+              data-amount="{{ amount }}"></a-entity>
   </template>
 </a-entity>
 ```
@@ -151,16 +151,16 @@ component will statically interpolate the variable. We are moving to
 This will result in:
 
 ```html
-<a-entity bind-for="for: shoppingItem; in: shoppingList; key: name">
+<a-entity bind-for="for: item; in: shoppingList; key: name">
   <template>
     <!-- ... -->
   </template>
-  <a-entity bind-item__text="value: shoppingItem.name"
-            bind-item__data-amount="shoppingItem.amount"
+  <a-entity bind-item__text="value: item.name"
+            data-amount="2"
             text="value: milk"
             data-bind-for-key="milk"></a-entity>
-  <a-entity bind__text="value: shoppingItem.name"
-            bind-item__data-amount="shoppingItem.amount"
+  <a-entity bind__text="value: item.name"
+            bind-item__data-amount="item.amount"
             text="value: eggs"
             data-amount="12"
             data-bind-for-key="eggs"></a-entity>
