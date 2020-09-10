@@ -30,6 +30,7 @@ See documentation for individual components:
 - [orbit-controls](https://github.com/supermedium/superframe/tree/master/components/orbit-controls/) - Orbit controls component for A-Frame.
 - [proxy-event](https://github.com/supermedium/superframe/tree/master/components/proxy-event/) - A component to declaratively proxy events for A-Frame.
 - [randomizer](https://github.com/supermedium/superframe/tree/master/components/randomizer/) - Randomize color, position, rotation, and scale in A-Frame
+- [render-order](https://github.com/supermedium/superframe/tree/master/components/render-order/) - A component that enables sorting and manually defining render order for transparent objects.
 - [state](https://github.com/supermedium/superframe/tree/master/components/state/) - State management for A-Frame using single global state modified through actions. State flows down to application via declarative binding.
 - [sun-sky](https://github.com/supermedium/superframe/tree/master/components/sun-sky/) - Gradient sky with adjustable sun in A-Frame
 - [template](https://github.com/supermedium/superframe/tree/master/components/template/) - Encapsulate groups of entities, use templating engines, and do string interpolations in A-Frame
