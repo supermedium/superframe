@@ -58,6 +58,16 @@ Primitive with a default plane geometry, black material, and light green text.
 document.querySelector('a-scene').emit('log', {message: 'hello', channel: 'bar'});
 ```
 
+#### Disabling copy of output to Javascript `console.log`
+
+By default a copy of the in-VR log is also sent to the normal Javascript console via `console.log`. To disable this add `log` system to your `a-scene` and set `console` parameter to `false` (default: `true`).
+
+```js
+<a-scene log="console: false">
+  <a-log position="0 0 -4"></a-log>
+</a-scene>
+```
+
 ### Installation
 
 #### Browser
