@@ -299,6 +299,10 @@ AFRAME.registerComponent('bind-for', {
     } else {
       this.onStateUpdateNaive();
     }
+  },
+
+  remove: function () {
+    this.el.sceneEl.systems.state.unsubscribe(this);
   }
 });
 
@@ -387,5 +391,9 @@ AFRAME.registerComponent('bind-item', {
 
     propertyMap[this.id] = this.data;
     lib.parseKeysToWatch(this.keysToWatch, this.data, true);
+  },
+
+  remove: function () {
+    this.el.sceneEl.systems.state.unsubscribe(this);
   }
 });
