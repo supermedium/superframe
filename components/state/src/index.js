@@ -166,7 +166,9 @@ AFRAME.registerSystem('state', {
   },
 
   unsubscribe: function (component) {
-    this.subscriptions.splice(this.subscriptions.indexOf(component), 1);
+    var i = this.subscriptions.indexOf(component);
+    if (i > -1)
+      this.subscriptions.splice(i, 1);
   },
 
   /**
