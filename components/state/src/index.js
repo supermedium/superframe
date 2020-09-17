@@ -112,11 +112,6 @@ AFRAME.registerSystem('state', {
         }
       }
 
-      // Update subscriptions.
-      for (i = 0; i < toUpdate.length; i++) {
-        toUpdate[i].onStateUpdate();
-      }
-
       // Unset array dirty.
       for (key in this.state) {
         if (this.state[key] && this.state[key].constructor === Array) {
@@ -126,6 +121,11 @@ AFRAME.registerSystem('state', {
 
       // Store last state.
       this.copyState(this.lastState, this.state);
+      
+      // Update subscriptions.
+      for (i = 0; i < toUpdate.length; i++) {
+        toUpdate[i].onStateUpdate();
+      }
 
       // Emit.
       this.eventDetail.action = actionName;
