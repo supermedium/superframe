@@ -69,13 +69,14 @@ AFRAME.registerSystem('state', {
    */
   dispatch: (function () {
 
+    const toUpdate = [];
+
     return function (actionName, payload) {
       var dirtyArrays;
       var i;
       var key;
       var subscription;
       
-      const toUpdate = [];
 
       // Modify state.
       State.handlers[actionName](this.state, payload);
@@ -97,7 +98,7 @@ AFRAME.registerSystem('state', {
       }
 
       // Notify subscriptions / binders.
-      toUpdate.length = 0;
+      let currentUpdateCount = 0;
       for (i = 0; i < this.subscriptions.length; i++) {
         if (this.subscriptions[i].name === 'bind-for') {
           // For arrays and bind-for, check __dirty flag on array rather than the diff.
@@ -110,6 +111,7 @@ AFRAME.registerSystem('state', {
         // Keep track to only update subscriptions once.
         if (toUpdate.indexOf(this.subscriptions[i]) === -1) {
           toUpdate.push(this.subscriptions[i]);
+          currentUpdateCount++;
         }
       }
 
@@ -124,8 +126,9 @@ AFRAME.registerSystem('state', {
       this.copyState(this.lastState, this.state);
 
       // Update subscriptions.
-      for (i = 0; i < toUpdate.length; i++) {
-        toUpdate[i].onStateUpdate();
+      for (i = 0; i < currentUpdateCount; i++) {
+        let subscriber = toUpdate.pop();
+        subscriber.onStateUpdate();
       }
 
       // Emit.
