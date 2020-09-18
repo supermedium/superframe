@@ -68,13 +68,14 @@ AFRAME.registerSystem('state', {
    * Dispatch action.
    */
   dispatch: (function () {
-    const toUpdate = [];
 
     return function (actionName, payload) {
       var dirtyArrays;
       var i;
       var key;
       var subscription;
+      
+      const toUpdate = [];
 
       // Modify state.
       State.handlers[actionName](this.state, payload);
@@ -121,7 +122,7 @@ AFRAME.registerSystem('state', {
 
       // Store last state.
       this.copyState(this.lastState, this.state);
-      
+
       // Update subscriptions.
       for (i = 0; i < toUpdate.length; i++) {
         toUpdate[i].onStateUpdate();

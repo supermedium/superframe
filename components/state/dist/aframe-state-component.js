@@ -418,7 +418,8 @@ AFRAME.registerSystem('state', {
   },
 
   unsubscribe: function unsubscribe(component) {
-    this.subscriptions.splice(this.subscriptions.indexOf(component), 1);
+    var i = this.subscriptions.indexOf(component);
+    if (i > -1) this.subscriptions.splice(i, 1);
   },
 
   /**
@@ -1040,6 +1041,10 @@ AFRAME.registerComponent('bind-for', {
     } else {
       this.onStateUpdateNaive();
     }
+  },
+
+  remove: function remove() {
+    this.el.sceneEl.systems.state.unsubscribe(this);
   }
 });
 
@@ -1134,6 +1139,10 @@ AFRAME.registerComponent('bind-item', {
 
     propertyMap[this.id] = this.data;
     lib.parseKeysToWatch(this.keysToWatch, this.data, true);
+  },
+
+  remove: function remove() {
+    this.el.sceneEl.systems.state.unsubscribe(this);
   }
 });
 
