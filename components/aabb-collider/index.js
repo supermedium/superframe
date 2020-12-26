@@ -61,6 +61,19 @@ AFRAME.registerComponent('aabb-collider', {
     this.observer.disconnect();
     this.el.sceneEl.removeEventListener('object3dset', this.setDirty);
     this.el.sceneEl.removeEventListener('object3dremove', this.setDirty);
+    if (this.data.debug) {
+      if (this.boxHelper) {
+        this.el.sceneEl.object3D.remove(this.boxHelper);
+        this.boxHelper = null;
+      };
+      for (i = 0; i < this.objectEls.length; i++) {
+        const boxHelper = this.objectEls[i].object3D.boxHelper;
+        if (boxHelper) {
+          this.el.sceneEl.object3D.remove(boxHelper);
+          this.objectEls[i].object3D.boxHelper = null;
+        };
+      };
+    }
   },
 
   tick: function (time) {
