@@ -8,8 +8,6 @@ if (typeof AFRAME === 'undefined') {
  * Haptics component for A-Frame.
  */
 AFRAME.registerComponent('haptics', {
-  dependencies: ['tracked-controls'],
-
   schema: {
     actuatorIndex: {default: 0},
     dur: {default: 100},
@@ -28,7 +26,8 @@ AFRAME.registerComponent('haptics', {
 
     this.callPulse = function () { self.pulse(); };
 
-    if (this.el.components['tracked-controls'].controller) {
+    // There may exist a tracked-controls when this component is initialized
+    if (this.el.components['tracked-controls'] && this.el.components['tracked-controls'].controller) {
       this.gamepad = this.el.components['tracked-controls'].controller;
 
       if (this.gamepad.gamepad) {
@@ -41,6 +40,10 @@ AFRAME.registerComponent('haptics', {
       this.addEventListeners();
     } else {
       this.el.addEventListener('controllerconnected', function init () {
+        // If no tracked-controls yet exists, add it here
+        if (!self.el.components['tracked-controls']) {
+          self.el.setAttribute('tracked-controls', {});
+        }
         setTimeout(function () {
           self.gamepad = self.el.components['tracked-controls'].controller;
 

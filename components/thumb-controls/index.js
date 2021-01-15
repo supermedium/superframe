@@ -38,8 +38,6 @@ var SIZE = 240;
  * `thumbdownend`
  */
 AFRAME.registerComponent('thumb-controls', {
-  dependencies: ['tracked-controls'],
-
   schema: {
     thresholdAngle: {default: 89.5},
     thresholdPad: {default: 0.05},
@@ -65,7 +63,18 @@ AFRAME.registerComponent('thumb-controls', {
       this.type = TYPE_PAD;
     });
 
-    this.axis = el.components['tracked-controls'].axis;
+    // There may exist a tracked-controls when this component is initialized
+    if (el.components['tracked-controls']) {
+      this.axis = el.components['tracked-controls'].axis;
+    } else {
+      this.el.addEventListener('controllerconnected', function init () {
+        // If no tracked-controls yet exists, add it here
+        if (!self.el.components['tracked-controls']) {
+          self.el.setAttribute('tracked-controls', {});
+        }
+        this.axis = el.components['tracked-controls'].axis;
+      }
+    }
   },
 
   play: function () {
@@ -136,6 +145,8 @@ AFRAME.registerComponent('thumb-controls', {
   getDistance: function () {
     var axis = this.axis;
 
+    if (!this.axis) { return 0; }
+
     // this.axis comes from the tracked-controls component, which copies it from this.controller.gamepad.axes.
     // See https://immersive-web.github.io/webxr-gamepads-module/#xr-standard-gamepad-mapping
     // for an explanation of gamepad.axes.
@@ -182,6 +193,8 @@ AFRAME.registerComponent('thumb-controls', {
     var angle;
     var axis = this.axis;
 
+    if (!this.axis) { return 0; }
+
     // See comments in getDistance() about axis.
     if (this.type === TYPE_PAD) {
       angle = Math.atan2(-axis[1], axis[0]);
@@ -194,7 +207,7 @@ AFRAME.registerComponent('thumb-controls', {
 });
 
 AFRAME.registerComponent('thumb-controls-debug', {
-  dependencies: ['thumb-controls', 'tracked-controls'],
+  dependencies: ['thumb-controls'],
 
   schema: {
     controllerType: {type: 'string'},
@@ -213,13 +226,28 @@ AFRAME.registerComponent('thumb-controls-debug', {
     if (!data.enabled && !AFRAME.utils.getUrlParameter('debug-thumb')) { return; }
     console.log('%c debug-thumb', 'background: #111; color: red');
 
-    // Stub.
-    el.components['tracked-controls'].handleAxes = () => {};
+    var GetTrackedControlsProperties = function () {
+      // Stub.
+      el.components['tracked-controls'].handleAxes = () => {};
 
-    axis = [0, 0, 0];
-    axisMoveEventDetail = {axis: axis};
-    el.components['tracked-controls'].axis = axis;
-    el.components['thumb-controls'].axis = axis;
+      axis = [0, 0, 0];
+      axisMoveEventDetail = {axis: axis};
+      el.components['tracked-controls'].axis = axis;
+      el.components['thumb-controls'].axis = axis;
+    };
+
+    // There may exist a tracked-controls when this component is initialized
+    if (el.components['tracked-controls']) {
+      GetTrackedControlsProperties();
+    } else {
+      this.el.addEventListener('controllerconnected', function init () {
+        // If no tracked-controls yet exists, add it here
+        if (!self.el.components['tracked-controls']) {
+          self.el.setAttribute('tracked-controls', {});
+        }
+        GetTrackedControlsProperties();
+      }
+    }
 
     canvas = this.createCanvas();
 
