@@ -40,10 +40,7 @@ AFRAME.registerComponent('haptics', {
       this.addEventListeners();
     } else {
       this.el.addEventListener('controllerconnected', function init () {
-        // If no tracked-controls yet exists, add it here
-        if (!self.el.components['tracked-controls']) {
-          self.el.setAttribute('tracked-controls', {});
-        }
+        // controllerconntected implies we have a tracked-controls component
         setTimeout(function () {
           self.gamepad = self.el.components['tracked-controls'].controller;
 
