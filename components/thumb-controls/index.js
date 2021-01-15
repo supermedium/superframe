@@ -52,9 +52,20 @@ AFRAME.registerComponent('thumb-controls', {
     this.directionStick = '';
     this.directionTrackpad = '';
 
+    // There may exist a tracked-controls when this component is initialized
+    if (el.components['tracked-controls']) {
+      this.axis = el.components['tracked-controls'].axis;
+    }
+
     // Get thumb type (stick vs pad).
     this.type = TYPE_STICK;
     el.addEventListener('controllerconnected', evt => {
+      // If no tracked-controls yet exists, add it here
+      if (!self.el.components['tracked-controls']) {
+        self.el.setAttribute('tracked-controls', {});
+      }
+      this.axis = el.components['tracked-controls'].axis;
+
       if (evt.detail.name === 'oculus-touch-controls' ||
           evt.detail.name === 'windows-motion-controls') {
         this.type = TYPE_STICK;
@@ -62,19 +73,6 @@ AFRAME.registerComponent('thumb-controls', {
       }
       this.type = TYPE_PAD;
     });
-
-    // There may exist a tracked-controls when this component is initialized
-    if (el.components['tracked-controls']) {
-      this.axis = el.components['tracked-controls'].axis;
-    } else {
-      this.el.addEventListener('controllerconnected', function init () {
-        // If no tracked-controls yet exists, add it here
-        if (!self.el.components['tracked-controls']) {
-          self.el.setAttribute('tracked-controls', {});
-        }
-        this.axis = el.components['tracked-controls'].axis;
-      }
-    }
   },
 
   play: function () {
@@ -246,7 +244,7 @@ AFRAME.registerComponent('thumb-controls-debug', {
           self.el.setAttribute('tracked-controls', {});
         }
         GetTrackedControlsProperties();
-      }
+      });
     }
 
     canvas = this.createCanvas();
