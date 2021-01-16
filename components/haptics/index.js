@@ -26,33 +26,23 @@ AFRAME.registerComponent('haptics', {
 
     this.callPulse = function () { self.pulse(); };
 
+    var doInit = function (gamepad) {
+      self.gamepad = gamepad;
+      if (self.gamepad.gamepad) {
+        // WebXR.
+         self.gamepad = self.gamepad.gamepad;
+       }
+       if (!self.gamepad || !self.gamepad.hapticActuators ||
+       !self.gamepad.hapticActuators.length) { return; }
+       self.addEventListeners();
+    };
+
     // There may exist a tracked-controls when this component is initialized
     if (this.el.components['tracked-controls'] && this.el.components['tracked-controls'].controller) {
-      this.gamepad = this.el.components['tracked-controls'].controller;
-
-      if (this.gamepad.gamepad) {
-        // WebXR.
-        this.gamepad = this.gamepad.gamepad;
-      }
-
-      if (!this.gamepad || !this.gamepad.hapticActuators ||
-          !this.gamepad.hapticActuators.length) { return; }
-      this.addEventListeners();
+      doInit(this.el.components['tracked-controls'].controller);
     } else {
       this.el.addEventListener('controllerconnected', function init () {
-        // controllerconntected implies we have a tracked-controls component
-        setTimeout(function () {
-          self.gamepad = self.el.components['tracked-controls'].controller;
-
-          if (self.gamepad.gamepad) {
-            // WebXR.
-            self.gamepad = self.gamepad.gamepad;
-          }
-
-          if (!self.gamepad || !self.gamepad.hapticActuators ||
-              !self.gamepad.hapticActuators.length) { return; }
-          self.addEventListeners();
-        }, 150);
+        doInit(self.el.components['tracked-controls'].controller);
       });
     }
   },
