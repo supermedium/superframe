@@ -26,8 +26,8 @@ AFRAME.registerComponent('haptics', {
 
     this.callPulse = function () { self.pulse(); };
 
-    var doInit = function (gamepad) {
-      self.gamepad = gamepad;
+    var doInit = function () {
+      self.gamepad = self.el.components['tracked-controls'].controller;
       if (self.gamepad.gamepad) {
         // WebXR.
          self.gamepad = self.gamepad.gamepad;
@@ -39,10 +39,10 @@ AFRAME.registerComponent('haptics', {
 
     // There may exist a tracked-controls when this component is initialized
     if (this.el.components['tracked-controls'] && this.el.components['tracked-controls'].controller) {
-      doInit(this.el.components['tracked-controls'].controller);
+      doInit();
     } else {
       this.el.addEventListener('controllerconnected', function init () {
-        doInit(self.el.components['tracked-controls'].controller);
+        doInit();
       });
     }
   },
