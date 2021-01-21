@@ -8,8 +8,6 @@ if (typeof AFRAME === 'undefined') {
  * Haptics component for A-Frame.
  */
 AFRAME.registerComponent('haptics', {
-  dependencies: ['tracked-controls'],
-
   schema: {
     actuatorIndex: {default: 0},
     dur: {default: 100},
@@ -28,31 +26,23 @@ AFRAME.registerComponent('haptics', {
 
     this.callPulse = function () { self.pulse(); };
 
-    if (this.el.components['tracked-controls'].controller) {
-      this.gamepad = this.el.components['tracked-controls'].controller;
-
-      if (this.gamepad.gamepad) {
+    var doInit = function () {
+      self.gamepad = self.el.components['tracked-controls'].controller;
+      if (self.gamepad.gamepad) {
         // WebXR.
-        this.gamepad = this.gamepad.gamepad;
-      }
+         self.gamepad = self.gamepad.gamepad;
+       }
+       if (!self.gamepad || !self.gamepad.hapticActuators ||
+       !self.gamepad.hapticActuators.length) { return; }
+       self.addEventListeners();
+    };
 
-      if (!this.gamepad || !this.gamepad.hapticActuators ||
-          !this.gamepad.hapticActuators.length) { return; }
-      this.addEventListeners();
+    // There may exist a tracked-controls when this component is initialized
+    if (this.el.components['tracked-controls'] && this.el.components['tracked-controls'].controller) {
+      doInit();
     } else {
       this.el.addEventListener('controllerconnected', function init () {
-        setTimeout(function () {
-          self.gamepad = self.el.components['tracked-controls'].controller;
-
-          if (self.gamepad.gamepad) {
-            // WebXR.
-            self.gamepad = self.gamepad.gamepad;
-          }
-
-          if (!self.gamepad || !self.gamepad.hapticActuators ||
-              !self.gamepad.hapticActuators.length) { return; }
-          self.addEventListeners();
-        }, 150);
+        doInit();
       });
     }
   },
