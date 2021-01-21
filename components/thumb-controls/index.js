@@ -221,7 +221,7 @@ AFRAME.registerComponent('thumb-controls-debug', {
     if (!data.enabled && !AFRAME.utils.getUrlParameter('debug-thumb')) { return; }
     console.log('%c debug-thumb', 'background: #111; color: red');
 
-    var GetTrackedControlsProperties = function () {
+    var getTrackedControlsProperties = function () {
       // Stub.
       el.components['tracked-controls'].handleAxes = () => {};
 
@@ -233,11 +233,11 @@ AFRAME.registerComponent('thumb-controls-debug', {
 
     // There may exist a tracked-controls when this component is initialized
     if (el.components['tracked-controls']) {
-      GetTrackedControlsProperties();
+      getTrackedControlsProperties();
     } else {
       this.el.addEventListener('controllerconnected', function init () {
         // controllerconntected implies we have a tracked-controls component
-        GetTrackedControlsProperties();
+        getTrackedControlsProperties();
       });
     }
 
