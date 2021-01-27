@@ -1,6 +1,6 @@
 {
   "name": "aframe-haptics-component",
-  "version": "1.6.2",
+  "version": "1.6.3",
   "description": "A controller haptics (vibrations) component for A-Frame.",
   "main": "index.js",
   "cdn": "dist/aframe-haptics-component.min.js",
