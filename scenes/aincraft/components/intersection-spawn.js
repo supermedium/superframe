@@ -18,8 +18,16 @@ AFRAME.registerComponent('intersection-spawn', {
       // Create element.
       const spawnEl = document.createElement('a-entity');
 
-      // Snap intersection point to grid and offset from center.
-      spawnEl.setAttribute('position', evt.detail.intersection.point);
+      // Get normal of the face of intersection and scale it down a bit
+      var normal = evt.detail.intersection.face.normal;
+      normal.multiplyScalar(0.25);
+
+      // Get the position of the intersection and add our scaled normal
+      var position = evt.detail.intersection.point;
+      position.add(normal);
+      
+      // Snap new position to grid and offset from center.
+      spawnEl.setAttribute('position', position);
 
       // Set components and properties.
       Object.keys(data).forEach(name => {
