@@ -60,7 +60,8 @@ AFRAME.registerComponent('look-at', {
 
     // Look at a position.
     if (typeof target === 'object') {
-      return this.lookAt(new THREE.Vector3(target.x, target.y, target.z));
+      this.lookAt(new THREE.Vector3(target.x, target.y, target.z));
+      return this.endTracking();
     }
 
     // Assume target is a string.
@@ -100,6 +101,10 @@ AFRAME.registerComponent('look-at', {
 
   beginTracking: function (targetEl) {
     this.target3D = targetEl.object3D;
+  },
+
+  endTracking: function () {
+    this.target3D = null;
   },
 
   cameraListener: function (e) {
