@@ -101,12 +101,9 @@ AFRAME.registerComponent('atlas-uvs', {
     var uvs = getGridUvs(data.row - 1, data.column - 1, data.totalRows, data.totalColumns);
 
     var geometry = this.el.getObject3D('mesh').geometry;
-    geometry.faceVertexUvs[0][0][0].copy(uvs[0]);
-    geometry.faceVertexUvs[0][0][1].copy(uvs[1]);
-    geometry.faceVertexUvs[0][0][2].copy(uvs[3]);
-    geometry.faceVertexUvs[0][1][0].copy(uvs[1]);
-    geometry.faceVertexUvs[0][1][1].copy(uvs[2]);
-    geometry.faceVertexUvs[0][1][2].copy(uvs[3]);
+
+    var float32Array = new Float32Array([uvs[0].x, uvs[0].y, uvs[3].x, uvs[3].y, uvs[1].x, uvs[1].y, uvs[2].x, uvs[2].y]);
+    geometry.setAttribute('uv', new THREE.BufferAttribute(float32Array, 2));
     geometry.uvsNeedUpdate = true;
   }
 });
@@ -169,6 +166,7 @@ function getGridUvs(row, column, totalRows, totalColumns) {
   var columnWidth = 1 / totalColumns;
   var rowHeight = 1 / totalRows;
 
+  // create a Map called `uvs` to hold the 4 UV pairs
   uvs[0].set(columnWidth * column, rowHeight * row + rowHeight);
   uvs[1].set(columnWidth * column, rowHeight * row);
   uvs[2].set(columnWidth * column + columnWidth, rowHeight * row);
