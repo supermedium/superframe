@@ -5,8 +5,9 @@
 
 An A-Frame component to set UVs onto a plane geometry given a gridded texture atlas.
 
-Does not support buffer geometries yet. Mostly for reference for people that
-want to do UV mapping.
+See examples here: https://supermedium.github.io/superframe/components/atlas-uvs/
+
+Version 3.0 supports buffer geometries for A-Frame 1.2 and greater. (Use version 2.1 of this component for A-Frame 1.1 and earlier)
 
 ### API
 
@@ -26,8 +27,8 @@ Install and use by directly including the [browser files](dist):
 ```html
 <head>
   <title>My A-Frame Scene</title>
-  <script src="https://aframe.io/releases/0.9.0/aframe.min.js"></script>
-  <script src="https://unpkg.com/aframe-atlas-uvs-component@2.1.0/dist/aframe-atlas-uvs-component.min.js"></script>
+  <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+  <script src="https://unpkg.com/aframe-atlas-uvs-component@3.0.0/dist/aframe-atlas-uvs-component.min.js"></script>
 </head>
 
 <body>
@@ -39,6 +40,11 @@ Install and use by directly including the [browser files](dist):
     <a-entity mixin="myAtlas" atlas-uvs="column: 2; row: 4"></a-entity>
   </a-scene>
 </body>
+```
+
+For A-Frame versions 1.1 and earlier:
+```
+  <script src="https://unpkg.com/aframe-atlas-uvs-component@2.1.0/dist/aframe-atlas-uvs-component.min.js"></script>
 ```
 
 #### npm
