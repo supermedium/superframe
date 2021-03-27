@@ -1,6 +1,6 @@
-{
+  {
   "name": "aframe-atlas-uvs-component",
-  "version": "2.1.0",
+  "version": "3.0.0",
   "description": "An A-Frame component to set UVs onto a plane geometry given a gridded texture atlas.",
   "main": "index.js",
   "unpkg": "dist/aframe-atlas-uvs-component.min.js",
