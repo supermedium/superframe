@@ -6,7 +6,7 @@ AFRAME.registerShader('sunSky', {
     luminance: {default: 1, min: 0, max: 2, is: 'uniform'},
     mieCoefficient: {default: 0.005, min: 0, max: 0.1, is: 'uniform'},
     mieDirectionalG: {default: 0.8, min: 0, max: 1, is: 'uniform'},
-    reileigh: {default: 1, min: 0, max: 4, is: 'uniform'},
+    rayleigh: {default: 1, min: 0, max: 4, is: 'uniform'},
     sunPosition: {type: 'vec3', default: '0 0 -1', is: 'uniform'},
     turbidity: {default: 2, min: 0, max: 20, is: 'uniform'}
   },
@@ -32,7 +32,7 @@ AFRAME.registerPrimitive('a-sun-sky', {
     luminance: 'material.luminance',
     mieCoefficient: 'material.mieCoefficient',
     mieDirectionalG: 'material.mieDirectionalG',
-    reileigh: 'material.reileigh',
+    rayleigh: 'material.rayleigh',
     sunPosition: 'material.sunPosition',
     turbidity: 'material.turbidity'
   }

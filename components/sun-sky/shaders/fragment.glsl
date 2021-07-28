@@ -6,7 +6,7 @@ vec3 cameraPos = vec3(0., 0., 0.);
 
 uniform float luminance;
 uniform float turbidity;
-uniform float reileigh;
+uniform float rayleigh;
 uniform float mieCoefficient;
 uniform float mieDirectionalG;
 
@@ -91,7 +91,7 @@ void main()
 {
   float sunfade = 1.0-clamp(1.0-exp((sunPosition.y/450000.0)),0.0,1.0);
 
-  float reileighCoefficient = reileigh - (1.0* (1.0-sunfade));
+  float rayleighCoefficient = rayleigh - (1.0* (1.0-sunfade));
 
   vec3 sunDirection = normalize(sunPosition);
 
@@ -100,7 +100,7 @@ void main()
   // extinction (absorbtion + out scattering)
   // rayleigh coefficients
 
-  vec3 betaR = simplifiedRayleigh() * reileighCoefficient;
+  vec3 betaR = simplifiedRayleigh() * rayleighCoefficient;
 
   // mie coefficients
   vec3 betaM = totalMie(lambda, K, turbidity) * mieCoefficient;
