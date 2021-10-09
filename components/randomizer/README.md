@@ -44,6 +44,12 @@ Random position that maps to a surface of a bounding sphere.
 | min      | Minimum scale components. | 1 1 1         |
 | max      | Maximum scale components. | 2 2 2         |
 
+#### random-primitive
+
+| Property | Description               | Default Value |
+|----------|---------------------------|---------------|
+| exclude  | Primitives to exclude.    | []            |
+
 ### Usage
 
 #### Browser Installation
@@ -59,8 +65,7 @@ Install and use by directly including the [browser files](dist):
 
 <body>
   <a-scene>
-    <a-entity geometry="primitive: box"
-              random-position random-rotation random-scale></a-entity>
+    <a-entity random-position random-rotation random-scale random-primitive></a-entity>
   </a-scene>
 </body>
 ```
