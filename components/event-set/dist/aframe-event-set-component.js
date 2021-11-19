@@ -107,7 +107,47 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /* global AFRAME */
+
+// AFRAME styleParse has one issue: it trasnforms hyphenated keys to camel-case.
+// This is a problem when those keys are component names, as A-Frame component
+// names often include hyphens, and are not converted internally to camel case.
+
 var styleParser = AFRAME.utils.styleParser;
+var styleParse = function styleParse(value) {
+
+  function dashLowerCase(str) {
+    return '-' + str[0].toLowerCase();
+  }
+
+  function fromCamelCase(str) {
+    return str.replace(/([A-Z])/g, dashLowerCase);
+  }
+
+  var data = AFRAME.utils.styleParser.parse(value);
+
+  var key;
+  var component;
+  var remainder;
+  var dashComponent;
+  var dashKey;
+
+  for (key in data) {
+    component = key.split('.')[0];
+    remainder = key.split('.').slice(1).join('.');
+    dashComponent = fromCamelCase(component);
+    if (component === dashComponent) {
+      continue;
+    }
+
+    if (AFRAME.components[dashComponent] && !AFRAME.components[component]) {
+      dashKey = dashComponent.concat('.', remainder);
+      data[dashKey] = data[key];
+      delete data[key];
+    }
+  }
+
+  return data;
+};
 
 if (typeof AFRAME === 'undefined') {
   throw new Error('Component attempted to register before AFRAME was available.');
@@ -117,7 +157,7 @@ AFRAME.registerComponent('event-set', {
   schema: {
     default: '',
     parse: function parse(value) {
-      return styleParser.parse(value);
+      return styleParse(value);
     }
   },
 
