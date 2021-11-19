@@ -16,7 +16,6 @@
 // - Could give incorrect results in case where two components have names that
 //   only differ by their casing.
 //   e.g. example-component-two & exampleComponentTwo
-var styleParser = AFRAME.utils.styleParser;
 var styleParse = function(value) {
 
   function dashLowerCase (str) { return '-' + str[0].toLowerCase(); }
