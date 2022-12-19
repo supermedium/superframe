@@ -202,7 +202,7 @@ AFRAME.registerComponent('aabb-collider', {
       let box;
 
       // Dynamic, recalculate each tick.
-      if (el.dataset.aabbColliderDynamic) {
+      if (el.dataset.aabbColliderDynamic !== undefined) {
         // Box.
         boundingBox.setFromObject(el.object3D);
         box = boundingBox;
@@ -212,7 +212,7 @@ AFRAME.registerComponent('aabb-collider', {
       }
 
       // Static, reuse box and centers.
-      if (!el.dataset.aabbColliderDynamic) {
+      if (el.dataset.aabbColliderDynamic === undefined) {
         if (!el.object3D.aabbBox) {
           // Box.
           el.object3D.updateWorldMatrix(true, false);
