@@ -215,6 +215,7 @@ AFRAME.registerComponent('aabb-collider', {
       if (!el.dataset.aabbColliderDynamic) {
         if (!el.object3D.aabbBox) {
           // Box.
+          el.object3D.updateWorldMatrix(true, false);
           el.object3D.aabbBox = new THREE.Box3().setFromObject(el.object3D);
           // Center.
           el.object3D.boundingBoxCenter = new THREE.Vector3();
