@@ -8,13 +8,10 @@
   </head>
   <body>
     <a-scene>
-      <a-entity>
+      <a-entity animation="property: rotation; dur: 2000; to: 0 360 0; loop:true">
         <a-entity template="src: cubes.template" position="-4 0 -8"></a-entity>
         <a-entity template="src: cubes.template" position="0 4 -8"></a-entity>
         <a-entity template="src: cubes.template" position="4 0 -8"></a-entity>
-
-        <a-animation attribute="rotation" dur="2000" to="0 360 0"
-                     repeat="indefinite"></a-animation>
       </a-entity>
 
       <a-camera></a-camera>
