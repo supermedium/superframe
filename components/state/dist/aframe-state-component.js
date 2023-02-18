@@ -313,6 +313,7 @@ AFRAME.registerSystem('state', {
    * Dispatch action.
    */
   dispatch: function () {
+
     var toUpdate = [];
 
     return function (actionName, payload) {
@@ -343,7 +344,7 @@ AFRAME.registerSystem('state', {
       }
 
       // Notify subscriptions / binders.
-      toUpdate.length = 0;
+      var currentUpdateCount = 0;
       for (i = 0; i < this.subscriptions.length; i++) {
         if (this.subscriptions[i].name === 'bind-for') {
           // For arrays and bind-for, check __dirty flag on array rather than the diff.
@@ -359,12 +360,8 @@ AFRAME.registerSystem('state', {
         // Keep track to only update subscriptions once.
         if (toUpdate.indexOf(this.subscriptions[i]) === -1) {
           toUpdate.push(this.subscriptions[i]);
+          currentUpdateCount++;
         }
-      }
-
-      // Update subscriptions.
-      for (i = 0; i < toUpdate.length; i++) {
-        toUpdate[i].onStateUpdate();
       }
 
       // Unset array dirty.
@@ -376,6 +373,12 @@ AFRAME.registerSystem('state', {
 
       // Store last state.
       this.copyState(this.lastState, this.state);
+
+      // Update subscriptions.
+      for (i = 0; i < currentUpdateCount; i++) {
+        var subscriber = toUpdate.pop();
+        subscriber.onStateUpdate();
+      }
 
       // Emit.
       this.eventDetail.action = actionName;
