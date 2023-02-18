@@ -4,7 +4,7 @@
   "description": "Gradient sky with adjustable sun in A-Frame",
   "main": "dist/aframe-sun-sky.js",
   "scripts": {
-    "dist": "webpack --module-bind 'glsl=shader' index.js dist/aframe-sun-sky.js && webpack --module-bind 'glsl=shader' -p index.js dist/aframe-sun-sky.min.js",
+    "dist": "webpack index.js dist/aframe-sun-sky.js && webpack -p index.js dist/aframe-sun-sky.min.js",
     "postpublish": "npm run dist"
   },
   "repository": {
@@ -27,6 +27,7 @@
   },
   "homepage": "https://github.com/supermedium/superframe/tree/components/sun-sky#readme",
   "devDependencies": {
-    "aframe": "^0.3.0"
+    "aframe": "*",
+    "webpack-glsl-loader": "^1.0.1"
   }
 }

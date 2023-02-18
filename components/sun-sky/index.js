@@ -1,5 +1,5 @@
-var vertexShader = require('./shaders/vertex.glsl');
-var fragmentShader = require('./shaders/fragment.glsl');
+var vertexShader = require('webpack-glsl!./shaders/vertex.glsl');
+var fragmentShader = require('webpack-glsl!./shaders/fragment.glsl');
 
 AFRAME.registerShader('sunSky', {
   schema: {
