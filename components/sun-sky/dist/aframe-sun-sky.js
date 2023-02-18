@@ -69,7 +69,8 @@
 	      segmentsHeight: 20
 	    },
 	    material: {
-	      shader: 'sunSky'
+	      shader: 'sunSky',
+	      side: 'back'
 	    },
 	    scale: '-1 1 1'
 	  },
