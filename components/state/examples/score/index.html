@@ -3,7 +3,7 @@
     <title>Score</title>
     <meta name="description" content="Incrementing and decrementing score"></meta>
     <meta property="og:image" content="https://raw.githubusercontent.com/supermedium/superframe/master/components/state/examples/score/preview.gif"></meta>
-    <script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
+    <script src="https://aframe.io/releases/1.4.1/aframe.min.js"></script>
     <script src="../../dist/aframe-state-component.min.js"></script>
     <script src="state.js"></script>
     <script>
@@ -27,8 +27,8 @@
     </script>
   </head>
   <body>
-    <a-scene inspector="url: http://localhost:3333/dist/aframe-inspector.js">
-      <a-entity bind__text="value: score" text="value: 0; color: #111; width: 3; align: center" geometry="primitive: plane" material="color: ##CCC" position="0 1 -3"></a-entity>
+    <a-scene>
+      <a-entity bind__text="value: score" text="value: 0; color: #111; width: 3; align: center" geometry="primitive: plane" material="color: #CCC" position="0 1 -3"></a-entity>
 
       <a-entity text="value: Decrease Score; align: center; width: 2" geometry="primitive: plane" material="color: black" position="-1 1 -3" decrease-action></a-entity>
       <a-entity text="value: Increase Score; align: center; width: 2" geometry="primitive: plane" material="color: black" position="1 1 -3" increase-action></a-entity>
