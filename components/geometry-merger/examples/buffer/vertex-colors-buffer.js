@@ -35,7 +35,7 @@ AFRAME.registerComponent('vertex-colors-buffer', {
     }
 
     if (!geometry.attributes.color) {
-      geometry.addAttribute('color',
+      geometry.setAttribute('color',
         new THREE.BufferAttribute(
           new Float32Array(geometry.attributes.position.array.length), 3
         )
@@ -53,5 +53,8 @@ AFRAME.registerComponent('vertex-colors-buffer', {
     }
 
     geometry.attributes.color.needsUpdate = true;
+
+    //mesh.material.color = new THREE.Color('#fff')
+    //mesh.material.vertexColors = true
   }
 });

@@ -54,58 +54,36 @@
 	  },
 
 	  init: function () {
-	    var faceIndexEnd;
-	    var faceIndexStart;
+	    var geometries = [];
+	    this.vertexIndex = {};
 	    var self = this;
+	    var vertexCount = 0;
 
-	    this.geometry = new THREE.Geometry();
-	    this.mesh = new THREE.Mesh(this.geometry);
-	    this.el.setObject3D('mesh', this.mesh);
-
-	    this.faceIndex = {};  // Keep index of original entity UUID to new face array.
-	    this.vertexIndex = {};  // Keep index of original entity UUID to vertex array.
-
+	    this.el.object3D.updateMatrixWorld()
 	    this.el.object3D.traverse(function (mesh) {
-	      if (mesh.type !== 'Mesh') { return; }
-	      if (mesh === self.mesh) { return; }
+	      if (mesh.type !== 'Mesh' || mesh.el === self.el) { return; }
+	      var geometry = mesh.geometry.clone();
+	      var currentMesh = mesh;
+	      while (currentMesh !== self.el.object3D) {
+	        geometry.applyMatrix4(currentMesh.parent.matrix);
+	        currentMesh = currentMesh.parent;
+	      }
+	      geometries.push(geometry);
 
-	      self.faceIndex[mesh.parent.uuid] = [
-	        self.geometry.faces.length,
-	        self.geometry.faces.length + mesh.geometry.faces.length - 1
-	      ];
+	      meshPositions = mesh.geometry.getAttribute('position');
 
 	      self.vertexIndex[mesh.parent.uuid] = [
-	        self.geometry.vertices.length,
-	        self.geometry.vertices.length + mesh.geometry.vertices.length - 1
+	        vertexCount,
+	        vertexCount + meshPositions.count - 1
 	      ];
 
-	      // Merge. Use parent's matrix due to A-Frame's <a-entity>(Group-Mesh) hierarchy.
-	      mesh.parent.updateMatrix();
-	      self.geometry.merge(mesh.geometry, mesh.parent.matrix);
+	      vertexCount += meshPositions.count;
 
 	      // Remove mesh if not preserving.
 	      if (!self.data.preserveOriginal) { mesh.parent.remove(mesh); }
 	    });
-	  }
-	});
 
-	AFRAME.registerComponent('buffer-geometry-merger', {
-	  schema: {
-	    preserveOriginal: {default: false}
-	  },
-
-	  init: function () {
-	    var geometries = [];
-
-	    this.el.sceneEl.object3D.updateMatrixWorld()
-	    this.el.object3D.traverse(function (mesh) {
-	      if (mesh.type !== 'Mesh' || mesh.el === self.el) { return; }
-	      mesh.geometry.applyMatrix(mesh.matrixWorld);
-	      geometries.push(mesh.geometry.clone());
-	      mesh.parent.remove(mesh);
-	    });
-
-	    const geometry = THREE.BufferGeometryUtils.mergeBufferGeometries(geometries);
+	    var geometry = THREE.BufferGeometryUtils.mergeBufferGeometries(geometries);
 	    this.mesh = new THREE.Mesh(geometry);
 	    this.el.setObject3D('mesh', this.mesh);
 	  }
