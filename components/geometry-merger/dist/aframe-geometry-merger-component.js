@@ -113,12 +113,17 @@
 	    this.geometry = THREE.BufferGeometryUtils.mergeBufferGeometries(geometries);
 	    this.mesh = new THREE.Mesh(this.geometry);
 	    this.el.setObject3D('mesh', this.mesh);
+
+	    // dereference original geometries (so they can be freed when no longer needed)
+	    geometries.length = 0;
 	  },
 
 	  getColor: function (uuid, color) {
 
 	    const colors = this.geometry.getAttribute('color')
 	    color.fromBufferAttribute(colors, this.vertexIndex[uuid][0]);
+
+	    return color;
 
 	  },
 
