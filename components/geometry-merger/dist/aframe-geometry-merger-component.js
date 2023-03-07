@@ -58,7 +58,6 @@
 	    this.vertexIndex = {};
 	    var self = this;
 	    var vertexCount = 0;
-	    this.colorHelper = new THREE.Color();
 
 	    this.el.object3D.updateMatrixWorld()
 	    this.el.object3D.traverse(function (mesh) {
@@ -103,23 +102,29 @@
 
 	  },
 
-	  setColorOverVertexRange: function (start, end, color) {
+	  setColorOverVertexRange: function () {
+	    
+	    const colorHelper = new THREE.Color();
 
-	    var colorHelper = this.colorHelper
-	    var geometry = this.geometry;
-	    var i;
-	    const colors = geometry.getAttribute('color')
-	    const itemSize = colors.itemSize;
-	    const array = colors.array
+	    return function (start, end, color) {
 
-	    colorHelper.set(color);
-	    for (i = start * 3; i <= end * 3; i += itemSize) {
-	      array[i] = colorHelper.r;
-	      array[i + 1] = colorHelper.g;
-	      array[i + 2] = colorHelper.b;
+	      var geometry = this.geometry;
+	      var i;
+	      const colors = geometry.getAttribute('color')
+	      const itemSize = colors.itemSize;
+	      const array = colors.array
+
+	      colorHelper.set(color);
+	      for (i = start * 3; i <= end * 3; i += itemSize) {
+	        array[i] = colorHelper.r;
+	        array[i + 1] = colorHelper.g;
+	        array[i + 2] = colorHelper.b;
+	      }
+	      colors.needsUpdate = true;
 	    }
-	    colors.needsUpdate = true;
-	  }
+	    
+	  }()
+
 	});
 
 
