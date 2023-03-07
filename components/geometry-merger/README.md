@@ -20,19 +20,34 @@ still be manipulated individually since this component keeps a `faceIndex` and
 
 ### API
 
-For either `geometry-merger` or `buffer-geometry-merger` components:
-
 | Property         | Description                                                                                                                                                                                                                                               | Default Value |
 | --------         | -----------                                                                                                                                                                                                                                               | ------------- |
 | preserveOriginal | Whether to remove the now-merged child goemetry or keep in scene graph. It can be useful to keep the original child entities' geometries and set their `material="visible: false"` so that we can still interact with them with colliders and raycasters. | false         |
-| materialColors | Whether to use material colors in merged geometries for the faces of the final mesh, so that colors of the faces in this final mesh resemble the colors of the original entities when they were material colors. | true |
 
 #### Members
 
 | Member      | Description                                                                                                                                                 |
 |-------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| faceIndex   | Map of child A-Frame entitites Object3D UUIDs to array of face indices indiciating which faces in the merged geometries belong to the former child geometry |
-| vertexIndex   | Map of child A-Frame entitites Object3D UUIDs to array of vertex indices indiciating which vertices in the merged geometries belong to the former child geometry |
+| vertexIndex   | Map of child A-Frame entitites Object3D UUIDs to array of vertex indices indicating which vertices in the merged geometries belong to the former child geometry.<br />Each array consists of two values, indicating the start & end index for the vertices associated wit |
+
+#### Methods
+
+| Method                | Description                                                  |
+| --------------------- | ------------------------------------------------------------ |
+| getColor(uuid, color) | Get the color of the 1st vertex of the object with this UUID that was incorporated into the merged geometry.  The color parameter should contain a THREE.Color object into which the color can be written. |
+| setColor(uuid, color) | Set all the vertices of the object with this UUID to the specified color.  The supplied color can be in any format supported by [THREE.Color.set()](https://threejs.org/docs/#api/en/math/Color.set), i.e. a THREE.Color, a hex string or a CSS-style string. |
+
+#### Utility Functions
+
+Including this component also makes the following generic utility functions available:
+
+**THREE.BufferGeometryUtils** - See the[THREE documentation](https://threejs.org/docs/#examples/en/utils/BufferGeometryUtils) for details
+
+**AFRAME.utils.setBufferGeometryColor(geometry, color, start, end)** - this sets the vertices of a buffer geometry to a specified color (a THREE.Color, a hex string or a CSS-style string).  Optionally a start & end can be provided, to indicate the vertex index at which to start and end the coloring.  
+
+
+
+
 
 ### Installation
 
@@ -43,7 +58,7 @@ Install and use by directly including the [browser files](dist):
 ```html
 <head>
   <title>My A-Frame Scene</title>
-  <script src="https://aframe.io/releases/0.9.0/aframe.min.js"></script>
+  <script src="https://aframe.io/releases/1.4.1/aframe.min.js"></script>
   <script src="https://unpkg.com/aframe-geometry-merger-component/dist/aframe-geometry-merger-component.min.js"></script>
 </head>
 
