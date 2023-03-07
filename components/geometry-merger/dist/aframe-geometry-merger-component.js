@@ -64,8 +64,8 @@
 	    const array = colors.array
 
 	    colorHelper.set(color);
-	    const verticesEnd = Math.min(end, colors.count) * 3
-	    for (i = start * 3; i <= verticesEnd; i += itemSize) {
+	    const verticesEnd = Math.min(end, colors.count) * itemSize
+	    for (i = start * itemSize; i <= verticesEnd; i += itemSize) {
 	      array[i] = colorHelper.r;
 	      array[i + 1] = colorHelper.g;
 	      array[i + 2] = colorHelper.b;
