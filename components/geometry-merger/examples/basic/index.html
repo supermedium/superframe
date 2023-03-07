@@ -34,8 +34,7 @@
           var firstRun = true;
           var entered = false;
 
-          this.vertexIndex = el.components['geometry-merger'].vertexIndex;
-          this.geometry = el.getObject3D('mesh').geometry;
+          const mergeComponent = el.components['geometry-merger']
           this.originalColor = new THREE.Color();
 
           el.addEventListener('mouseenter', evt => {
@@ -48,35 +47,16 @@
             }
 
             uuid = evt.target.object3D.uuid;
-            const colors = this.geometry.getAttribute('color')
-            this.originalColor.fromBufferAttribute(colors, this.vertexIndex[uuid][0]);
-            this.setColor(uuid, this.data.color);
+            mergeComponent.getColor(uuid, this.originalColor)
+            mergeComponent.setColor(uuid, this.data.color);
             entered = true;
           });
 
           el.addEventListener('mouseleave', evt => {
             if (!entered) { return; }
             entered = false;
-            this.setColor(evt.target.object3D.uuid, this.originalColor);
+            mergeComponent.setColor(evt.target.object3D.uuid, this.originalColor);
           });
-        },
-
-        setColor: function (uuid, color) {
-          var vertexIndex = this.vertexIndex;
-          var geometry = this.geometry;
-          var i;
-          var itemSize = this.data.itemSize;
-
-          const colors = geometry.getAttribute('color')
-          const array = colors.array
-
-          colorHelper.set(color);
-          for (i = vertexIndex[uuid][0] * 3; i <= vertexIndex[uuid][1] * 3; i += itemSize) {
-            array[i] = colorHelper.r;
-            array[i + 1] = colorHelper.g;
-            array[i + 2] = colorHelper.b;
-          }
-          colors.needsUpdate = true;
         }
       });
     </script>

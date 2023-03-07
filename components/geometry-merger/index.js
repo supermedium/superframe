@@ -12,6 +12,7 @@ AFRAME.registerComponent('geometry-merger', {
     this.vertexIndex = {};
     var self = this;
     var vertexCount = 0;
+    this.colorHelper = new THREE.Color();
 
     this.el.object3D.updateMatrixWorld()
     this.el.object3D.traverse(function (mesh) {
@@ -37,8 +38,40 @@ AFRAME.registerComponent('geometry-merger', {
       if (!self.data.preserveOriginal) { mesh.parent.remove(mesh); }
     });
 
-    var geometry = THREE.BufferGeometryUtils.mergeBufferGeometries(geometries);
-    this.mesh = new THREE.Mesh(geometry);
+    this.geometry = THREE.BufferGeometryUtils.mergeBufferGeometries(geometries);
+    this.mesh = new THREE.Mesh(this.geometry);
     this.el.setObject3D('mesh', this.mesh);
+  },
+
+  getColor: function (uuid, color) {
+
+    const colors = this.geometry.getAttribute('color')
+    color.fromBufferAttribute(colors, this.vertexIndex[uuid][0]);
+
+  },
+
+  setColor: function (uuid, color) {
+
+    const vertexData = this.vertexIndex[uuid];
+    this.setColorOverVertexRange(vertexData[0], vertexData[1], color);
+
+  },
+
+  setColorOverVertexRange: function (start, end, color) {
+
+    var colorHelper = this.colorHelper
+    var geometry = this.geometry;
+    var i;
+    const colors = geometry.getAttribute('color')
+    const itemSize = colors.itemSize;
+    const array = colors.array
+
+    colorHelper.set(color);
+    for (i = start * 3; i <= end * 3; i += itemSize) {
+      array[i] = colorHelper.r;
+      array[i + 1] = colorHelper.g;
+      array[i + 2] = colorHelper.b;
+    }
+    colors.needsUpdate = true;
   }
 });

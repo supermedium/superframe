@@ -1,4 +1,3 @@
-var colorHelper = new THREE.Color();
 
 AFRAME.registerComponent('vertex-colors-buffer', {
   schema: {
@@ -14,6 +13,7 @@ AFRAME.registerComponent('vertex-colors-buffer', {
     var geometry;
     var mesh;
     var self = this;
+    this.colorHelper = new THREE.Color();
 
     mesh = this.el.getObject3D('mesh');
 
@@ -45,11 +45,11 @@ AFRAME.registerComponent('vertex-colors-buffer', {
     colors = geometry.attributes.color.array;
 
     // TODO: For some reason, incrementing loop by 3 doesn't work. Need to do by 4 for glTF.
-    colorHelper.set(data.baseColor);
+    this.colorHelper.set(data.baseColor);
     for (i = 0; i < colors.length; i += data.itemSize) {
-      colors[i] = colorHelper.r;
-      colors[i + 1] = colorHelper.g;
-      colors[i + 2] = colorHelper.b;
+      colors[i] = this.colorHelper.r;
+      colors[i + 1] = this.colorHelper.g;
+      colors[i + 2] = this.colorHelper.b;
     }
 
     geometry.attributes.color.needsUpdate = true;
