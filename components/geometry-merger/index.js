@@ -2,6 +2,33 @@ if (!THREE.BufferGeometryUtils) {
   require('./lib/BufferGeometryUtils');
 }
 
+AFRAME.utils.setBufferGeometryColor = function () {
+    
+  const colorHelper = new THREE.Color();
+
+  return function (geometry, color, start, end) {
+
+    // ES5 compatible default parameters
+    if (start === undefined) start = 0;
+    if (end === undefined) end = Infinity;
+
+    var i;
+    const colors = geometry.getAttribute('color')
+    const itemSize = colors.itemSize;
+    const array = colors.array
+
+    colorHelper.set(color);
+    const verticesEnd = Math.min(end, colors.count) * 3
+    for (i = start * 3; i <= verticesEnd; i += itemSize) {
+      array[i] = colorHelper.r;
+      array[i + 1] = colorHelper.g;
+      array[i + 2] = colorHelper.b;
+    }
+    colors.needsUpdate = true;
+  }
+
+}()
+
 AFRAME.registerComponent('geometry-merger', {
   schema: {
     preserveOriginal: {default: false}
@@ -52,31 +79,7 @@ AFRAME.registerComponent('geometry-merger', {
   setColor: function (uuid, color) {
 
     const vertexData = this.vertexIndex[uuid];
-    this.setColorOverVertexRange(vertexData[0], vertexData[1], color);
+    AFRAME.utils.setBufferGeometryColor(this.geometry, color, vertexData[0], vertexData[1]);
 
-  },
-
-  setColorOverVertexRange: function () {
-    
-    const colorHelper = new THREE.Color();
-
-    return function (start, end, color) {
-
-      var geometry = this.geometry;
-      var i;
-      const colors = geometry.getAttribute('color')
-      const itemSize = colors.itemSize;
-      const array = colors.array
-
-      colorHelper.set(color);
-      for (i = start * 3; i <= end * 3; i += itemSize) {
-        array[i] = colorHelper.r;
-        array[i + 1] = colorHelper.g;
-        array[i + 2] = colorHelper.b;
-      }
-      colors.needsUpdate = true;
-    }
-    
-  }()
-
+  }
 });

@@ -6,14 +6,11 @@ AFRAME.registerComponent('vertex-colors-buffer', {
   },
 
   update: function (oldData) {
-    var colors;
     var data = this.data;
-    var i;
     var el = this.el;
     var geometry;
     var mesh;
     var self = this;
-    this.colorHelper = new THREE.Color();
 
     mesh = this.el.getObject3D('mesh');
 
@@ -42,19 +39,7 @@ AFRAME.registerComponent('vertex-colors-buffer', {
       );
     }
 
-    colors = geometry.attributes.color.array;
+    AFRAME.utils.setBufferGeometryColor(geometry, data.baseColor)
 
-    // TODO: For some reason, incrementing loop by 3 doesn't work. Need to do by 4 for glTF.
-    this.colorHelper.set(data.baseColor);
-    for (i = 0; i < colors.length; i += data.itemSize) {
-      colors[i] = this.colorHelper.r;
-      colors[i + 1] = this.colorHelper.g;
-      colors[i + 2] = this.colorHelper.b;
-    }
-
-    geometry.attributes.color.needsUpdate = true;
-
-    //mesh.material.color = new THREE.Color('#fff')
-    //mesh.material.vertexColors = true
   }
 });
