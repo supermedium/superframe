@@ -9,7 +9,7 @@
       // This is a patch for an A-Frame bug not yet fixed in the latest published version:
       // https://github.com/aframevr/aframe/pull/5250
       const materialPrototype = AFRAME.components.material.Component.prototype
-      materialPrototype.updateMaterialOriginal = function() { materialPrototype.updateMaterial };
+      materialPrototype.updateMaterialOriginal = materialPrototype.updateMaterial;
       materialPrototype.updateMaterial = function (oldData) {
         this.updateMaterialOriginal(oldData)
         this.material.vertexColors = (this.data.vertexColors === 'vertex')
