@@ -42,14 +42,14 @@ Install and use by directly including the [browser files](dist):
 ```html
 <head>
   <title>My A-Frame Scene</title>
-  <script src="https://aframe.io/releases/0.9.0/aframe.min.js"></script>
+  <script src="https://aframe.io/releases/1.4.1/aframe.min.js"></script>
   <script src="https://unpkg.com/aframe-haptics-component/dist/aframe-haptics-component.min.js"></script>
 </head>
 
 <body>
   <a-scene>
-    <a-entity hand-controls="left"  haptics="events: triggerdown; dur: 1000; force: 0.5"></a-entity>
-    <a-entity hand-controls="right" haptics="events: triggerdown; dur: 500; force: 1.0"></a-entity>
+    <a-entity hand-controls="hand:left"  haptics="events: triggerdown; dur: 1000; force: 0.5"></a-entity>
+    <a-entity hand-controls="hand:right" haptics="events: triggerdown; dur: 500; force: 1.0"></a-entity>
   </a-scene>
 </body>
 ```
