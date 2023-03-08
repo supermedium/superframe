@@ -1,6 +1,9 @@
 /**
  * TextGeometry component for A-Frame.
  */
+require('./lib/FontLoader')
+require('./lib/TextGeometry')
+
 var debug = AFRAME.utils.debug;
 
 var error = debug('aframe-text-component:error');
