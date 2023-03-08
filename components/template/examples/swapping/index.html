@@ -10,14 +10,13 @@
   <body>
     <a-scene>
       <a-entity template="src: scenes/spheres.html"
-                template-looper="scenes/boxes.html, scenes/spheres.html"
+                template-looper="list: scenes/boxes.html, scenes/spheres.html"
                 position="0 0 -8"></a-entity>
 
       <a-sky color="#D7C1E0"></a-sky>
-
-      <a-sky id="mask" color="#111" opacity="0" radius="2">
-        <a-animation attribute="material.opacity" begin="fade" from="0" to="1" dur="200"
-                     direction="alternate" repeat="1"></a-animation>
+      <a-sky id="mask" color="#111" opacity="0" radius="2"
+             animation__fadeout="property:material.opacity; startEvents: fadeout; from: 0; to: 1; dur: 200"
+             animation__fadein="property:material.opacity; startEvents: fadein; from: 1; to: 0; dur: 200">
       </a-sky>
     </a-scene>
 

@@ -2,7 +2,11 @@
  * Swap template with mask animation.
  */
 AFRAME.registerComponent('template-looper', {
-  schema: {type: 'array'},
+  // array + single property schema does not appear to work.
+  // See: https://github.com/aframevr/aframe/issues/5242
+  schema: {
+    list: { type: 'array' }    
+  },
 
   init: function () {
     this.maskEl = this.el.sceneEl.querySelector('#mask');
@@ -16,11 +20,11 @@ AFRAME.registerComponent('template-looper', {
     this.time = time;
 
     // Set template.
-    this.maskEl.emit('fade');
+    this.maskEl.emit('fadeout');
     setTimeout(function () {
-      self.el.setAttribute('template', 'src', self.data[self.index++]);
-      self.maskEl.emit('fade');
-      if (self.index === self.data.length) { self.index = 0; }
+      self.el.setAttribute('template', 'src', self.data.list[self.index++]);
+      self.maskEl.emit('fadein');
+      if (self.index === self.data.list.length) { self.index = 0; }
     }, 200);
   }
 });
