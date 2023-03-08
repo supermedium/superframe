@@ -197,7 +197,7 @@ AFRAME.registerComponent('thumb-controls', {
       angle = Math.atan2(-axis[3], axis[2]);
     }
     if (angle < 0) { angle = 2 * Math.PI + angle; }
-    return THREE.Math.radToDeg(angle);
+    return THREE.MathUtils.radToDeg(angle);
   }
 });
 

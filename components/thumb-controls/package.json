@@ -55,7 +55,7 @@
     "randomcolor": "^0.4.4",
     "semistandard": "^8.0.0",
     "shelljs": "^0.7.0",
-    "sinon": "^1.17.5",
+    "sinon": "^2.1.0",
     "sinon-chai": "^2.8.0",
     "shx": "^0.1.1",
     "snazzy": "^4.0.0",
