@@ -4,33 +4,27 @@
     <meta charset="utf-8">
     <title>A-Frame Geometry Merger Component - Basic</title>
     <meta name="description" content="Basic example for Geometry Merger component."></meta>
-    <script src="https://aframe.io/releases/0.7.1/aframe.min.js"></script>
-    <script src="../../dist/aframe-geometry-merger-component.min.js"></script>
-    <script src="https://unpkg.com/aframe-environment-component@1.0.0/dist/aframe-environment-component.min.js"></script>
+    <script src="https://aframe.io/releases/1.4.1/aframe.min.js"></script>
     <script>
-      AFRAME.registerComponent('face-colors', {
-        dependencies: ['geometry'],
-
-        schema: {
-          color: {default: '#FFF'}
-        },
-
-        init: function () {
-          var geometry;
-          var i;
-          geometry = this.el.getObject3D('mesh').geometry;
-          for (i = 0; i < geometry.faces.length; i++) {
-            geometry.faces[i].color.set(this.data.color);
-          }
-          geometry.colorsNeedUpdate = true;
-        }
-      });
-
+      // This is a patch for an A-Frame bug not yet fixed in the latest published version:
+      // https://github.com/aframevr/aframe/pull/5250
+      const materialPrototype = AFRAME.components.material.Component.prototype
+      materialPrototype.updateMaterialOriginal = materialPrototype.updateMaterial;
+      materialPrototype.updateMaterial = function (oldData) {
+        this.updateMaterialOriginal(oldData)
+        this.material.vertexColors = (this.data.vertexColors === 'vertex')
+      }
+    </script>
+    <script src="../../dist/aframe-geometry-merger-component.js"></script>
+    <script src="https://unpkg.com/aframe-environment-component@1.3.2/dist/aframe-environment-component.min.js"></script>
+    <script src="../components/vertex-colors-buffer.js"></script>>
+    <script>
       AFRAME.registerComponent('merged-hover-highlight', {
         dependencies: ['geometry-merger'],
 
         schema: {
-          color: {default: 'orange'}
+          color: {type: 'color', default: 'orange'},
+          itemSize: {default: 3}
         },
 
         init: function () {
@@ -40,8 +34,7 @@
           var firstRun = true;
           var entered = false;
 
-          this.faceIndex = el.components['geometry-merger'].faceIndex;
-          this.geometry = el.getObject3D('mesh').geometry;
+          const mergeComponent = el.components['geometry-merger']
           this.originalColor = new THREE.Color();
 
           el.addEventListener('mouseenter', evt => {
@@ -53,38 +46,27 @@
               return;
             }
 
-            uuid = evt.detail.target.object3D.uuid;
-            this.originalColor.copy(this.geometry.faces[this.faceIndex[uuid][0]].color);
-            this.setColor(uuid, this.data.color);
+            uuid = evt.target.object3D.uuid;
+            mergeComponent.getColor(uuid, this.originalColor)
+            mergeComponent.setColor(uuid, this.data.color);
             entered = true;
           });
 
           el.addEventListener('mouseleave', evt => {
             if (!entered) { return; }
             entered = false;
-            this.setColor(evt.detail.target.object3D.uuid, this.originalColor);
+            mergeComponent.setColor(evt.target.object3D.uuid, this.originalColor);
           });
-        },
-
-        setColor: function (uuid, color) {
-          var faceIndex = this.faceIndex;
-          var geometry = this.geometry;
-          var i;
-
-          for (i = faceIndex[uuid][0]; i <= faceIndex[uuid][1]; i++) {
-            geometry.faces[i].color.set(color);
-          }
-          geometry.colorsNeedUpdate = true;
         }
       });
     </script>
   </head>
   <body>
     <a-scene environment="preset: forest" cursor="rayOrigin: mouse" raycaster="objects: [geometry]">
-      <a-entity geometry-merger="preserveOriginal: true" material="vertexColors: face" merged-hover-highlight>
-        <a-entity geometry="primitive: box; buffer: false" material="visible: false" face-colors="color: red" position="-2 0.75 -3"></a-entity>
-        <a-entity geometry="primitive: sphere; buffer: false" material="visible: false" face-colors="color: blue" position="0 0.75 -3"></a-entity>
-        <a-entity geometry="primitive: cylinder; buffer: false" material="visible: false" face-colors="color: green" position="2 0.75 -3" scale="0.5 0.5 0.5"></a-entity>
+      <a-entity id="merged" geometry-merger="preserveOriginal: true" material="vertexColors: vertex" merged-hover-highlight>
+        <a-entity id="box" geometry="primitive: box" material="visible: false" vertex-colors-buffer="baseColor: red" position="-2 0.75 -3"></a-entity>
+        <a-entity id="sphere" geometry="primitive: sphere" material="visible: false" vertex-colors-buffer="baseColor: blue" position="0 0.75 -3"></a-entity>
+        <a-entity id="cylinder" geometry="primitive: cylinder" material="visible: false" vertex-colors-buffer="baseColor: green" position="2 0.75 -3" scale="0.5 0.5 0.5"></a-entity>
       </a-entity>
     </a-scene>
 

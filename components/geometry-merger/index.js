@@ -2,64 +2,43 @@ if (!THREE.BufferGeometryUtils) {
   require('./lib/BufferGeometryUtils');
 }
 
-AFRAME.registerComponent('geometry-merger', {
-  schema: {
-    preserveOriginal: {default: false},
-    materialColors: {default: true}
-  },
+AFRAME.utils.setBufferGeometryColor = function () {
+    
+  const colorHelper = new THREE.Color();
 
-  init: function () {
-    var faceIndexEnd;
-    var faceIndexStart;
-    var self = this;
+  return function (geometry, color, start, end) {
 
-    this.geometry = new THREE.Geometry();
-    this.mesh = new THREE.Mesh(this.geometry);
-    this.el.setObject3D('mesh', this.mesh);
+    // ES5 compatible default parameters
+    if (start === undefined) start = 0;
+    if (end === undefined) end = Infinity;
 
-    this.faceIndex = {};  // Keep index of original entity UUID to new face array.
-    this.vertexIndex = {};  // Keep index of original entity UUID to vertex array.
+    var i;
+    const colors = geometry.getAttribute('color')
+    const itemSize = colors.itemSize;
+    const array = colors.array
 
-    this.el.object3D.traverse(function (mesh) {
-      if (mesh.type !== 'Mesh') { return; }
-      if (mesh === self.mesh) { return; }
-
-      self.faceIndex[mesh.parent.uuid] = [
-        self.geometry.faces.length,
-        self.geometry.faces.length + mesh.geometry.faces.length - 1
-      ];
-
-      self.vertexIndex[mesh.parent.uuid] = [
-        self.geometry.vertices.length,
-        self.geometry.vertices.length + mesh.geometry.vertices.length - 1
-      ];
-
-      // If material color applied to all faces, copy colors to faces
-      if (self.data.materialColors && (mesh.material.vertexColors === THREE.NoColors)) {
-        let color = mesh.material.color;
-        for ( const face of mesh.geometry.faces) {
-          face.color.set( color );
-        };
-      };
-
-      // Merge. Use parent's matrix due to A-Frame's <a-entity>(Group-Mesh) hierarchy.
-      mesh.parent.updateMatrix();
-      self.geometry.merge(mesh.geometry, mesh.parent.matrix);
-
-      // Remove mesh if not preserving.
-      if (!self.data.preserveOriginal) { mesh.parent.remove(mesh); }
-    });
+    colorHelper.set(color);
+    const verticesEnd = Math.min(end, colors.count) * itemSize
+    for (i = start * itemSize; i <= verticesEnd; i += itemSize) {
+      array[i] = colorHelper.r;
+      array[i + 1] = colorHelper.g;
+      array[i + 2] = colorHelper.b;
+    }
+    colors.needsUpdate = true;
   }
-});
 
-AFRAME.registerComponent('buffer-geometry-merger', {
+}()
+
+AFRAME.registerComponent('geometry-merger', {
   schema: {
     preserveOriginal: {default: false}
   },
 
   init: function () {
     var geometries = [];
+    this.vertexIndex = {};
     var self = this;
+    var vertexCount = 0;
 
     this.el.object3D.updateMatrixWorld()
     this.el.object3D.traverse(function (mesh) {
@@ -67,16 +46,45 @@ AFRAME.registerComponent('buffer-geometry-merger', {
       var geometry = mesh.geometry.clone();
       var currentMesh = mesh;
       while (currentMesh !== self.el.object3D) {
-        geometry.applyMatrix(currentMesh.parent.matrix);
+        geometry.applyMatrix4(currentMesh.parent.matrix);
         currentMesh = currentMesh.parent;
       }
       geometries.push(geometry);
+
+      meshPositions = mesh.geometry.getAttribute('position');
+
+      self.vertexIndex[mesh.parent.uuid] = [
+        vertexCount,
+        vertexCount + meshPositions.count - 1
+      ];
+
+      vertexCount += meshPositions.count;
+
       // Remove mesh if not preserving.
       if (!self.data.preserveOriginal) { mesh.parent.remove(mesh); }
     });
 
-    const geometry = THREE.BufferGeometryUtils.mergeBufferGeometries(geometries);
-    this.mesh = new THREE.Mesh(geometry);
+    this.geometry = THREE.BufferGeometryUtils.mergeBufferGeometries(geometries);
+    this.mesh = new THREE.Mesh(this.geometry);
     this.el.setObject3D('mesh', this.mesh);
+
+    // dereference original geometries (so they can be freed when no longer needed)
+    geometries.length = 0;
+  },
+
+  getColor: function (uuid, color) {
+
+    const colors = this.geometry.getAttribute('color')
+    color.fromBufferAttribute(colors, this.vertexIndex[uuid][0]);
+
+    return color;
+
+  },
+
+  setColor: function (uuid, color) {
+
+    const vertexData = this.vertexIndex[uuid];
+    AFRAME.utils.setBufferGeometryColor(this.geometry, color, vertexData[0], vertexData[1]);
+
   }
 });

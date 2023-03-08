@@ -4,17 +4,27 @@
     <meta charset="utf-8">
     <title>A-Frame Geometry Merger Component - Buffer</title>
     <meta name="description" content="Merging buffer geometry with Geometry Merger component."></meta>
-    <script src="https://aframe.io/releases/0.8.2/aframe.js"></script>
+    <script src="https://aframe.io/releases/1.4.1/aframe.js"></script>
+    <script>
+      // This is a patch for an A-Frame bug not yet fixed in the latest published version:
+      // https://github.com/aframevr/aframe/pull/5250
+      const materialPrototype = AFRAME.components.material.Component.prototype
+      materialPrototype.updateMaterialOriginal = materialPrototype.updateMaterial;
+      materialPrototype.updateMaterial = function (oldData) {
+        this.updateMaterialOriginal(oldData)
+        this.material.vertexColors = (this.data.vertexColors === 'vertex')
+      }
+    </script>
     <script src="../../dist/aframe-geometry-merger-component.min.js"></script>
-    <script src="vertex-colors-buffer.js"></script>
+    <script src="../components/vertex-colors-buffer.js"></script>
   </head>
   <body>
     <a-scene background="color: #DADADA" stats>
-      <a-entity buffer-geometry-merger material="vertexColors: vertex">
-        <a-entity geometry="primitive: box; skipCache: true" vertex-colors-buffer="baseColor: red" position="-2 0.75 -3"></a-entity>
-        <a-entity geometry="primitive: box; skipCache: true" vertex-colors-buffer="baseColor: green" position="2 0.75 -3" scale="0.5 0.5 0.5"></a-entity>
+      <a-entity id="merged" geometry-merger material="vertexColors: vertex">
+        <a-entity id="red-box" geometry="primitive: box; skipCache: true" vertex-colors-buffer="baseColor: red" position="-2 0.75 -3"></a-entity>
+        <a-entity id="green-box" geometry="primitive: box; skipCache: true" vertex-colors-buffer="baseColor: green" position="2 0.75 -3" scale="0.5 0.5 0.5"></a-entity>
         <a-entity position="0 2 0">
-          <a-entity geometry="primitive: sphere; radius: 0.5" vertex-colors-buffer="baseColor: blue" position="0 0 -2"></a-entity>
+          <a-entity id="blue-sphere" geometry="primitive: sphere; radius: 0.5" vertex-colors-buffer="baseColor: blue" position="0 0 -2"></a-entity>
         </a-entity>
       </a-entity>
     </a-scene>
