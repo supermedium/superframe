@@ -4,33 +4,31 @@
     <title>Sun Position</title>
     <meta name="description" content="Animating sun position">
     <meta property="og:image" content="https://raw.githubusercontent.com/supermedium/superframe/master/components/sun-sky/examples/sun-position/preview.gif"></meta>
-    <script src="../build.js"></script>
+    <script src="https://aframe.io/releases/1.4.1/aframe.min.js"></script>
+    <script src="../../dist/aframe-sun-sky.min.js"></script>
   </head>
   <body>
     <script>
       AFRAME.registerComponent('sun-position-setter', {
         init: function () {
-          var skyEl = this.el;
-          var orbitEl = this.el.sceneEl.querySelector('#orbit');
+          this.orbitEl = this.el.sceneEl.querySelector('#orbit');
+        },
 
-          orbitEl.addEventListener('componentchanged', function changeSun (evt) {
-            var sunPosition;
-            var phi;
-            var theta;
+        tick: function() {
+          var sunPosition;
+          var phi;
+          var theta;
 
-            if (evt.detail.name !== 'rotation') { return; }
+          sunPosition = this.orbitEl.object3D.rotation;
 
-            sunPosition = orbitEl.getComputedAttribute('rotation');
+          if(sunPosition === null) { return; }
 
-            if(sunPosition === null) { return; }
-
-            theta = Math.PI * (- 0.5);
-            phi = 2 * Math.PI * (sunPosition.y / 360 - 0.5);
-            skyEl.setAttribute('material', 'sunPosition', {
-              x: Math.cos(phi),
-              y: Math.sin(phi) * Math.sin(theta),
-              z: -1
-            });
+          theta = Math.PI * (- 0.5);
+          phi = sunPosition.y - Math.PI;
+          this.el.setAttribute('material', 'sunPosition', {
+            x: Math.cos(phi),
+            y: Math.sin(phi) * Math.sin(theta),
+            z: -1
           });
         }
       });
@@ -38,9 +36,8 @@
 
     <a-scene>
       <a-sun-sky sun-position-setter>
-        <a-entity id="orbit">
-          <a-animation attribute="rotation" from="0 0 0" to="0 360 0" dur="5000"
-                       repeat="indefinite" easing="linear"></a-animation>
+        <a-entity id="orbit"
+                  animation="property: rotation; from: 0 0 0; to: 0 360 0; dur: 5000; loop: true; easing: linear">
         </a-entity>
       </a-sun-sky>
     </a-scene>
