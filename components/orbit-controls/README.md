@@ -60,15 +60,25 @@ Install and use by directly including the [browser files](dist):
 ```html
 <head>
   <title>My A-Frame Scene</title>
-  <script src="https://aframe.io/releases/0.9.0/aframe.min.js"></script>
-  <script src="https://unpkg.com/aframe-orbit-controls@1.3.0/dist/aframe-orbit-controls.min.js"></script>
-  <script src="https://unpkg.com/aframe-supercraft-loader@1.1.3/dist/aframe-supercraft-loader.js"></script>
+  <script src="https://aframe.io/releases/1.4.1/aframe.min.js"></script>
+  <script src="https://unpkg.com/aframe-orbit-controls/dist/aframe-orbit-controls.min.js"></script>
 </head>
 
 <body>
   <a-scene>
-    <a-entity supercraft-loader="name: icky-snake"></a-entity>
-    <a-entity camera look-controls orbit-controls="target: 0 1.6 -0.5; minDistance: 0.5; maxDistance: 180; initialPosition: 0 5 15"></a-entity>
+    <a-torus-knot
+      color="#B84A39"
+      arc="180"
+      p="2"
+      q="7"
+      radius="5"
+      radius-tubular="0.1"
+    ></a-torus-knot>
+    <a-entity
+      camera
+      look-controls
+      orbit-controls="target: 0 1.6 -0.5; minDistance: 0.5; maxDistance: 180; initialPosition: 0 5 15"
+    ></a-entity>
   </a-scene>
 </body>
 ```

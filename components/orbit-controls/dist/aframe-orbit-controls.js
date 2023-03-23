@@ -198,7 +198,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		// so camera.up is the orbit axis
 		var quat = new THREE.Quaternion().setFromUnitVectors( object.up, new THREE.Vector3( 0, 1, 0 ) );
-		var quatInverse = quat.clone().inverse();
+		var quatInverse = quat.clone().invert();
 
 		var lastPosition = new THREE.Vector3();
 		var lastQuaternion = new THREE.Quaternion();
@@ -1229,12 +1229,12 @@ AFRAME.registerComponent('orbit-controls', {
     controls.enableRotate = data.enableRotate;
     controls.enableZoom = data.enableZoom;
     controls.keyPanSpeed = data.keyPanSpeed;
-    controls.maxPolarAngle = THREE.Math.degToRad(data.maxPolarAngle);
-    controls.maxAzimuthAngle = THREE.Math.degToRad(data.maxAzimuthAngle);
+    controls.maxPolarAngle = THREE.MathUtils.degToRad(data.maxPolarAngle);
+    controls.maxAzimuthAngle = THREE.MathUtils.degToRad(data.maxAzimuthAngle);
     controls.maxDistance = data.maxDistance;
     controls.minDistance = data.minDistance;
-    controls.minPolarAngle = THREE.Math.degToRad(data.minPolarAngle);
-    controls.minAzimuthAngle = THREE.Math.degToRad(data.minAzimuthAngle);
+    controls.minPolarAngle = THREE.MathUtils.degToRad(data.minPolarAngle);
+    controls.minAzimuthAngle = THREE.MathUtils.degToRad(data.minAzimuthAngle);
     controls.minZoom = data.minZoom;
     controls.panSpeed = data.panSpeed;
     controls.rotateSpeed = data.rotateSpeed;
