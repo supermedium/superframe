@@ -26,10 +26,6 @@ AFRAME.registerComponent('event-set', {
     this.addEventListener();
   },
 
-  remove: function () {
-    this.removeEventListener();
-  },
-
   pause: function () {
     this.removeEventListener();
   },
