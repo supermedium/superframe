@@ -4,14 +4,15 @@
     <meta charset="utf-8">
     <title>A-Frame Orbit Controls Component - Basic</title>
     <meta name="description" content="Basic example for A-Frame Orbit Controls component."></meta>
-    <script src="https://aframe.io/releases/0.8.2/aframe.min.js"></script>
+    <script src="https://aframe.io/releases/1.4.1/aframe.min.js"></script>
+    <script src="https://unpkg.com/aframe-environment-component@1.3.2/dist/aframe-environment-component.min.js"></script>
     <script src="../../dist/aframe-orbit-controls.min.js"></script>
-    <script src="https://unpkg.com/aframe-supercraft-loader@3.0.0/dist/aframe-supercraft-loader.js"></script>
   </head>
   <body>
-    <a-scene>
-      <a-entity supercraft-loader="name: icky-snake"></a-entity>
-      <a-entity camera look-controls="enabled: false" orbit-controls="target: 0 1.6 -0.5; minDistance: 0.5; maxDistance: 180; initialPosition: 0 15 20"></a-entity>
+    <a-scene environment="preset: forest">
+
+      <a-torus-knot position="0 2 0"></a-torus-knot>
+      <a-entity camera look-controls="enabled: false" orbit-controls="target: 0 2 0; minDistance: 2; maxDistance: 180; initialPosition: 0 3 5; rotateSpeed: 0.5"></a-entity>
     </a-scene>
 
     <!-- GitHub Corner. -->
