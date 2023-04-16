@@ -1,5 +1,8 @@
-/* THREE.OrbitControls code comes from:
-https://github.com/mrdoob/three.js/blob/master/examples/jsm/controls/OrbitControls.js
+/* THREE.OrbitControls code comes from three r151:
+https://github.com/mrdoob/three.js/blob/0fbae6f682f6e13dd9eb8acde02e4f50c0b73935/examples/jsm/controls/OrbitControls.js
+
+The import statement at the top of the file has been replaced by:
+const {..} = THREE;
 
 The MIT License
 
