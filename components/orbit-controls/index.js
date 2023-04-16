@@ -60,6 +60,7 @@ AFRAME.registerComponent('orbit-controls', {
     const el = this.el;
     this.controls = new THREE.OrbitControls(el.getObject3D('camera'), el.sceneEl.renderer.domElement);
     this.update();
+    this.controls.saveState();
   },
 
   onEnterVR: function() {
