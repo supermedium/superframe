@@ -72,6 +72,33 @@
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return OrbitControls; });
+/* THREE.OrbitControls code comes from three r151:
+https://github.com/mrdoob/three.js/blob/0fbae6f682f6e13dd9eb8acde02e4f50c0b73935/examples/jsm/controls/OrbitControls.js
+
+The import statement at the top of the file has been replaced by:
+const {..} = THREE;
+
+The MIT License
+
+Copyright © 2010-2023 three.js authors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE. */
 
 const	{
   EventDispatcher,
@@ -1380,9 +1407,7 @@ AFRAME.registerComponent('orbit-controls', {
 
   init: function () {
     var el = this.el;
-    var oldPosition;
-
-    oldPosition = new THREE.Vector3();
+    this.oldPosition = new THREE.Vector3();
 
     this.bindMethods();
     el.sceneEl.addEventListener('enter-vr', this.onEnterVR);
@@ -1408,6 +1433,7 @@ AFRAME.registerComponent('orbit-controls', {
     const el = this.el;
     this.controls = new THREE.OrbitControls(el.getObject3D('camera'), el.sceneEl.renderer.domElement);
     this.update();
+    this.controls.saveState();
   },
 
   onEnterVR: function() {
@@ -1418,7 +1444,7 @@ AFRAME.registerComponent('orbit-controls', {
     this.controls.enabled = false;
     if (el.hasAttribute('look-controls')) {
       el.setAttribute('look-controls', 'enabled', true);
-      oldPosition.copy(el.getObject3D('camera').position);
+      this.oldPosition.copy(el.getObject3D('camera').position);
       el.getObject3D('camera').position.set(0, 0, 0);
     }
   },
@@ -1429,7 +1455,7 @@ AFRAME.registerComponent('orbit-controls', {
     if (!AFRAME.utils.device.checkHeadsetConnected() &&
         !AFRAME.utils.device.isMobile()) { return; }
     this.controls.enabled = true;
-    el.getObject3D('camera').position.copy(oldPosition);
+    el.getObject3D('camera').position.copy(this.oldPosition);
     if (el.hasAttribute('look-controls')) {
       el.setAttribute('look-controls', 'enabled', false);
     }
