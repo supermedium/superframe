@@ -1,4 +1,5 @@
-require('./lib/OrbitControls');
+import { OrbitControls } from './lib/OrbitControls.js';
+THREE.OrbitControls = OrbitControls
 
 var bind = AFRAME.utils.bind;
 
@@ -33,9 +34,7 @@ AFRAME.registerComponent('orbit-controls', {
 
   init: function () {
     var el = this.el;
-    var oldPosition;
-
-    oldPosition = new THREE.Vector3();
+    this.oldPosition = new THREE.Vector3();
 
     this.bindMethods();
     el.sceneEl.addEventListener('enter-vr', this.onEnterVR);
@@ -61,6 +60,7 @@ AFRAME.registerComponent('orbit-controls', {
     const el = this.el;
     this.controls = new THREE.OrbitControls(el.getObject3D('camera'), el.sceneEl.renderer.domElement);
     this.update();
+    this.controls.saveState();
   },
 
   onEnterVR: function() {
@@ -71,7 +71,7 @@ AFRAME.registerComponent('orbit-controls', {
     this.controls.enabled = false;
     if (el.hasAttribute('look-controls')) {
       el.setAttribute('look-controls', 'enabled', true);
-      oldPosition.copy(el.getObject3D('camera').position);
+      this.oldPosition.copy(el.getObject3D('camera').position);
       el.getObject3D('camera').position.set(0, 0, 0);
     }
   },
@@ -82,7 +82,7 @@ AFRAME.registerComponent('orbit-controls', {
     if (!AFRAME.utils.device.checkHeadsetConnected() &&
         !AFRAME.utils.device.isMobile()) { return; }
     this.controls.enabled = true;
-    el.getObject3D('camera').position.copy(oldPosition);
+    el.getObject3D('camera').position.copy(this.oldPosition);
     if (el.hasAttribute('look-controls')) {
       el.setAttribute('look-controls', 'enabled', false);
     }
@@ -110,12 +110,12 @@ AFRAME.registerComponent('orbit-controls', {
     controls.enableRotate = data.enableRotate;
     controls.enableZoom = data.enableZoom;
     controls.keyPanSpeed = data.keyPanSpeed;
-    controls.maxPolarAngle = THREE.Math.degToRad(data.maxPolarAngle);
-    controls.maxAzimuthAngle = THREE.Math.degToRad(data.maxAzimuthAngle);
+    controls.maxPolarAngle = THREE.MathUtils.degToRad(data.maxPolarAngle);
+    controls.maxAzimuthAngle = THREE.MathUtils.degToRad(data.maxAzimuthAngle);
     controls.maxDistance = data.maxDistance;
     controls.minDistance = data.minDistance;
-    controls.minPolarAngle = THREE.Math.degToRad(data.minPolarAngle);
-    controls.minAzimuthAngle = THREE.Math.degToRad(data.minAzimuthAngle);
+    controls.minPolarAngle = THREE.MathUtils.degToRad(data.minPolarAngle);
+    controls.minAzimuthAngle = THREE.MathUtils.degToRad(data.minAzimuthAngle);
     controls.minZoom = data.minZoom;
     controls.panSpeed = data.panSpeed;
     controls.rotateSpeed = data.rotateSpeed;
