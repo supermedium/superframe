@@ -1,6 +1,6 @@
 {
   "name": "aframe-template-component",
-  "version": "3.2.1",
+  "version": "3.2.2",
   "description": "Encapsulate groups of entities, use templating engines, and do string interpolations in A-Frame",
   "main": "index.js",
   "scripts": {
