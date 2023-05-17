@@ -1,6 +1,6 @@
 {
   "name": "aframe-sun-sky",
-  "version": "3.0.3",
+  "version": "3.0.4",
   "description": "Gradient sky with adjustable sun in A-Frame",
   "main": "dist/aframe-sun-sky.js",
   "scripts": {
