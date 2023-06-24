@@ -31,6 +31,13 @@ presumed to be static for performance purposes.
 | hitclosest      | Intersection between the box and the closest entity from its center. Only one entity is "closest" at a time.           |
 | hitclosestclear | The previously closest intersected entity to the box is no longer the closest entity.                                  |
 
+When the event is emitted on the entity having the aabb-collider component, the event includes detail:
+
+- `hitstart`: `evt.detail.intersectedEls`
+- `hitend`: no detail
+- `hitclosest`: `evt.detail.el`
+- `hitclosestclear`: `evt.detail.el`
+
 #### Members
 
 Accessed via `entity.components['aabb-collider'][<member>]`.
