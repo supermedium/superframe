@@ -9,10 +9,10 @@ AFRAME.registerComponent('orbit-controls', {
   schema: {
     autoRotate: {type: 'boolean'},
     autoRotateSpeed: {default: 2},
+    cursor: {type: 'vec3'},
     dampingFactor: {default: 0.1},
     enabled: {default: true},
     enableDamping: {default: true},
-    enableKeys: {default: true},
     enablePan: {default: true},
     enableRotate: {default: true},
     enableZoom: {default: true},
@@ -24,12 +24,16 @@ AFRAME.registerComponent('orbit-controls', {
     maxPolarAngle: {default: AFRAME.utils.device.isMobile() ? 90 : 120},
     minDistance: {default: 1},
     minPolarAngle: {default: 0},
+    minTargetRadius: {type: 'number', default: 0},
+    maxTargetRadius: {type: 'number', default: Infinity},
     minZoom: {default: 0},
+    maxZoom: {type: 'number', default: Infinity},
     panSpeed: {default: 1},
     rotateSpeed: {default: 0.05},
     screenSpacePanning: {default: false},
     target: {type: 'vec3'},
-    zoomSpeed: {default: 0.5}
+    zoomSpeed: {default: 0.5},
+    zoomToCursor: {default: false}
   },
 
   init: function () {
@@ -49,6 +53,7 @@ AFRAME.registerComponent('orbit-controls', {
     });
 
     this.target = new THREE.Vector3();
+    this.cursor = new THREE.Vector3();
     el.getObject3D('camera').position.copy(this.data.initialPosition);
   },
 
@@ -100,12 +105,12 @@ AFRAME.registerComponent('orbit-controls', {
     if (!controls) { return; }
 
     controls.target = this.target.copy(data.target);
+    controls.cursor = this.cursor.copy(data.cursor);
     controls.autoRotate = data.autoRotate;
     controls.autoRotateSpeed = data.autoRotateSpeed;
     controls.dampingFactor = data.dampingFactor;
     controls.enabled = data.enabled;
     controls.enableDamping = data.enableDamping;
-    controls.enableKeys = data.enableKeys;
     controls.enablePan = data.enablePan;
     controls.enableRotate = data.enableRotate;
     controls.enableZoom = data.enableZoom;
@@ -115,12 +120,16 @@ AFRAME.registerComponent('orbit-controls', {
     controls.maxDistance = data.maxDistance;
     controls.minDistance = data.minDistance;
     controls.minPolarAngle = THREE.MathUtils.degToRad(data.minPolarAngle);
+    controls.minTargetRadius = data.minTargetRadius;
+    controls.maxTargetRadius = data.maxTargetRadius;
     controls.minAzimuthAngle = THREE.MathUtils.degToRad(data.minAzimuthAngle);
     controls.minZoom = data.minZoom;
+    controls.maxZoom = data.maxZoom;
     controls.panSpeed = data.panSpeed;
     controls.rotateSpeed = data.rotateSpeed;
     controls.screenSpacePanning = data.screenSpacePanning;
     controls.zoomSpeed = data.zoomSpeed;
+    controls.zoomToCursor = data.zoomToCursor;
   },
 
   tick: function () {
