@@ -70,7 +70,6 @@ Install and use by directly including the [browser files](dist):
   <a-scene environment="preset: forest">
     <a-torus-knot position="0 2 0"></a-torus-knot>
     <a-entity camera look-controls="enabled: false" orbit-controls="target: 0 2 0; minDistance: 2; maxDistance: 180; initialPosition: 0 3 5; rotateSpeed: 0.5"></a-entity>
-    </a-scene>
   </a-scene>
 </body>
 ```
