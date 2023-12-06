@@ -44,12 +44,14 @@ AFRAME.registerComponent('orbit-controls', {
     el.sceneEl.addEventListener('enter-vr', this.onEnterVR);
     el.sceneEl.addEventListener('exit-vr', this.onExitVR);
 
-    document.body.style.cursor = 'grab';
-    document.addEventListener('mousedown', () => {
-      document.body.style.cursor = 'grabbing';
+    const canvasEl = el.sceneEl.canvas;
+
+    canvasEl.style.cursor = 'grab';
+    canvasEl.addEventListener('mousedown', () => {
+      canvasEl.style.cursor = 'grabbing';
     });
-    document.addEventListener('mouseup', () => {
-      document.body.style.cursor = 'grab';
+    canvasEl.addEventListener('mouseup', () => {
+      canvasEl.style.cursor = 'grab';
     });
 
     this.target = new THREE.Vector3();
