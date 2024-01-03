@@ -41,6 +41,7 @@ AFRAME.registerComponent('orbit-controls', {
     this.oldPosition = new THREE.Vector3();
 
     this.bindMethods();
+    this.handleConflict();
     el.sceneEl.addEventListener('enter-vr', this.onEnterVR);
     el.sceneEl.addEventListener('exit-vr', this.onExitVR);
 
@@ -55,6 +56,11 @@ AFRAME.registerComponent('orbit-controls', {
     this.target = new THREE.Vector3();
     this.cursor = new THREE.Vector3();
     el.getObject3D('camera').position.copy(this.data.initialPosition);
+  },
+
+  handleConflict: function () {
+    this.el.setAttribute('look-controls', 'enabled: false');
+    this.el.setAttribute('wasd-controls', 'enabled: false');
   },
 
   pause: function () {
