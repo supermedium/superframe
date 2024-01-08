@@ -132,12 +132,12 @@ AFRAME.registerComponent('orbit-controls', {
     controls.zoomToCursor = data.zoomToCursor;
   },
 
-  tick: function () {
+  tick: function (t, dt) {
     var controls = this.controls;
     var data = this.data;
     if (!data.enabled) { return; }
     if (controls.enabled && (controls.enableDamping || controls.autoRotate)) {
-      this.controls.update();
+      this.controls.update(dt / 1000);
     }
   },
 
