@@ -1,18 +1,33 @@
+<!-- This test is virtually identical to the basic test
+     The only difference is that the component updated with event-set is called "test-material"
+     rather than "material".
+     This reproduces the problem seen in https://github.com/supermedium/superframe/issues/296
+     where event-set component had trouble with hyphenated component names-->
+
 <html>
   <head>
     <title>Cursor</title>
-    <meta name="description" content="Changing properties in response to cursor component events"></meta>
+    <meta name="description" content="Changing properties in response to cursor component events, with hyphenated component name"></meta>
     <meta property="og:image" content="https://raw.githubusercontent.com/supermedium/superframe/master/components/event-set/examples/basic/preview.gif"></meta>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="../../dist/aframe-event-set-component.min.js"></script>
+    <script>
+      AFRAME.registerComponent('test-material', {
+        update: function() {
+          this.el.setAttribute("material", this.data)
+        }
+      }
+    );
+    </script>
+
   </head>
   <body>
     <a-scene>
       <a-entity geometry="primitive: box" material="color: #FCB241"
                 event-set__click="_target: #eye-1; visible: true"
                 event-set__click2="_event: click; _target: #eye-2; visible: true"
-                event-set__mouseenter="material.color: #5A67A6"
-                event-set__mouseleave="material.color: #FCB241; _delay: 500"
+                event-set__mouseenter="test-material.color: #5A67A6"
+                event-set__mouseleave="test-material.color: #FCB241; _delay: 500"
                 position="-1 0 -2">
         <a-sphere id="eye-1" radius="0.05" position="-0.5 0.7 0.5" visible="false"></a-sphere>
         <a-sphere id="eye-2" radius="0.05" position="0.5 0.7 0.5" visible="false"></a-sphere>
@@ -23,7 +38,7 @@
       <a-entity camera look-controls>
         <a-entity cursor
                   geometry="primitive: ring; radiusInner: 0.01; radiusOuter: 0.016"
-                  material="color: #EEE"
+                  test-material="color: #EEE"
                   position="0 0 -1"></a-entity>
       </a-entity>
     </a-scene>
