@@ -10,7 +10,10 @@ AFRAME.registerComponent('event-set', {
     default: '',
     parse: function (value) {
       return styleParser.parse(value);
-    }
+    },
+    stringify: function (data) {
+      return styleParser.stringify(data);
+    },
   },
 
   multiple: true,
