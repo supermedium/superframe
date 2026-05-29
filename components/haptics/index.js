@@ -20,31 +20,30 @@ AFRAME.registerComponent('haptics', {
   multiple: true,
 
   init: function () {
-    var data = this.data;
-    var i;
     var self = this;
 
     this.callPulse = function () { self.pulse(); };
 
     var doInit = function () {
-      self.gamepad = self.el.components['tracked-controls'].controller;
-      if (self.gamepad.gamepad) {
-        // WebXR.
-         self.gamepad = self.gamepad.gamepad;
-       }
-       if (!self.gamepad || !self.gamepad.hapticActuators ||
-       !self.gamepad.hapticActuators.length) { return; }
-       self.addEventListeners();
+      var controller = self.el.components['tracked-controls'].controller;
+      if (controller.gamepad) {
+         self.gamepad = controller.gamepad;
+      }
+      if (!self.gamepad || !self.gamepad.hapticActuators ||
+          !self.gamepad.hapticActuators.length) { return; }
+      self.addEventListeners();
     };
 
-    // There may exist a tracked-controls when this component is initialized
+    // There may exist a tracked-controls when this component is initialized,
+    // so call doInit() right away. We still register controllerconnected
+    // listener in this case to be sure the gamepad reference is still valid
+    // for this hand when the controllers reconnects.
     if (this.el.components['tracked-controls'] && this.el.components['tracked-controls'].controller) {
       doInit();
-    } else {
-      this.el.addEventListener('controllerconnected', function init () {
-        doInit();
-      });
     }
+    this.el.addEventListener('controllerconnected', function init () {
+      doInit();
+    });
   },
 
   remove: function () {
