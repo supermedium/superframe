@@ -27,6 +27,7 @@ AFRAME.registerComponent('animation-timeline', {
 
     this.animationIsPlaying = false;
     this.beginAnimation = this.beginAnimation.bind(this);
+    this.pauseAnimation = this.pauseAnimation.bind(this);
     this.eventDetail = {name: this.id}
     this.time = 0;
     this.timeline = null;
