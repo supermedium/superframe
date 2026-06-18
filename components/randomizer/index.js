@@ -24,6 +24,23 @@ AFRAME.registerComponent('random-color', {
 });
 
 /**
+ * Set random primitive.
+ */
+AFRAME.registerComponent('random-primitive', {
+  schema: {
+    exclude: { default: [] },
+  },
+  update: function () {
+    var exclude = this.data.exclude;
+    var primitives = Object.keys(AFRAME.geometries).filter(primitive => !exclude.includes(primitive));
+    var primitive = primitives[Math.floor(Math.random() * primitives.length)];
+    this.el.setAttribute('geometry', {
+      primitive: primitive
+    });
+  }
+});
+
+/**
  * Set random position within bounds.
  */
 AFRAME.registerComponent('random-position', {
