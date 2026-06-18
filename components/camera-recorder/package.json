@@ -54,7 +54,7 @@
     "karma-sinon-chai": "^1.1.0",
     "mocha": "^2.3.4",
     "randomcolor": "^0.4.4",
-    "rollup": "0.59.1",
+    "rollup": "2.79.2",
     "semistandard": "^8.0.0",
     "shelljs": "^0.7.0",
     "sinon": "^1.17.5",
