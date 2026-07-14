@@ -5,10 +5,14 @@ const PLUGINS = [];
 
 module.exports = {
   devServer: {
-    disableHostCheck: true
+    allowedHosts: 'all',
+    static: {
+      directory: __dirname
+    }
   },
   entry: './index.js',
   mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
+  devtool: false,
   output: {
     globalObject: 'this',
     path: __dirname + '/dist',
